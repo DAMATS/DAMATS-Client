@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------
 //
-// Project: EOxClient <https://github.com/EOX-A/EOxClient>
+// Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
 //-------------------------------------------------------------------------------
@@ -9,8 +9,8 @@
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-// copies of the Software, and to permit persons to whom the Software is 
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in all
@@ -25,26 +25,23 @@
 // THE SOFTWARE.
 //-------------------------------------------------------------------------------
 
-(function() {
-	'use strict';
+(function () {
+    'use strict';
+    var root = this;
 
-	var root = this;
+    root.define(
+        [
+            'backbone',
+            'communicator'
+        ],
+        function (Backbone, Communicator) {
+            var MapModel = Backbone.Model.extend({
+                visualizationLibs : [],
+                center: [],
+                zoom: 0
+            });
+            return {"MapModel": MapModel};
+        }
+    );
 
-	root.define([
-		'backbone',
-		'communicator'
-	],
-
-	function( Backbone, Communicator ) {
-
-		var MapModel = Backbone.Model.extend({
-			visualizationLibs : [],
-			center: [],
-			zoom: 0
-		});
-
-		return {"MapModel":MapModel};
-
-	});
-
-}).call( this );
+}).call(this);

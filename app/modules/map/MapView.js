@@ -29,9 +29,9 @@ define(['backbone',
 		'communicator',
 		'globals',
 		'openlayers',
-		'models/MapModel',
 		'filesaver'
 		],
+		//'models/MapModel',
 		function( Backbone, Communicator, globals ) {
 
 			var MapView = Backbone.View.extend({

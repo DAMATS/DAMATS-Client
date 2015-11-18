@@ -220,7 +220,7 @@
 
 
   "views": [
-    "views/MapView",
+    "modules/map/MapView",
     "views/NavBarCollectionView",
     "views/NavBarItemView",
     "views/BaseLayerSelectionView",
@@ -235,7 +235,7 @@
 
   "models":[
     "models/LayerModel",
-    "models/MapModel",
+    "modules/map/MapModel",
     "models/NavBarCollection",
     "models/NavBarItemModel",
     "models/ToolModel",

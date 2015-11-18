@@ -109,6 +109,9 @@
             json2: '../bower_components/require-handlebars-plugin/hbs/json2',
             hbs: '../bower_components/require-handlebars-plugin/hbs',
 
+            /* modules base path definition */
+            modules: '../modules',
+
             /* marionette and handlebars plugin */
             'marionette.handlebars': '../bower_components/backbone.marionette.handlebars/backbone.marionette.handlebars.min',
 
