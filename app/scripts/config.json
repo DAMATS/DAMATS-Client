@@ -3,8 +3,6 @@
   "debug":true,
 
   "mapConfig": {
-    "module": "views/MapView",
-    "model": "models/MapModel",
     "visualizationLibs": [
       "openlayers"
     ],

@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------
 //
-// Project: EOxClient <https://github.com/EOX-A/EOxClient>
+// Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
 //-------------------------------------------------------------------------------
@@ -25,7 +25,8 @@
 // THE SOFTWARE.
 //-------------------------------------------------------------------------------
 
-(function() {
+// This script starts the application.
+(function () {
     'use strict';
 
     var root = this;
@@ -33,8 +34,12 @@
     root.require.config({
         baseUrl: "scripts",
 
-        /* starting point for application */
-        deps: ['backbone.marionette', 'bootstrap', 'marionette.handlebars', 'main'],
+        deps: [
+          'backbone.marionette',
+          'bootstrap',
+          'marionette.handlebars',
+          'main' // application starting point (see main.js)
+        ],
 
         shim: {
             /*jqueryui: 'jquery',*/
@@ -62,7 +67,7 @@
             },
             lm:{
                 exports: 'lm'
-			},
+            },
             timeslider: {
                 deps: ['d3']
             },
@@ -107,12 +112,15 @@
             /* marionette and handlebars plugin */
             'marionette.handlebars': '../bower_components/backbone.marionette.handlebars/backbone.marionette.handlebars.min',
 
-            'openlayers': 'http://openlayers.org/api/OpenLayers'
+            //'openlayers': 'http://openlayers.org/api/OpenLayers'
             //'openlayers': 'http://ol3js.org/en/master/build/ol',
+            'openlayers': './vendor/OpenLayers'
         },
 
         hbs: {
             disableI18n: true
         }
+
     });
-}).call( this );
+
+}).call(this);

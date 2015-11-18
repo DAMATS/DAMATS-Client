@@ -25,97 +25,121 @@
 // THE SOFTWARE.
 //-------------------------------------------------------------------------------
 
-(function() {
+(function () {
     'use strict';
 
     var root = this;
 
-    function setuplogging (enable) {
-
-    	// Check if console exists (difference in browsers and if it is enabled)
-    	if (!enable || typeof console === 'undefined' || !console.log ) {
-		  window.console = {
-		    debug: function() {},
-		    trace: function() {},
-		    log: function() {},
-		    info: function() {},
-		    warn: function() {},
-		    error: function() {}
-		  };
-		}
-    	
+    function setupLoggingConsole(enable_logging) {
+        // Check if console exists and set a dummy console if not avaiable
+        // or logging disabled by configuration.
+        if (!enable_logging || typeof console === 'undefined' || !console.log) {
+            window.console = {
+                debug: function () {},
+                trace: function () {},
+                log: function () {},
+                info: function () {},
+                warn: function () {},
+                error: function () {}
+            };
+        }
     }
 
-    root.require([
-		'backbone',
-		'app',
-		'backbone.marionette',
-		'regionManager',
-		'jquery',
-		'jqueryui',
-		"text!config.json",
-		"util",
-		"libcoverage"
-	],
-	function ( Backbone, App ) {
+    var dependencies = [
+        'backbone',
+        'app',
+        'backbone.marionette',
+        'regionManager',
+        'jquery',
+        'jqueryui',
+        "util",
+        "libcoverage"
+    ]
 
-		$.getJSON("scripts/config.json", function(values) {
-	
-			// Configure Debug options
-			setuplogging(values.debug);
+	function require_error(err) {
+        console.log("Require failed!")
+        console.log(err)
+        window.alert(
+            "The application failed to load some of the client's " +
+            "dependencies.\n" +
+            "Reason: " + err.requireType + "\n" +
+            "Module(s): " + err.requireModules
+        )
+        //location.reload(true)
+    }
 
-			var viewModules = [];
-			var models = [];
-			var templates = [];
-			var options = {};
-			var config = {};
+    function require_callback(Backbone, App) {
+        // TODO: Separate static and dynamical configuration.
 
-			_.each(values.views, function(view) {
-				viewModules.push(view);
-			}, this);
+        // Load and parse client's configuration.
+        $.getJSON("scripts/config.json", function (values) {
 
-			_.each(values.models, function(model) {
-				models.push(model);
-			}, this);
+            var views = [];
+            var models = [];
+            var templates = [];
+            var options = {};
+            var config = {};
 
-			_.each(values.templates, function(tmpl) {
-				templates.push(tmpl.template);
-			}, this);
+            setupLoggingConsole(values.debug);
 
-			root.require([].concat(
-				values.mapConfig.visualizationLibs, 	//Visualizations such as Openlayers or GlobWeb
-				values.mapConfig.module, 				//Which module should be used for map visualization
-				values.mapConfig.model,					//Which model to use for saving map data
-				viewModules,							//All "activated" views are loaded
-				models,
-				templates
-			), function(){
-				App.configure(values);
-				App.start();
-			});
+            _.each(values.views, function (item) {
+                views.push(item);
+            }, this);
 
-			
-			//Timeout for loading wheel if there is an error in the application and the loading wheel is not removed
-			setTimeout(function() {
-				if($('#loadscreen').length){
+            _.each(values.models, function (item) {
+                console.log(item);
+                models.push(item);
+            }, this);
 
-					$('#loadscreen').remove();
-					$("#error-messages").append(
-					  	'<div class="alert alert-warning alert-danger">'+
-						  '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
-						  '<strong>Warning!</strong> <p>There was a problem loading the application, some functionality might not be available.</p>' +
-						  '<p>Please contact the website administrator if you have any problems.</p>' +
-						'</div>'
-					);
-				}	
-			}, 10000);
+            _.each(values.templates, function (item) {
+                templates.push(item.template);
+            }, this);
 
-				
-		})
-		.fail(function() {
-			$('#loadscreen').empty();
-			$('#loadscreen').html('<p class="warninglabel">There was a problem loading the configuration file, please contact the site administrator</p>');
-		});
-		
-	});
-}).call( this );
+            root.require([].concat(
+                values.mapConfig.visualizationLibs,	// map visualisation libs
+                views,
+                models,
+                templates
+            ), function () {
+                App.configure(values);
+                App.start();
+            }, require_error);
+
+            // Set timeout for loading wheel in order no to spin endlessly
+            // in case of an error.
+            setTimeout(function () {
+                if($('#loadscreen').length){
+                    $('#loadscreen').remove();
+                    $("#error-messages").append(
+                        '<div class="alert alert-warning alert-danger">'+
+                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
+                          '<strong>Warning!</strong>' +
+                          '<p>Due to the encoutered errors the application ' +
+                          'cannot be started properly.</p>' +
+                          '<p>This may be a temporary problem.<br>' +
+                          'Please, try to reaload the client first.<p>' +
+                          '<p>If the problem persists contact the site administrator. <p>' +
+                        '</div>'
+                    );
+                }
+            }, 10000);
+        })
+        .fail( function() {
+            $('#loadscreen').empty();
+            $('#loadscreen').html(
+                '<p class="warninglabel">' +
+                'The application failed to load the configuration file.<br>' +
+                'This may be a temporary problem. ' +
+                'Try to reaload the client.<br><br>' +
+                'If the problem persists contact the site administrator.' +
+                '</p>'
+            );
+        });
+
+    }
+
+    // Assure that all required JS modules and the configuration are available
+    // and trigger the main app's setup
+    root.require(dependencies, require_callback, require_error);
+
+}).call(this);
