@@ -30,370 +30,281 @@
 
     var root = this;
 
-    root.define(
-        [
-            'backbone',
-            'communicator','globals',
-            'regions/DialogRegion','regions/UIRegion',
-            'layouts/LayerControlLayout',
-            'layouts/ToolControlLayout',
-            'jquery', 'backbone.marionette',
-            'controller/ContentController',
-            'controller/DownloadController',
-            'controller/SelectionManagerController',
-            'controller/LoadingController',
-            'router'
-        ],
-        function (Backbone, Communicator, globals, DialogRegion,
+    var deps = [
+        'backbone',
+        'communicator','globals',
+        'regions/DialogRegion','regions/UIRegion',
+        'layouts/LayerControlLayout',
+        'layouts/ToolControlLayout',
+        'jquery', 'backbone.marionette',
+        'controller/ContentController',
+        'controller/DownloadController',
+        'controller/SelectionManagerController',
+        'controller/LoadingController',
+        'router'
+    ];
+
+    function init(Backbone, Communicator, globals, DialogRegion,
                   UIRegion, LayerControlLayout, ToolControlLayout) {
-                  // TODO: clean this mess!
 
-            var Application = Backbone.Marionette.Application.extend({
-                initialize: function (options) {
-                },
+        var Application = Backbone.Marionette.Application.extend({
+            initialize: function (options) {
+                // clear permanent local storage
+                localStorage.clear()
+            },
 
-                configure: function (config) {
+            configure: function (config) {
 
-                    // Load jquery ui tooltip tool
-                    $("body").tooltip({
-                        selector: '[data-toggle=tooltip]',
-                        position: { my: "left+5 center", at: "right center" },
-                        hide: { effect: false, duration: 0 },
-                        show:{ effect: false, delay: 700}
-                    });
+                // Load jquery ui tooltip tool
+                $("body").tooltip({
+                    selector: '[data-toggle=tooltip]',
+                    position: { my: "left+5 center", at: "right center" },
+                    hide: { effect: false, duration: 0 },
+                    show:{ effect: false, delay: 700}
+                });
 
-                    var views = {};
-                    var models = {};
-                    var templates = {};
+                var views = {};
+                var models = {};
+                var templates = {};
 
-                    // Application regions are loaded and added to the Marionette Application
-                    _.each(config.regions, function (region) {
-                        var obj ={};
-                        obj[region.name] = "#" + region.name;
-                        this.addRegions(obj);
-                        console.log("Added region " + obj[region.name]);
+                // Application regions are loaded and added to the Marionette Application
+                _.each(config.regions, function (region) {
+                    var obj = {};
+                    obj[region.name] = "#" + region.name;
+                    this.addRegions(obj);
+                    console.log("Added region " + obj[region.name]);
+                }, this);
+
+                // Load all configured views.
+                _.each(config.views, function (item) {
+                    $.extend(views, require(item));
+                }, this);
+
+                // Load all configured models.
+                _.each(config.models, function (item) {
+                    $.extend(models, require(item));
+                }, this);
+
+                // Load all configured templates.
+                _.each(config.templates, function (item) {
+                    templates[item.id] = require(item.template);
+                }, this);
+
+
+                // Map attributes are loaded and added to the global map model.
+                globals.objects.add('mapmodel', models.parseMapConfig(config.mapConfig));
+
+                // Base layers are loaded and added to the global collection.
+                _.each(config.mapConfig.baseLayers, function (item) {
+                    globals.baseLayers.add(models.parseBaseLayer(item));
+                    console.log("Adding base-layer: " + item.id);
+                }, this);
+
+                //Overlays are loaded and added to the global collection
+                _.each(config.mapConfig.overlays, function (item) {
+                    globals.overlays.add(models.parseOverlayLayer(item));
+                    console.log("Adding overlay-layer " + item.id);
+                }, this);
+
+                //Data layers are loaded and added to the global collection
+                _.each(config.mapConfig.products, function (item) {
+                    globals.products.add(models.parseProductLayer(item));
+                    console.log("Added data-layer " + item.view.id );
+                }, this);
+
+                // Create and displaye map view.
+                this.map.show(new views.MapView({el: $("#map")}));
+
+                // If Navigation Bar is set in configuration go through the
+                // defined elements creating a item collection to rendered
+                // by the marionette collection view
+                if (config.navBarConfig) {
+
+                    var navBarItemCollection = new models.NavBarCollection;
+
+                    _.each(config.navBarConfig.items, function (list_item){
+                        navBarItemCollection.add(
+                            new models.NavBarItemModel({
+                                name:list_item.name,
+                                icon:list_item.icon,
+                                eventToRaise:list_item.eventToRaise
+                            }));
                     }, this);
 
-                    // Load all configured views.
-                    _.each(config.views, function (item) {
-                        $.extend(views, require(item));
-                    }, this);
+                    this.topBar.show(new views.NavBarCollectionView(
+                        {template: templates.NavBar({
+                            title: config.navBarConfig.title,
+                            url: config.navBarConfig.url}),
+                        className:"navbar navbar-inverse navbar-fixed-top not-selectable",
+                        itemView: views.NavBarItemView, tag: "div",
+                        collection: navBarItemCollection}));
 
-                    // Load all configured models.
-                    _.each(config.models, function (item) {
-                        $.extend(models, require(item));
-                    }, this);
+                };
 
-                    // Load all configured templates.
-                    _.each(config.templates, function (item) {
-                        templates[item.id] = require(item.template);
-                    }, this);
+                // Added region to test combination of backbone
+                // functionality combined with jQuery UI
+                this.addRegions({dialogRegion: DialogRegion.extend({el: "#viewContent"})});
+                this.DialogContentView = new views.ContentView({
+                    template: {type: 'handlebars', template: templates.Info},
+                    id: "about",
+                    className: "modal fade",
+                    attributes: {
+                        role: "dialog",
+                        tabindex: "-1",
+                        "aria-labelledby": "about-title",
+                        "aria-hidden": true,
+                        "data-keyboard": true,
+                        "data-backdrop": "static"
+                    }
+                });
 
+                // Create the views - these are Marionette.CollectionViews that render ItemViews
+                this.baseLayerView = new views.BaseLayerSelectionView({
+                    collection:globals.baseLayers,
+                    itemView: views.LayerItemView.extend({
+                        template: {
+                            type:'handlebars',
+                            template: templates.BulletLayer
+                        },
+                        className: "radio"
+                    })
+                });
 
-                    //Map attributes are loaded and added to the global map model
-                    globals.objects.add('mapmodel', models.parseMapConfig(config.mapConfig));
+                this.productsView = new views.LayerSelectionView({
+                    collection:globals.products,
+                    itemView: views.LayerItemView.extend({
+                        template: {
+                            type:'handlebars',
+                            template: templates.CheckBoxLayer
+                        },
+                        className: "sortable-layer"
+                    }),
+                    className: "sortable"
+                });
 
-                    //Base Layers are loaded and added to the global collection
-                    _.each(config.mapConfig.baseLayers, function (baselayer) {
+                this.overlaysView = new views.BaseLayerSelectionView({
+                    collection:globals.overlays,
+                    itemView: views.LayerItemView.extend({
+                        template: {
+                            type:'handlebars',
+                            template: templates.CheckBoxOverlayLayer
+                        },
+                        className: "checkbox"
+                    }),
+                    className: "check"
+                });
 
-                        globals.baseLayers.add(
-                            new models.LayerModel({
-                                name: baselayer.name,
-                                visible: baselayer.visible,
-                                view: {
-                                    id : baselayer.id,
-                                    urls : baselayer.urls,
-                                    protocol: baselayer.protocol,
-                                    projection: baselayer.projection,
-                                    attribution: baselayer.attribution,
-                                    matrixSet: baselayer.matrixSet,
-                                    style: baselayer.style,
-                                    format: baselayer.format,
-                                    resolutions: baselayer.resolutions,
-                                    maxExtent: baselayer.maxExtent,
-                                    gutter: baselayer.gutter,
-                                    buffer: baselayer.buffer,
-                                    units: baselayer.units,
-                                    transitionEffect: baselayer.transitionEffect,
-                                    isphericalMercator: baselayer.isphericalMercator,
-                                    isBaseLayer: true,
-                                    wrapDateLine: baselayer.wrapDateLine,
-                                    zoomOffset: baselayer.zoomOffset,
-                                    time: baselayer.time,
-                                    requestEncoding: baselayer.requestEncoding
-                                }
-                            })
-                        );
-                        console.log("Added baselayer " + baselayer.id );
-                    }, this);
-
-                    //Productsare loaded and added to the global collection
-                    _.each(config.mapConfig.products, function (products) {
-
-                        globals.products.add(
-                            new models.LayerModel({
-                                name: products.name,
-                                visible: products.visible,
-                                timeSlider: products.timeSlider,
-                                // Default to WMS if no protocol is defined
-                                timeSliderProtocol: (products.timeSliderProtocol) ? products.timeSliderProtocol : "EOWCS",
-                                color: products.color,
-                                time: products.time,
-                                opacity: 1,
-                                view:{
-                                    id : products.view.id,
-                                    protocol: products.view.protocol,
-                                    urls : products.view.urls,
-                                    visualization: products.view.visualization,
-                                    projection: products.view.projection,
-                                    attribution: products.view.attribution,
-                                    matrixSet: products.view.matrixSet,
-                                    style: products.view.style,
-                                    format: products.view.format,
-                                    resolutions: products.view.resolutions,
-                                    maxExtent: products.view.maxExtent,
-                                    gutter: products.view.gutter,
-                                    buffer: products.view.buffer,
-                                    units: products.view.units,
-                                    transitionEffect: products.view.transitionEffect,
-                                    isphericalMercator: products.view.isphericalMercator,
-                                    isBaseLayer: false,
-                                    wrapDateLine: products.view.wrapDateLine,
-                                    zoomOffset: products.view.zoomOffset,
-                                    requestEncoding: products.view.requestEncoding
-                                },
-                                download: {
-                                    id : products.download.id,
-                                    protocol: products.download.protocol,
-                                    url : products.download.url
-                                }
-                            })
-                        );
-                        console.log("Added product " + products.view.id );
-                    }, this);
-
-                    //Overlays are loaded and added to the global collection
-                    _.each(config.mapConfig.overlays, function (overlay) {
-
-                        globals.overlays.add(
-                            new models.LayerModel({
-                                name: overlay.name,
-                                visible: overlay.visible,
-                                view: {
-                                    id : overlay.id,
-                                    urls : overlay.urls,
-                                    protocol: overlay.protocol,
-                                    projection: overlay.projection,
-                                    attribution: overlay.attribution,
-                                    matrixSet: overlay.matrixSet,
-                                    style: overlay.style,
-                                    format: overlay.format,
-                                    resolutions: overlay.resolutions,
-                                    maxExtent: overlay.maxExtent,
-                                    gutter: overlay.gutter,
-                                    buffer: overlay.buffer,
-                                    units: overlay.units,
-                                    transitionEffect: overlay.transitionEffect,
-                                    isphericalMercator: overlay.isphericalMercator,
-                                    isBaseLayer: false,
-                                    wrapDateLine: overlay.wrapDateLine,
-                                    zoomOffset: overlay.zoomOffset,
-                                    time: overlay.time,
-                                    requestEncoding: overlay.requestEncoding
-                                }
-                            })
-                        );
-                        console.log("Added overlay " + overlay.id );
-                    }, this);
+                // Create layout that will hold the child views
+                this.layout = new LayerControlLayout();
 
 
-                    // Create map view and execute show of its region
-                    this.map.show(new views.MapView({el: $("#map")}));
+                // Define collection of selection tools
+                var selectionToolsCollection = new models.ToolCollection();
+                _.each(config.selectionTools, function (selTool) {
+                    selectionToolsCollection.add(
+                            new models.ToolModel({
+                                id: selTool.id,
+                                description: selTool.description,
+                                icon:selTool.icon,
+                                enabled: true,
+                                active: false,
+                                type: "selection"
+                            }));
+                }, this);
 
-                    // If Navigation Bar is set in configuration go trhough the
-                    // defined elements creating a item collection to rendered
-                    // by the marionette collection view
-                    if (config.navBarConfig) {
+                // Define collection of visualization tools
+                var visualizationToolsCollection = new models.ToolCollection();
+                _.each(config.visualizationTools, function (visTool) {
+                    visualizationToolsCollection.add(
+                            new models.ToolModel({
+                                id: visTool.id,
+                                eventToRaise: visTool.eventToRaise,
+                                description: visTool.description,
+                                disabledDescription: visTool.disabledDescription,
+                                icon:visTool.icon,
+                                enabled: visTool.enabled,
+                                active: visTool.active,
+                                type: "tool"
+                            }));
+                }, this);
 
-                        var navBarItemCollection = new models.NavBarCollection;
-
-                        _.each(config.navBarConfig.items, function (list_item){
-                            navBarItemCollection.add(
-                                new models.NavBarItemModel({
-                                    name:list_item.name,
-                                    icon:list_item.icon,
-                                    eventToRaise:list_item.eventToRaise
-                                }));
-                        }, this);
-
-                        this.topBar.show(new views.NavBarCollectionView(
-                            {template: templates.NavBar({
-                                title: config.navBarConfig.title,
-                                url: config.navBarConfig.url}),
-                            className:"navbar navbar-inverse navbar-fixed-top not-selectable",
-                            itemView: views.NavBarItemView, tag: "div",
-                            collection: navBarItemCollection}));
-
-                    };
-
-                    // Added region to test combination of backbone
-                    // functionality combined with jQuery UI
-                    this.addRegions({dialogRegion: DialogRegion.extend({el: "#viewContent"})});
-                    this.DialogContentView = new views.ContentView({
-                        template: {type: 'handlebars', template: templates.Info},
-                        id: "about",
-                        className: "modal fade",
-                        attributes: {
-                            role: "dialog",
-                            tabindex: "-1",
-                            "aria-labelledby": "about-title",
-                            "aria-hidden": true,
-                            "data-keyboard": true,
-                            "data-backdrop": "static"
+                // Create Collection Views to hold set of views for selection tools
+                this.visualizationToolsView = new views.ToolSelectionView({
+                    collection:visualizationToolsCollection,
+                    itemView: views.ToolItemView.extend({
+                        template: {
+                            type:'handlebars',
+                            template: templates.ToolIcon
                         }
-                    });
+                    })
+                });
 
-                    // Create the views - these are Marionette.CollectionViews that render ItemViews
-                    this.baseLayerView = new views.BaseLayerSelectionView({
-                        collection:globals.baseLayers,
-                        itemView: views.LayerItemView.extend({
-                            template: {
-                                type:'handlebars',
-                                template: templates.BulletLayer},
-                            className: "radio"
-                        })
-                    });
-
-                    this.productsView = new views.LayerSelectionView({
-                        collection:globals.products,
-                        itemView: views.LayerItemView.extend({
-                            template: {
-                                type:'handlebars',
-                                template: templates.CheckBoxLayer},
-                            className: "sortable-layer"
-                        }),
-                        className: "sortable"
-                    });
-
-                    this.overlaysView = new views.BaseLayerSelectionView({
-                        collection:globals.overlays,
-                        itemView: views.LayerItemView.extend({
-                            template: {
-                                type:'handlebars',
-                                template: templates.CheckBoxOverlayLayer},
-                            className: "checkbox"
-                        }),
-                        className: "check"
-                    });
-
-                    // Create layout that will hold the child views
-                    this.layout = new LayerControlLayout();
+                // Create Collection Views to hold set of views for visualization tools
+                this.selectionToolsView = new views.ToolSelectionView({
+                    collection:selectionToolsCollection,
+                    itemView: views.ToolItemView.extend({
+                        template: {
+                            type:'handlebars',
+                            template: templates.ToolIcon
+                        }
+                    })
+                });
 
 
-                    // Define collection of selection tools
-                    var selectionToolsCollection = new models.ToolCollection();
-                    _.each(config.selectionTools, function (selTool) {
-                        selectionToolsCollection.add(
-                                new models.ToolModel({
-                                    id: selTool.id,
-                                    description: selTool.description,
-                                    icon:selTool.icon,
-                                    enabled: true,
-                                    active: false,
-                                    type: "selection"
-                                }));
-                    }, this);
-
-                    // Define collection of visualization tools
-                    var visualizationToolsCollection = new models.ToolCollection();
-                    _.each(config.visualizationTools, function (visTool) {
-                        visualizationToolsCollection.add(
-                                new models.ToolModel({
-                                    id: visTool.id,
-                                    eventToRaise: visTool.eventToRaise,
-                                    description: visTool.description,
-                                    disabledDescription: visTool.disabledDescription,
-                                    icon:visTool.icon,
-                                    enabled: visTool.enabled,
-                                    active: visTool.active,
-                                    type: "tool"
-                                }));
-                    }, this);
-
-                    // Create Collection Views to hold set of views for selection tools
-                    this.visualizationToolsView = new views.ToolSelectionView({
-                        collection:visualizationToolsCollection,
-                        itemView: views.ToolItemView.extend({
-                            template: {
-                                type:'handlebars',
-                                template: templates.ToolIcon}
-                        })
-                    });
-
-                    // Create Collection Views to hold set of views for visualization tools
-                    this.selectionToolsView = new views.ToolSelectionView({
-                        collection:selectionToolsCollection,
-                        itemView: views.ToolItemView.extend({
-                            template: {
-                                type:'handlebars',
-                                template: templates.ToolIcon}
-                        })
-                    });
+                // Create layout to hold collection views
+                this.toolLayout = new ToolControlLayout();
 
 
+                this.timeSliderView = new views.TimeSliderView(config.timeSlider);
+                this.bottomBar.show(this.timeSliderView);
 
+                // Add a trigger for ajax calls in order to display loading state
+                // in mouse cursor to give feedback to the user the client is busy
+                $(document).ajaxStart(function () {
+                  Communicator.mediator.trigger("progress:change", true);
+                });
 
-                    // Create layout to hold collection views
-                    this.toolLayout = new ToolControlLayout();
+                $(document).ajaxStop(function () {
+                  Communicator.mediator.trigger("progress:change", false);
+                });
 
-
-
-                    this.timeSliderView = new views.TimeSliderView(config.timeSlider);
-                    this.bottomBar.show(this.timeSliderView);
-
-                    // Add a trigger for ajax calls in order to display loading state
-                    // in mouse cursor to give feedback to the user the client is busy
-                    $(document).ajaxStart(function () {
-                      Communicator.mediator.trigger("progress:change", true);
-                    });
-
-                    $(document).ajaxStop(function () {
-                      Communicator.mediator.trigger("progress:change", false);
-                    });
-
-                    $(document).ajaxError(function ( event, request, settings ) {
-                        var statuscode = "";
-                        if (request.status != 0)
-                            statuscode =  '; Status Code: '+ request.status;
-                        $("#error-messages").append(
-                            '<div class="alert alert-warning alert-danger">'+
-                              '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
-                              '<strong>Warning!</strong> Error response on HTTP ' + settings.type + ' to '+ settings.url.split("?")[0] +
-                              statuscode +
-                            '</div>'
-                        );
-
-                    });
-
-                    // Go through Navigation Bar items and throw activation event for all
-                    // elements that are marked with show == true
-                    if (config.navBarConfig) {
-
-                        _.each(config.navBarConfig.items, function (list_item){
-                            if(list_item.show){
-                                Communicator.mediator.trigger(list_item.eventToRaise);
-                            }
-                        }, this);
+                $(document).ajaxError(function (event, request, settings) {
+                    if(settings.suppressErrors) {
+                        return;
                     }
 
-                    // Remove loading screen when this point is reached in the script
-                    $('#loadscreen').remove();
+                    var statuscode = "";
+                    if (request.status != 0)
+                        statuscode =  '<br>Status Code: ' + request.status;
+                    $("#error-messages").append(
+                        '<div class="alert alert-warning alert-danger">'+
+                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
+                          '<strong><i class="fa fa-fw fa-exclamation-triangle"></i>&nbsp;ERROR: '+
+                          'HTTP/' + settings.type + ' request failed!</strong>'+
+                          '<br>URL:&nbsp;'+settings.url.split("?")[0] + statuscode +
+                        '</div>'
+                    );
+                });
 
+                // Go through Navigation Bar items and throw activation event for all
+                // elements that are marked with show == true
+                if (config.navBarConfig) {
+
+                    _.each(config.navBarConfig.items, function (list_item){
+                        if(list_item.show){
+                            Communicator.mediator.trigger(list_item.eventToRaise);
+                        }
+                    }, this);
                 }
 
-            });
+                // Remove loading screen when this point is reached in the script
+                $('#loadscreen').remove();
 
-            return new Application();
-        }
-    );
+            }
+        });
+
+        return new Application();
+    }
+
+    root.define(deps, init);
 }).call(this);
