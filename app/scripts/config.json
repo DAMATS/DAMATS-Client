@@ -234,7 +234,7 @@
   ],
 
   "models":[
-    "models/LayerModel",
+    "modules/layer/LayerModel",
     "modules/map/MapModel",
     "models/NavBarCollection",
     "models/NavBarItemModel",
