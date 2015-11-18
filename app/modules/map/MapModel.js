@@ -35,12 +35,22 @@
             'communicator'
         ],
         function (Backbone, Communicator) {
+
             var MapModel = Backbone.Model.extend({
                 visualizationLibs : [],
                 center: [],
                 zoom: 0
             });
-            return {"MapModel": MapModel};
+
+            function parseMapConfig(obj) {
+                return new MapModel({
+                    visualizationLibs : obj.visualizationLibs,
+                    center: obj.center,
+                    zoom: obj.zoom
+                });
+            }
+
+            return {parseMapConfig: parseMapConfig, MapModel: MapModel};
         }
     );
 

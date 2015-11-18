@@ -62,9 +62,9 @@
                         show:{ effect: false, delay: 700}
                     });
 
-                    var v = {}; //views
-                    var m = {};	//models
-                    var t = {};	//templates
+                    var views = {};
+                    var models = {};
+                    var templates = {};
 
                     // Application regions are loaded and added to the Marionette Application
                     _.each(config.regions, function (region) {
@@ -74,38 +74,30 @@
                         console.log("Added region " + obj[region.name]);
                     }, this);
 
-                    //Load all configured views
-                    _.each(config.views, function (viewDef) {
-                        var View = require(viewDef);
-                        $.extend(v, View);
+                    // Load all configured views.
+                    _.each(config.views, function (item) {
+                        $.extend(views, require(item));
                     }, this);
 
-                    //Load all configured models
-                    _.each(config.models, function (modelDef) {
-                        var Model = require(modelDef);
-                        $.extend(m, Model);
+                    // Load all configured models.
+                    _.each(config.models, function (item) {
+                        $.extend(models, require(item));
                     }, this);
 
-                    //Load all configured templates
-                    _.each(config.templates, function (tmplDef) {
-                        var Tmpl = require(tmplDef.template);
-                        t[tmplDef.id] = Tmpl;
+                    // Load all configured templates.
+                    _.each(config.templates, function (item) {
+                        templates[item.id] = require(item.template);
                     }, this);
 
 
                     //Map attributes are loaded and added to the global map model
-                    globals.objects.add('mapmodel', new m.MapModel({
-                            visualizationLibs : config.mapConfig.visualizationLibs,
-                            center: config.mapConfig.center,
-                            zoom: config.mapConfig.zoom
-                        })
-                    );
+                    globals.objects.add('mapmodel', models.parseMapConfig(config.mapConfig));
 
                     //Base Layers are loaded and added to the global collection
                     _.each(config.mapConfig.baseLayers, function (baselayer) {
 
                         globals.baseLayers.add(
-                            new m.LayerModel({
+                            new models.LayerModel({
                                 name: baselayer.name,
                                 visible: baselayer.visible,
                                 view: {
@@ -139,7 +131,7 @@
                     _.each(config.mapConfig.products, function (products) {
 
                         globals.products.add(
-                            new m.LayerModel({
+                            new models.LayerModel({
                                 name: products.name,
                                 visible: products.visible,
                                 timeSlider: products.timeSlider,
@@ -184,7 +176,7 @@
                     _.each(config.mapConfig.overlays, function (overlay) {
 
                         globals.overlays.add(
-                            new m.LayerModel({
+                            new models.LayerModel({
                                 name: overlay.name,
                                 visible: overlay.visible,
                                 view: {
@@ -216,30 +208,30 @@
 
 
                     // Create map view and execute show of its region
-                    this.map.show(new v.MapView({el: $("#map")}));
+                    this.map.show(new views.MapView({el: $("#map")}));
 
                     // If Navigation Bar is set in configuration go trhough the
                     // defined elements creating a item collection to rendered
                     // by the marionette collection view
                     if (config.navBarConfig) {
 
-                        var navBarItemCollection = new m.NavBarCollection;
+                        var navBarItemCollection = new models.NavBarCollection;
 
                         _.each(config.navBarConfig.items, function (list_item){
                             navBarItemCollection.add(
-                                new m.NavBarItemModel({
+                                new models.NavBarItemModel({
                                     name:list_item.name,
                                     icon:list_item.icon,
                                     eventToRaise:list_item.eventToRaise
                                 }));
                         }, this);
 
-                        this.topBar.show(new v.NavBarCollectionView(
-                            {template: t.NavBar({
+                        this.topBar.show(new views.NavBarCollectionView(
+                            {template: templates.NavBar({
                                 title: config.navBarConfig.title,
                                 url: config.navBarConfig.url}),
                             className:"navbar navbar-inverse navbar-fixed-top not-selectable",
-                            itemView: v.NavBarItemView, tag: "div",
+                            itemView: views.NavBarItemView, tag: "div",
                             collection: navBarItemCollection}));
 
                     };
@@ -247,8 +239,8 @@
                     // Added region to test combination of backbone
                     // functionality combined with jQuery UI
                     this.addRegions({dialogRegion: DialogRegion.extend({el: "#viewContent"})});
-                    this.DialogContentView = new v.ContentView({
-                        template: {type: 'handlebars', template: t.Info},
+                    this.DialogContentView = new views.ContentView({
+                        template: {type: 'handlebars', template: templates.Info},
                         id: "about",
                         className: "modal fade",
                         attributes: {
@@ -262,33 +254,33 @@
                     });
 
                     // Create the views - these are Marionette.CollectionViews that render ItemViews
-                    this.baseLayerView = new v.BaseLayerSelectionView({
+                    this.baseLayerView = new views.BaseLayerSelectionView({
                         collection:globals.baseLayers,
-                        itemView: v.LayerItemView.extend({
+                        itemView: views.LayerItemView.extend({
                             template: {
                                 type:'handlebars',
-                                template: t.BulletLayer},
+                                template: templates.BulletLayer},
                             className: "radio"
                         })
                     });
 
-                    this.productsView = new v.LayerSelectionView({
+                    this.productsView = new views.LayerSelectionView({
                         collection:globals.products,
-                        itemView: v.LayerItemView.extend({
+                        itemView: views.LayerItemView.extend({
                             template: {
                                 type:'handlebars',
-                                template: t.CheckBoxLayer},
+                                template: templates.CheckBoxLayer},
                             className: "sortable-layer"
                         }),
                         className: "sortable"
                     });
 
-                    this.overlaysView = new v.BaseLayerSelectionView({
+                    this.overlaysView = new views.BaseLayerSelectionView({
                         collection:globals.overlays,
-                        itemView: v.LayerItemView.extend({
+                        itemView: views.LayerItemView.extend({
                             template: {
                                 type:'handlebars',
-                                template: t.CheckBoxOverlayLayer},
+                                template: templates.CheckBoxOverlayLayer},
                             className: "checkbox"
                         }),
                         className: "check"
@@ -299,10 +291,10 @@
 
 
                     // Define collection of selection tools
-                    var selectionToolsCollection = new m.ToolCollection();
+                    var selectionToolsCollection = new models.ToolCollection();
                     _.each(config.selectionTools, function (selTool) {
                         selectionToolsCollection.add(
-                                new m.ToolModel({
+                                new models.ToolModel({
                                     id: selTool.id,
                                     description: selTool.description,
                                     icon:selTool.icon,
@@ -313,10 +305,10 @@
                     }, this);
 
                     // Define collection of visualization tools
-                    var visualizationToolsCollection = new m.ToolCollection();
+                    var visualizationToolsCollection = new models.ToolCollection();
                     _.each(config.visualizationTools, function (visTool) {
                         visualizationToolsCollection.add(
-                                new m.ToolModel({
+                                new models.ToolModel({
                                     id: visTool.id,
                                     eventToRaise: visTool.eventToRaise,
                                     description: visTool.description,
@@ -329,22 +321,22 @@
                     }, this);
 
                     // Create Collection Views to hold set of views for selection tools
-                    this.visualizationToolsView = new v.ToolSelectionView({
+                    this.visualizationToolsView = new views.ToolSelectionView({
                         collection:visualizationToolsCollection,
-                        itemView: v.ToolItemView.extend({
+                        itemView: views.ToolItemView.extend({
                             template: {
                                 type:'handlebars',
-                                template: t.ToolIcon}
+                                template: templates.ToolIcon}
                         })
                     });
 
                     // Create Collection Views to hold set of views for visualization tools
-                    this.selectionToolsView = new v.ToolSelectionView({
+                    this.selectionToolsView = new views.ToolSelectionView({
                         collection:selectionToolsCollection,
-                        itemView: v.ToolItemView.extend({
+                        itemView: views.ToolItemView.extend({
                             template: {
                                 type:'handlebars',
-                                template: t.ToolIcon}
+                                template: templates.ToolIcon}
                         })
                     });
 
@@ -356,7 +348,7 @@
 
 
 
-                    this.timeSliderView = new v.TimeSliderView(config.timeSlider);
+                    this.timeSliderView = new views.TimeSliderView(config.timeSlider);
                     this.bottomBar.show(this.timeSliderView);
 
                     // Add a trigger for ajax calls in order to display loading state

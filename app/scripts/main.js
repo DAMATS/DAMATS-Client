@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------
 //
-// Project: EOxClient <https://github.com/EOX-A/EOxClient>
+// Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
 //-------------------------------------------------------------------------------
