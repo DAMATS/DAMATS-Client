@@ -27,13 +27,11 @@
 
 (function () {
     'use strict';
-
     var root = this;
-
-    root.define([
+    var deps = [
         'backbone',
         'd3'
-    ],
+    ];
 
     function init(Backbone) {
 
@@ -232,7 +230,8 @@
             parseBaseLayer: parseBaseLayer,
             LayerModel: LayerModel
         };
-    });
+    };
 
     root.define(deps, init);
+
 }).call( this );
