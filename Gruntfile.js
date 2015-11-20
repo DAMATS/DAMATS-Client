@@ -64,6 +64,7 @@ module.exports = function (grunt) {
                     '<%= yeoman.app %>/*.html',
                     '{.tmp,<%= yeoman.app %>}/styles/{,*/}*.css',
                     '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
+                    '{.tmp,<%= yeoman.app %>}/modules/{,*/}*.js',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
                     '<%= yeoman.app %>/scripts/config.json',
                 '<%= yeoman.app %>/templates/{,*/}*.hbs'
@@ -72,7 +73,11 @@ module.exports = function (grunt) {
         },
         docco: {
             docs: {
-                src: ['readme.md','<%= yeoman.app %>/scripts/{,*/}*.js', '!<%= yeoman.app %>/scripts/vendor/{,*/}*.js'],
+                src: [
+                    'readme.md',
+                    '<%= yeoman.app %>/scripts/{,*/}*.js',
+                    '<%= yeoman.app %>/modules/{,*/}*.js',
+                    '!<%= yeoman.app %>/scripts/vendor/{,*/}*.js'],
                 options: {
                     layout: 'linear',
                     css: 'docco.css',
@@ -132,6 +137,7 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= yeoman.app %>/scripts/{,*/}*.js',
+                '<%= yeoman.app %>/modules/{,*/}*.js',
                 '!<%= yeoman.app %>/scripts/vendor/*'
             ]
         },
@@ -204,6 +210,7 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
+                        '<%= yeoman.dist %>/modules/{,*/}*.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css',
                         '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp}',
                         '<%= yeoman.dist %>/styles/fonts/*'
