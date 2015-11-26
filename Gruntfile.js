@@ -89,15 +89,22 @@ module.exports = function (grunt) {
             options: {
                 port: 9000,
                 // change this to '0.0.0.0' to access the server from outside
-                hostname: 'localhost'
+                hostname: 'localhost',
             },
             livereload: {
                 options: {
-                    middleware: function (connect) {
+                    debug: true,
+                    middleware: function (connect, options) {
                         return [
+                            function (req, res, next) {
+                                res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8100');
+                                res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+                                res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+                                return next();
+                            },
                             lrSnippet,
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, yeomanConfig.app)
+                            mountFolder(connect, yeomanConfig.app),
                         ];
                     }
                 }
@@ -338,8 +345,10 @@ module.exports = function (grunt) {
                         'bower_components/require-handlebars-plugin/hbs.js',
                         'bower_components/backbone.marionette.handlebars/backbone.marionette.handlebars.min.js',
                         'bower_components/bootstrap/dist/*/*',
+                        'bower_components/bootstrap-datepicker/js/bootstrap-datepicker.js',
                         'bower_components/font-awesome/css/*',
-                        'bower_components/lm.js/lm.js'
+                        'bower_components/lm.js/lm.js',
+                        'scripts/vendor/theme/default/style.css'
                     ]
                 },{
                     expand: true,
@@ -363,7 +372,7 @@ module.exports = function (grunt) {
                     cwd: '<%= yeoman.app %>',
                     dest: '<%= yeoman.dist %>',
                     src: [
-                        'scripts/*.json'
+                        '*.json'
                     ]
                 },{
                     expand: true,
