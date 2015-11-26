@@ -2,6 +2,14 @@
 
   "debug":true,
 
+  "damats": {
+    "pathUser": "user",
+    "pathGroups": "groups",
+    "pathSources": "sources",
+    "pathProcesses": "processes",
+    "url": "http://127.0.0.1:8100/eoxs/damats"
+  },
+
   "mapConfig": {
     "visualizationLibs": [
       "openlayers"
@@ -178,14 +186,28 @@
         "icon" : "fa-globe",
         "eventToRaise" : "ui:open:layercontrol",
         "template" : "LayerControl",
-        "show":true
+        "show": false
+      },
+      {
+        "name" : "SITS",
+        "icon" : "fa-list",
+        "eventToRaise" : "dialog:toggle:SITSCreation",
+        "template" : "SITSCreation",
+        "show": false
+      },
+      {
+        "name" : "Profile",
+        "icon" : "fa-user",
+        "eventToRaise" : "dialog:toggle:UserProfile",
+        "template" : "SITSCreation",
+        "show": false
       },
       {
         "name" : "Tools",
         "icon" : "fa-wrench",
         "eventToRaise" : "ui:open:toolselection",
         "template" : "ToolSelection",
-        "show":true
+        "show": false
       },
       {
         "name" : "About",
@@ -243,6 +265,18 @@
   ],
 
   "templates":[
+    {
+      "id": "SITSCreation",
+      "template": "hbs!tmpl/SITSCreation"
+    },
+    {
+      "id": "UserProfile",
+      "template":"hbs!tmpl/UserProfile"
+    },
+    {
+      "id": "UserProfileGroupItem",
+      "template":"hbs!tmpl/UserProfileGroupItem"
+    },
     {
       "id":"BulletLayer",
       "template":"hbs!tmpl/BulletLayer"

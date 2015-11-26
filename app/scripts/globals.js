@@ -1,9 +1,10 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // Project: EOxClient <https://github.com/EOX-A/EOxClient>
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
+//          Martin Paces <martin.paces@eox.at>
 //
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Copyright (C) 2014 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +14,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies of this Software or works derived from this Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies of this Software or works derived from this Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,16 +24,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-
-// globals
-define(['backbone', 'objectStore'], function(Backbone, ObjectStore) {
-	return {
-		objects: new ObjectStore(),
-		selections: new ObjectStore(),
-		baseLayers: new Backbone.Collection(),
-		products: new Backbone.Collection(),
-		overlays: new Backbone.Collection()
-	}
-});
+// Global shared model instances.
+define(
+    [
+        'backbone',
+        'objectStore',
+        'modules/damats/DataModelsAndCollections'
+    ],
+    function (Backbone, ObjectStore, DataModels) {
+        return {
+            objects: new ObjectStore(),
+            selections: new ObjectStore(),
+            baseLayers: new Backbone.Collection(),
+            products: new Backbone.Collection(),
+            overlays: new Backbone.Collection(),
+            damats: {
+                processes: new DataModels.GroupCollection(),
+                sources: new DataModels.GroupCollection(),
+                groups: new DataModels.GroupCollection(),
+                user: new DataModels.UserModel()
+            }
+        };
+    }
+);

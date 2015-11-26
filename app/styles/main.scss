@@ -83,6 +83,10 @@ body.wait *, body.wait {
   cursor:wait !important;
 }
 
+#alert {
+    color: red;
+}
+
 // Mouse over tooltip
 .ui-tooltip {
   display: inline-block;
@@ -152,6 +156,19 @@ div#preload {
 button[active=active] {
   background-color: #ccc;
 }
+
+/*
+ * Form controls
+ */
+button[active=active] {
+  background-color: #ccc;
+}
+
+.fixed-sized-addon {
+    min-width:5em;
+    text-align:left;
+}
+
 
 /*
  * Draggable & Sortable Elements
@@ -249,6 +266,56 @@ button[active=active] {
 .selectionManager .panel-body, .download .panel-body {
   max-height: 15em;
   overflow: auto;
+}
+
+/*
+ * SITS Creation
+ */
+ .sits-creation {
+  width: 20em;
+  top: 10em;
+  right: 3em;
+  font-size: .9em;
+  position: relative;
+  float: right;
+ }
+
+.sits-creation .input-group {
+  margin: .3em 0;
+}
+
+.sits-creation .btn-group {
+  margin-top: .6em;
+}
+
+/*
+ * User Profile
+ */
+ .user-profile {
+  width: 30em;
+  top: 10em;
+  right: 3em;
+  font-size: .9em;
+  position: relative;
+  float: right;
+ }
+
+.user-profile .user-group-list {
+  max-height: 10em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.user-profile .form-control {
+  margin: .3em 0;
+}
+
+.user-profile .form-group {
+  margin: .3em 0;
+  margin-bottom: .3em;
+}
+
+.user-profile .btn-group {
+  margin-top: .6em;
 }
 
 /*

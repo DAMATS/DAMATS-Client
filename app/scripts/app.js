@@ -1,9 +1,9 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Copyright (C) 2014 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +13,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies of this Software or works derived from this Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies of this Software or works derived from this Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,7 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 (function () {
     'use strict';
@@ -32,15 +32,20 @@
 
     var deps = [
         'backbone',
-        'communicator','globals',
-        'regions/DialogRegion','regions/UIRegion',
+        'communicator',
+        'globals',
+        'regions/DialogRegion',
+        'regions/UIRegion',
         'layouts/LayerControlLayout',
         'layouts/ToolControlLayout',
-        'jquery', 'backbone.marionette',
+        'jquery',
+        'backbone.marionette',
         'controller/ContentController',
         'controller/DownloadController',
         'controller/SelectionManagerController',
         'controller/LoadingController',
+        'modules/damats/SITSCreationController',
+        'modules/damats/UserProfileController',
         'router'
     ];
 
@@ -48,9 +53,10 @@
                   UIRegion, LayerControlLayout, ToolControlLayout) {
 
         var Application = Backbone.Marionette.Application.extend({
+
             initialize: function (options) {
                 // clear permanent local storage
-                localStorage.clear()
+                localStorage.clear();
             },
 
             configure: function (config) {
@@ -66,6 +72,28 @@
                 var views = {};
                 var models = {};
                 var templates = {};
+
+                // DAMATS specific configuration
+                globals.damats.user.fetchData = function (options) {
+                    options = options ? _.clone(options) : {};
+                    options.url = config.damats.url + "/" + config.damats.pathUser;
+                    return this.fetch(options);
+                }
+                globals.damats.user.saveData = function (attributes, options) {
+                    attributes = attributes ? attributes : {};
+                    options = options ? _.clone(options) : {};
+                    options.url = config.damats.url + "/" + config.damats.pathUser;
+                    return this.save(attributes, options);
+                }
+
+                globals.damats.groups.fetchData = function (options) {
+                    options = options ? _.clone(options) : {};
+                    options.url = config.damats.url + "/" + config.damats.pathGroups;
+                    return this.fetch(options);
+                }
+
+                globals.damats.user.fetchData();
+                globals.damats.groups.fetchData();
 
                 // Application regions are loaded and added to the Marionette Application
                 _.each(config.regions, function (region) {
@@ -89,7 +117,6 @@
                 _.each(config.templates, function (item) {
                     templates[item.id] = require(item.template);
                 }, this);
-
 
                 // Map attributes are loaded and added to the global map model.
                 globals.objects.add('mapmodel', models.parseMapConfig(config.mapConfig));
@@ -171,7 +198,7 @@
                 });
 
                 this.productsView = new views.LayerSelectionView({
-                    collection:globals.products,
+                    collection: globals.products,
                     itemView: views.LayerItemView.extend({
                         template: {
                             type:'handlebars',
@@ -183,7 +210,7 @@
                 });
 
                 this.overlaysView = new views.BaseLayerSelectionView({
-                    collection:globals.overlays,
+                    collection: globals.overlays,
                     itemView: views.LayerItemView.extend({
                         template: {
                             type:'handlebars',
