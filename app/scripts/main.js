@@ -52,8 +52,8 @@
         'regionManager',
         'jquery',
         'jqueryui',
-        "util",
-        "libcoverage"
+        'util',
+        'libcoverage'
     ]
 
 	function require_error(err) {
