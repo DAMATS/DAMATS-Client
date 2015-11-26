@@ -62,11 +62,11 @@
             configure: function (config) {
 
                 // Load jquery ui tooltip tool
-                $("body").tooltip({
+                $('body').tooltip({
                     selector: '[data-toggle=tooltip]',
-                    position: { my: "left+5 center", at: "right center" },
+                    position: { my: 'left+5 center', at: 'right center' },
                     hide: { effect: false, duration: 0 },
-                    show:{ effect: false, delay: 700}
+                    show: { effect: false, delay: 700}
                 });
 
                 var views = {};
@@ -76,31 +76,38 @@
                 // DAMATS specific configuration
                 globals.damats.user.fetchData = function (options) {
                     options = options ? _.clone(options) : {};
-                    options.url = config.damats.url + "/" + config.damats.pathUser;
+                    options.url = (
+                        config.damats.url + '/' + config.damats.pathUser
+                    );
                     return this.fetch(options);
-                }
+                };
                 globals.damats.user.saveData = function (attributes, options) {
                     attributes = attributes ? attributes : {};
                     options = options ? _.clone(options) : {};
-                    options.url = config.damats.url + "/" + config.damats.pathUser;
+                    options.url = (
+                        config.damats.url + '/' + config.damats.pathUser
+                    );
                     return this.save(attributes, options);
-                }
+                };
 
                 globals.damats.groups.fetchData = function (options) {
                     options = options ? _.clone(options) : {};
-                    options.url = config.damats.url + "/" + config.damats.pathGroups;
+                    options.url = (
+                        config.damats.url + '/' + config.damats.pathGroups
+                    );
                     return this.fetch(options);
-                }
+                };
 
                 globals.damats.user.fetchData();
                 globals.damats.groups.fetchData();
 
-                // Application regions are loaded and added to the Marionette Application
+                // Application regions are loaded and added
+                // to the Marionette Application
                 _.each(config.regions, function (region) {
                     var obj = {};
-                    obj[region.name] = "#" + region.name;
+                    obj[region.name] = '#' + region.name;
                     this.addRegions(obj);
-                    console.log("Added region " + obj[region.name]);
+                    console.log('Added region ' + obj[region.name]);
                 }, this);
 
                 // Load all configured views.
@@ -119,28 +126,30 @@
                 }, this);
 
                 // Map attributes are loaded and added to the global map model.
-                globals.objects.add('mapmodel', models.parseMapConfig(config.mapConfig));
+                globals.objects.add(
+                    'mapmodel', models.parseMapConfig(config.mapConfig)
+                );
 
                 // Base layers are loaded and added to the global collection.
                 _.each(config.mapConfig.baseLayers, function (item) {
                     globals.baseLayers.add(models.parseBaseLayer(item));
-                    console.log("Adding base-layer: " + item.id);
+                    console.log('Adding base-layer: ' + item.id);
                 }, this);
 
                 //Overlays are loaded and added to the global collection
                 _.each(config.mapConfig.overlays, function (item) {
                     globals.overlays.add(models.parseOverlayLayer(item));
-                    console.log("Adding overlay-layer " + item.id);
+                    console.log('Adding overlay-layer ' + item.id);
                 }, this);
 
                 //Data layers are loaded and added to the global collection
                 _.each(config.mapConfig.products, function (item) {
                     globals.products.add(models.parseProductLayer(item));
-                    console.log("Added data-layer " + item.view.id );
+                    console.log('Added data-layer ' + item.view.id );
                 }, this);
 
                 // Create and displaye map view.
-                this.map.show(new views.MapView({el: $("#map")}));
+                this.map.show(new views.MapView({el: $('#map')}));
 
                 // If Navigation Bar is set in configuration go through the
                 // defined elements creating a item collection to rendered
@@ -149,51 +158,57 @@
 
                     var navBarItemCollection = new models.NavBarCollection;
 
-                    _.each(config.navBarConfig.items, function (list_item){
+                    _.each(config.navBarConfig.items, function (list_item) {
                         navBarItemCollection.add(
                             new models.NavBarItemModel({
-                                name:list_item.name,
-                                icon:list_item.icon,
-                                eventToRaise:list_item.eventToRaise
+                                name: list_item.name,
+                                icon: list_item.icon,
+                                eventToRaise: list_item.eventToRaise
                             }));
                     }, this);
 
-                    this.topBar.show(new views.NavBarCollectionView(
-                        {template: templates.NavBar({
+                    this.topBar.show(new views.NavBarCollectionView({
+                        template: templates.NavBar({
                             title: config.navBarConfig.title,
-                            url: config.navBarConfig.url}),
-                        className:"navbar navbar-inverse navbar-fixed-top not-selectable",
-                        itemView: views.NavBarItemView, tag: "div",
-                        collection: navBarItemCollection}));
+                            url: config.navBarConfig.url
+                        }),
+                        className: 'navbar navbar-inverse navbar-fixed-top not-selectable',
+                        itemView: views.NavBarItemView,
+                        tag: 'div',
+                        collection: navBarItemCollection
+                    }));
 
-                };
+                }
 
                 // Added region to test combination of backbone
                 // functionality combined with jQuery UI
-                this.addRegions({dialogRegion: DialogRegion.extend({el: "#viewContent"})});
+                this.addRegions({
+                    dialogRegion: DialogRegion.extend({el: '#viewContent'})
+                });
                 this.DialogContentView = new views.ContentView({
                     template: {type: 'handlebars', template: templates.Info},
-                    id: "about",
-                    className: "modal fade",
+                    id: 'about',
+                    className: 'modal fade',
                     attributes: {
-                        role: "dialog",
-                        tabindex: "-1",
-                        "aria-labelledby": "about-title",
-                        "aria-hidden": true,
-                        "data-keyboard": true,
-                        "data-backdrop": "static"
+                        role: 'dialog',
+                        tabindex: '-1',
+                        'aria-labelledby': 'about-title',
+                        'aria-hidden': true,
+                        'data-keyboard': true,
+                        'data-backdrop': 'static'
                     }
                 });
 
-                // Create the views - these are Marionette.CollectionViews that render ItemViews
+                // Create the views - these are Marionette.CollectionViews
+                // that render ItemViews
                 this.baseLayerView = new views.BaseLayerSelectionView({
-                    collection:globals.baseLayers,
+                    collection: globals.baseLayers,
                     itemView: views.LayerItemView.extend({
                         template: {
-                            type:'handlebars',
+                            type: 'handlebars',
                             template: templates.BulletLayer
                         },
-                        className: "radio"
+                        className: 'radio'
                     })
                 });
 
@@ -201,24 +216,24 @@
                     collection: globals.products,
                     itemView: views.LayerItemView.extend({
                         template: {
-                            type:'handlebars',
+                            type: 'handlebars',
                             template: templates.CheckBoxLayer
                         },
-                        className: "sortable-layer"
+                        className: 'sortable-layer'
                     }),
-                    className: "sortable"
+                    className: 'sortable'
                 });
 
                 this.overlaysView = new views.BaseLayerSelectionView({
                     collection: globals.overlays,
                     itemView: views.LayerItemView.extend({
                         template: {
-                            type:'handlebars',
+                            type: 'handlebars',
                             template: templates.CheckBoxOverlayLayer
                         },
-                        className: "checkbox"
+                        className: 'checkbox'
                     }),
-                    className: "check"
+                    className: 'check'
                 });
 
                 // Create layout that will hold the child views
@@ -232,46 +247,47 @@
                             new models.ToolModel({
                                 id: selTool.id,
                                 description: selTool.description,
-                                icon:selTool.icon,
+                                icon: selTool.icon,
                                 enabled: true,
                                 active: false,
-                                type: "selection"
+                                type: 'selection'
                             }));
                 }, this);
 
                 // Define collection of visualization tools
                 var visualizationToolsCollection = new models.ToolCollection();
                 _.each(config.visualizationTools, function (visTool) {
-                    visualizationToolsCollection.add(
-                            new models.ToolModel({
-                                id: visTool.id,
-                                eventToRaise: visTool.eventToRaise,
-                                description: visTool.description,
-                                disabledDescription: visTool.disabledDescription,
-                                icon:visTool.icon,
-                                enabled: visTool.enabled,
-                                active: visTool.active,
-                                type: "tool"
-                            }));
+                    visualizationToolsCollection.add(new models.ToolModel({
+                        id: visTool.id,
+                        eventToRaise: visTool.eventToRaise,
+                        description: visTool.description,
+                        disabledDescription: visTool.disabledDescription,
+                        icon: visTool.icon,
+                        enabled: visTool.enabled,
+                        active: visTool.active,
+                        type: 'tool'
+                    }));
                 }, this);
 
-                // Create Collection Views to hold set of views for selection tools
+                // Create Collection Views to hold set of views
+                // for selection tools
                 this.visualizationToolsView = new views.ToolSelectionView({
-                    collection:visualizationToolsCollection,
+                    collection: visualizationToolsCollection,
                     itemView: views.ToolItemView.extend({
                         template: {
-                            type:'handlebars',
+                            type: 'handlebars',
                             template: templates.ToolIcon
                         }
                     })
                 });
 
-                // Create Collection Views to hold set of views for visualization tools
+                // Create Collection Views to hold set of views
+                // for visualization tools
                 this.selectionToolsView = new views.ToolSelectionView({
-                    collection:selectionToolsCollection,
+                    collection: selectionToolsCollection,
                     itemView: views.ToolItemView.extend({
                         template: {
-                            type:'handlebars',
+                            type: 'handlebars',
                             template: templates.ToolIcon
                         }
                     })
@@ -281,52 +297,51 @@
                 // Create layout to hold collection views
                 this.toolLayout = new ToolControlLayout();
 
-
                 this.timeSliderView = new views.TimeSliderView(config.timeSlider);
                 this.bottomBar.show(this.timeSliderView);
 
-                // Add a trigger for ajax calls in order to display loading state
-                // in mouse cursor to give feedback to the user the client is busy
+                // Add a trigger for ajax calls in order to display loading
+                // state in mouse cursor to give feedback to the user the client
+                // if busy.
                 $(document).ajaxStart(function () {
-                  Communicator.mediator.trigger("progress:change", true);
+                  Communicator.mediator.trigger('progress:change', true);
                 });
 
                 $(document).ajaxStop(function () {
-                  Communicator.mediator.trigger("progress:change", false);
+                  Communicator.mediator.trigger('progress:change', false);
                 });
 
                 $(document).ajaxError(function (event, request, settings) {
-                    if(settings.suppressErrors) {
+                    if (settings.suppressErrors) {
                         return;
                     }
 
-                    var statuscode = "";
+                    var statuscode = '';
                     if (request.status != 0)
                         statuscode =  '<br>Status Code: ' + request.status;
-                    $("#error-messages").append(
-                        '<div class="alert alert-warning alert-danger">'+
-                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
-                          '<strong><i class="fa fa-fw fa-exclamation-triangle"></i>&nbsp;ERROR: '+
-                          'HTTP/' + settings.type + ' request failed!</strong>'+
-                          '<br>URL:&nbsp;'+settings.url.split("?")[0] + statuscode +
+                    $('#error-messages').append(
+                        '<div class="alert alert-warning alert-danger">' +
+                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                          '<strong><i class="fa fa-fw fa-exclamation-triangle"></i>&nbsp;ERROR: ' +
+                          'HTTP/' + settings.type + ' request failed!</strong>' +
+                          '<br>URL:&nbsp;' + settings.url.split('?')[0] + statuscode +
                         '</div>'
                     );
                 });
 
-                // Go through Navigation Bar items and throw activation event for all
+                // Go through Navigation Bar items and for each throw 
+                // an activation event
                 // elements that are marked with show == true
                 if (config.navBarConfig) {
-
-                    _.each(config.navBarConfig.items, function (list_item){
-                        if(list_item.show){
+                    _.each(config.navBarConfig.items, function (list_item) {
+                        if (list_item.show) {
                             Communicator.mediator.trigger(list_item.eventToRaise);
                         }
                     }, this);
                 }
 
-                // Remove loading screen when this point is reached in the script
+                // Remove loading screen at the end of the initialisation.
                 $('#loadscreen').remove();
-
             }
         });
 

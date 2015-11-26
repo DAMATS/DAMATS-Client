@@ -1,9 +1,9 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Copyright (C) 2014 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +13,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies of this Software or works derived from this Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies of this Software or works derived from this Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,7 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 (function () {
     'use strict';
@@ -54,17 +54,17 @@
         'jqueryui',
         'util',
         'libcoverage'
-    ]
+    ];
 
-	function require_error(err) {
-        console.log("Require failed!")
-        console.log(err)
+    function require_error(err) {
+        console.log('Require failed!');
+        console.log(err);
         window.alert(
-            "The application failed to load some of the client's " +
-            "dependencies.\n" +
-            "Reason: " + err.requireType + "\n" +
-            "Module(s): " + err.requireModules
-        )
+            'The application failed to load some of the client\'s ' +
+            'dependencies.\n' +
+            'Reason: ' + err.requireType + '\n' +
+            'Module(s): ' + err.requireModules
+        );
         //location.reload(true)
     }
 
@@ -72,7 +72,7 @@
         // TODO: Separate static and dynamical configuration.
 
         // Load and parse client's configuration.
-        $.getJSON("scripts/config.json", function (values) {
+        $.getJSON('scripts/config.json', function (values) {
 
             var views = [];
             var models = [];
@@ -96,7 +96,7 @@
             }, this);
 
             root.require([].concat(
-                values.mapConfig.visualizationLibs,	// map visualisation libs
+                values.mapConfig.visualizationLibs, // map visualisation libs
                 views,
                 models,
                 templates
@@ -108,11 +108,11 @@
             // Set timeout for loading wheel in order no to spin endlessly
             // in case of an error.
             setTimeout(function () {
-                if($('#loadscreen').length){
+                if ($('#loadscreen').length) {
                     $('#loadscreen').remove();
-                    $("#error-messages").append(
-                        '<div class="alert alert-warning alert-danger">'+
-                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
+                    $('#error-messages').append(
+                        '<div class="alert alert-warning alert-danger">' +
+                          '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
                           '<strong>Warning!</strong>' +
                           '<p>Due to the encoutered errors the application ' +
                           'cannot be started properly.</p>' +
@@ -124,7 +124,7 @@
                 }
             }, 10000);
         })
-        .fail( function() {
+        .fail( function () {
             $('#loadscreen').empty();
             $('#loadscreen').html(
                 '<p class="warninglabel">' +
