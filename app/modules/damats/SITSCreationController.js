@@ -46,13 +46,28 @@
         SITSCreationModel,
         SITSCreationView
     ) {
+        function getDefaultSITSName() {
+            var date = new Date();
+            var name = 'SITS ';
+            name += String('000' + date.getFullYear()).slice(-4) ;
+            name += '-' + String('0' + (1 + date.getMonth())).slice(-2);
+            name += '-' + String('0' + date.getDate()).slice(-2);
+            name += ' ' + String('0' + date.getHours()).slice(-2);
+            name += ':' + String('0' + date.getMinutes()).slice(-2);
+            name += ':' + String('0' + date.getSeconds()).slice(-2);
+            return name;
+        };
+
         var SITSCreationController = Backbone.Marionette.Controller.extend({
             model: new SITSCreationModel.SITSCreationModel(),
+            collection: globals.damats.sources,
             view: null,
 
             initialize: function (options) {
                 //this.model.set('products', {});
                 //this.listenTo(Communicator.mediator, 'map:layer:change', this.onChangeLayer);
+                this.listenTo(Communicator.mediator, 'sits:creation:create', this.onCreate);
+                this.listenTo(Communicator.mediator, 'sits:creation:name:set', this.onNameChange);
                 this.listenTo(Communicator.mediator, 'time:change', this.onTOIChange);
                 this.listenTo(Communicator.mediator, 'selection:changed', this.onAOIChange);
                 this.listenTo(Communicator.mediator, 'selection:bbox:changed', this.onAOIChange);
@@ -62,8 +77,13 @@
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSCreation', this.onToggle);
 
                 this.view = new SITSCreationView.SITSCreationView({
-                    model: this.model
+                    model: this.model,
+                    collection: this.collection
                 });
+            },
+
+            onNameChange: function (name) {
+                this.model.set('name', name);
             },
 
             onTOIChange: function (time) {
@@ -113,7 +133,34 @@
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;
             },
 
+            onCreate: function () {
+                var model = this.model;
+                globals.damats.time_series.create({ // new object
+                    locked: false,
+                    source: this.model.get('source'),
+                    name: this.model.get('name'),
+                    description: null,
+                    selection: {
+                        'aoi': this.model.get('AoI'),
+                        'toi': this.model.get('ToI')
+                    }
+                }, { // create options
+                    wait: true,
+                    success: function () {
+                        model.set('is_saved', true);
+                        Communicator.mediator.trigger(
+                            'dialog:open:SITSManager', true
+                        );
+                    }
+                });
+            },
+
             onOpen: function (event_) {
+                if (this.model.get('is_saved')) {
+                    // set a new SIST
+                    this.model.set('is_saved', false);
+                    this.model.set('name', getDefaultSITSName());
+                }
                 if (this.isClosed()) {
                     App.viewContent.show(this.view);
                 }

@@ -1,0 +1,11 @@
+{{#if locked}}
+<span class="input-group-addon btn-browse" title="Click to browse SITS."><i class="fa fa-fw fa-eye"></i></span>
+{{else}}
+<span class="input-group-addon btn-edit" title="Click to edit SITS."><i class="fa fa-fw fa-edit"></i></span>
+{{/if}}
+<span class="form-control" {{#if description }}title="{{ description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;&nbsp;{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</span>
+{{#if owned}}
+<span class="input-group-addon btn-remove" title="Click to remove own SITS."><i class="fa fa-fw fa-remove"></i></span>
+{{else}}
+<span class="input-group-addon btn-remove-locked" title="Shared SITS cannot be removed."><i class="fa fa-fw fa-lock"></i></span>
+{{/if}}

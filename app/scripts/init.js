@@ -1,9 +1,9 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Copyright (C) 2014 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +13,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies of this Software or works derived from this Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies of this Software or works derived from this Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,7 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 // This script starts the application.
 (function () {
@@ -32,7 +32,7 @@
     var root = this;
 
     root.require.config({
-        baseUrl: "scripts",
+        baseUrl: 'scripts',
 
         deps: [
           'backbone.marionette',
@@ -65,7 +65,7 @@
             filesaver: {
                 exports: 'saveAs'
             },
-            lm:{
+            lm: {
                 exports: 'lm'
             },
             timeslider: {
@@ -88,7 +88,7 @@
             libcoverage: '../bower_components/libcoverage/libcoverage.min',
             filesaver: '../bower_components/filesaver/FileSaver',
             lm: '../bower_components/lm.js/lm',
-            "bootstrap-datepicker": "../bower_components/bootstrap-datepicker/js/bootstrap-datepicker",
+            'bootstrap-datepicker': '../bower_components/bootstrap-datepicker/js/bootstrap-datepicker',
 
             /* alias all marionette libs */
             'backbone.marionette': '../bower_components/backbone.marionette/lib/core/amd/backbone.marionette.min',
@@ -100,7 +100,7 @@
 
             /* Alias text.js for template loading and shortcut the templates dir to tmpl */
             text: '../bower_components/requirejs-text/text',
-            tmpl: "../templates",
+            tmpl: '../templates',
 
             /* handlebars from the require handlerbars plugin below */
             handlebars: '../bower_components/require-handlebars-plugin/Handlebars',

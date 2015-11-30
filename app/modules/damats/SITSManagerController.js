@@ -33,7 +33,7 @@
         'communicator',
         'globals',
         'app',
-        'modules/damats/UserProfileView'
+        'modules/damats/SITSManagerView'
     ];
 
     function init(
@@ -41,21 +41,35 @@
         Communicator,
         globals,
         App,
-        UserProfileView
+        SITSManagerView
     ) {
-        var UserProfileController = Backbone.Marionette.Controller.extend({
-            model: globals.damats.user,
-            collection: globals.damats.groups,
+        var SITSManagerController = Backbone.Marionette.Controller.extend({
+            model: new Backbone.Model(),
+            collection: globals.damats.time_series,
             view: null,
 
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'dialog:open:UserProfile', this.onOpen);
-                this.listenTo(Communicator.mediator, 'dialog:close:UserProfile', this.onClose);
-                this.listenTo(Communicator.mediator, 'dialog:toggle:UserProfile', this.onToggle);
-                this.view = new UserProfileView.UserProfileView({
+                //this.model.set('products', {});
+                //this.listenTo(Communicator.mediator, 'map:layer:change', this.onChangeLayer);
+                //this.listenTo(Communicator.mediator, 'time:change', this.onTOIChange);
+                //this.listenTo(Communicator.mediator, 'selection:changed', this.onAOIChange);
+                //this.listenTo(Communicator.mediator, 'selection:bbox:changed', this.onAOIChange);
+                //this.listenTo(Communicator.mediator, 'dialog:open:download', this.onDownloadToolOpen);
+                this.listenTo(Communicator.mediator, 'dialog:open:SITSManager', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:SITSManager', this.onClose);
+                this.listenTo(Communicator.mediator, 'dialog:toggle:SITSManager', this.onToggle);
+                this.listenTo(Communicator.mediator, 'time_series:removal:proceed', this.onItemRemove);
+
+                this.view = new SITSManagerView.SITSManagerView({
                     model: this.model,
                     collection: this.collection
                 });
+            },
+
+            onItemRemove: function (item) {
+                console.log('SITSManagerController.onItemRemove(' + item.get('identifier') + ')');
+                item.destroy();
+                //this.collection.remove(item);
             },
 
             isClosed: function () {
@@ -83,7 +97,7 @@
             }
         });
 
-        return new UserProfileController();
+        return new SITSManagerController();
     };
 
     root.require(deps, init);

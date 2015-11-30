@@ -33,7 +33,7 @@
         'communicator',
         'globals',
         'app',
-        'modules/damats/UserProfileView'
+        'modules/damats/SITSRemovalView'
     ];
 
     function init(
@@ -41,50 +41,47 @@
         Communicator,
         globals,
         App,
-        UserProfileView
+        SITSRemovalView
     ) {
-        var UserProfileController = Backbone.Marionette.Controller.extend({
-            model: globals.damats.user,
-            collection: globals.damats.groups,
+        var SITSRemovalController = Backbone.Marionette.Controller.extend({
+            model: null,
             view: null,
 
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'dialog:open:UserProfile', this.onOpen);
-                this.listenTo(Communicator.mediator, 'dialog:close:UserProfile', this.onClose);
-                this.listenTo(Communicator.mediator, 'dialog:toggle:UserProfile', this.onToggle);
-                this.view = new UserProfileView.UserProfileView({
-                    model: this.model,
-                    collection: this.collection
+                this.listenTo(Communicator.mediator, 'time_series:removal:confirm', this.onRequest);
+                this.listenTo(Communicator.mediator, 'dialog:close:SITSRemove', this.onClose);
+            },
+
+            onRequest: function (model) {
+                // only owned time series can be removed
+                if (!model.get('owned')) { return; }
+                if (!this.isClosed()) {
+                    this.view.close();
+                }
+                this.model = model;
+                this.view = new SITSRemovalView.SITSRemovalView({
+                    model: model
                 });
+                App.dialogRegion.show(this.view);
             },
 
             isClosed: function () {
-                return _.isUndefined(this.view.isClosed) || this.view.isClosed;
-            },
-
-            onOpen: function (event_) {
-                if (this.isClosed()) {
-                    App.viewContent.show(this.view);
-                }
+                return !this.view || _.isUndefined(this.view.isClosed) || this.view.isClosed;
             },
 
             onClose: function (event_) {
                 if (!this.isClosed()) {
                     this.view.close();
                 }
-            },
-
-            onToggle: function (event_) {
-                if (this.isClosed()) {
-                    this.onOpen(event_);
-                } else {
-                    this.onClose(event_);
-                }
+                this.view = null;
+                // Region.empty() not available. Might be a version issue.
+                //App.dialogRegion.empty();
             }
         });
 
-        return new UserProfileController();
+        return new SITSRemovalController();
     };
 
     root.require(deps, init);
 }).call(this);
+

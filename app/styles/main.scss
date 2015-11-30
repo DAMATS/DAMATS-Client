@@ -83,7 +83,7 @@ body.wait *, body.wait {
   cursor:wait !important;
 }
 
-#alert {
+.alert {
     color: red;
 }
 
@@ -117,7 +117,7 @@ body.wait *, body.wait {
   top: calc(50%);
 }
 
-div#preload { 
+div#preload {
   display: none;
 }
 
@@ -146,9 +146,15 @@ div#preload {
 }
 
 .modal{
-  overflow-y: hidden !important; 
+  overflow-y: hidden !important;
 }
 
+@media screen and (min-width: 32em) {
+  .modal-dialog.modal-confirm {
+    width: 30em;
+    margin: 1em auto;
+  }
+}
 
 /*
  * Buttons
@@ -272,7 +278,7 @@ button[active=active] {
  * SITS Creation
  */
  .sits-creation {
-  width: 20em;
+  width: 30em;
   top: 10em;
   right: 3em;
   font-size: .9em;
@@ -285,6 +291,40 @@ button[active=active] {
 }
 
 .sits-creation .btn-group {
+  margin-top: .6em;
+}
+
+.sits-creation .source-list {
+  max-height: 10em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/*
+ * SITS Manager
+ */
+ .sits-manager {
+  width: 32em;
+  top: 10em;
+  left: 50%;
+  margin: 0 0 0 -15em;
+  font-size: 1em;
+  position: absolute;
+ }
+
+.sits-manager .sits-list {
+  max-height: 20em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.sits-manager .sits-item {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sits-manager .btn-group {
   margin-top: .6em;
 }
 

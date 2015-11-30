@@ -1,1 +1,1 @@
-<li class="list-group-item user-group-item" {{#if description }}title="{{ description }}"{{/if}}>{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</li>
+<span {{#if description }}title="{{ description }}"{{/if}}><i class="fa fa-fw fa-group"></i>&nbsp;{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</span>

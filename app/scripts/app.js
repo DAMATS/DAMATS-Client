@@ -44,7 +44,9 @@
         'controller/DownloadController',
         'controller/SelectionManagerController',
         'controller/LoadingController',
+        'modules/damats/SITSManagerController',
         'modules/damats/SITSCreationController',
+        'modules/damats/SITSRemovalController',
         'modules/damats/UserProfileController',
         'router'
     ];
@@ -73,33 +75,23 @@
                 var models = {};
                 var templates = {};
 
-                // DAMATS specific configuration
-                globals.damats.user.fetchData = function (options) {
-                    options = options ? _.clone(options) : {};
-                    options.url = (
-                        config.damats.url + '/' + config.damats.pathUser
-                    );
-                    return this.fetch(options);
-                };
-                globals.damats.user.saveData = function (attributes, options) {
-                    attributes = attributes ? attributes : {};
-                    options = options ? _.clone(options) : {};
-                    options.url = (
-                        config.damats.url + '/' + config.damats.pathUser
-                    );
-                    return this.save(attributes, options);
-                };
-
-                globals.damats.groups.fetchData = function (options) {
-                    options = options ? _.clone(options) : {};
-                    options.url = (
-                        config.damats.url + '/' + config.damats.pathGroups
-                    );
-                    return this.fetch(options);
-                };
-
-                globals.damats.user.fetchData();
-                globals.damats.groups.fetchData();
+                // DAMATS specific URL configuration and data loading
+                globals.damats.user.url = (
+                    config.damats.url + '/' + config.damats.pathUser
+                );
+                globals.damats.groups.url = (
+                    config.damats.url + '/' + config.damats.pathGroups
+                );
+                globals.damats.sources.url = (
+                    config.damats.url + '/' + config.damats.pathSources
+                );
+                globals.damats.processes.url = (
+                    config.damats.url + '/' + config.damats.pathProcesses
+                );
+                globals.damats.time_series.url = (
+                    config.damats.url + '/' + config.damats.pathTimeSeries
+                );
+                globals.damats.fetchAll();
 
                 // Application regions are loaded and added
                 // to the Marionette Application
@@ -183,7 +175,7 @@
                 // Added region to test combination of backbone
                 // functionality combined with jQuery UI
                 this.addRegions({
-                    dialogRegion: DialogRegion.extend({el: '#viewContent'})
+                    dialogRegion: DialogRegion.extend({el: '#dialogRegion'})
                 });
                 this.DialogContentView = new views.ContentView({
                     template: {type: 'handlebars', template: templates.Info},

@@ -6,6 +6,7 @@
     "pathUser": "user",
     "pathGroups": "groups",
     "pathSources": "sources",
+    "pathTimeSeries": "time_series",
     "pathProcesses": "processes",
     "url": "http://127.0.0.1:8100/eoxs/damats"
   },
@@ -174,6 +175,10 @@
     {
       "name": "viewContent",
       "class": ""
+    },
+    {
+      "name": "dialogRegion",
+      "class": ""
     }
   ],
 
@@ -191,8 +196,8 @@
       {
         "name" : "SITS",
         "icon" : "fa-list",
-        "eventToRaise" : "dialog:toggle:SITSCreation",
-        "template" : "SITSCreation",
+        "eventToRaise" : "dialog:toggle:SITSManager",
+        "template" : "SITSManager",
         "show": false
       },
       {
@@ -242,6 +247,10 @@
 
 
   "views": [
+    "modules/damats/SITSManagerView",
+    "modules/damats/SITSCreationView",
+    "modules/damats/SITSRemovalView",
+    "modules/damats/UserProfileView",
     "modules/map/MapView",
     "views/NavBarCollectionView",
     "views/NavBarItemView",
@@ -256,6 +265,7 @@
   ],
 
   "models":[
+    "modules/damats/DataModelsAndCollections",
     "modules/layer/LayerModel",
     "modules/map/MapModel",
     "models/NavBarCollection",
@@ -266,8 +276,16 @@
 
   "templates":[
     {
+      "id": "SITSManager",
+      "template": "hbs!tmpl/SITSManager"
+    },
+    {
       "id": "SITSCreation",
       "template": "hbs!tmpl/SITSCreation"
+    },
+    {
+      "id": "SITSRemoval",
+      "template": "hbs!tmpl/SITSRemoval"
     },
     {
       "id": "UserProfile",

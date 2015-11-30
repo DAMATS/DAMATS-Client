@@ -32,7 +32,7 @@
 (function () {
     'use strict';
     var root = this;
-    var deps = ['backbone', 'communicator'];
+    var deps = ['backbone', 'communicator', 'underscore'];
 
     function init(Backbone, Communicator) {
 
@@ -54,6 +54,13 @@
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
+        var TimeSeriesModel = Backbone.Model.extend({
+            idAttribute: 'identifier',
+            defaults: _.extend({
+                locked: true,
+                owned: true
+            }, defaults_baseline)
+        });
 
         var GroupCollection = Backbone.Collection.extend({
             model: GroupModel
@@ -61,15 +68,19 @@
         var SourceSeriesCollection = Backbone.Collection.extend({
             model: SourceSeriesModel
         });
+        var TimeSeriesCollection = Backbone.Collection.extend({
+            model: TimeSeriesModel
+        });
 
         return {
             UserModel: UserModel,
             GroupModel: GroupModel,
             GroupCollection: GroupCollection,
             SourceSeriesModel: SourceSeriesModel,
-            SourceSeriesCollection: SourceSeriesCollection
+            SourceSeriesCollection: SourceSeriesCollection,
+            TimeSeriesModel: TimeSeriesModel,
+            TimeSeriesCollection: TimeSeriesCollection
         };
     };
     root.define(deps, init);
 }).call(this);
-

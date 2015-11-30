@@ -1,0 +1,15 @@
+<div class="panel-heading">
+    <button type="button" class="close"><i class="fa fa-times-circle"></i></button>
+    <h3 class="panel-title"><i class="fa fa-fw fa-list"></i>&nbsp;SITS Manager</h3>
+</div>
+<div class="panel-body">
+<h5>Avaiable SITS:</h5>
+{{#if hasNoSITS }}
+  <p class="alert">No existing SITS is avaiable.</p>
+{{else}}
+  <div class="list-group sits-list" id="sits-list"></div>
+{{/if}}
+</div>
+<div class="panel-footer">
+  <button class="btn btn-block btn-primary" id="btn-sits-create"  href="#modal-sits-create" title="Create a new time series."><i class="fa fa-fw fa-plus-square"></i>&nbsp;Create new SIST</button>
+</div>

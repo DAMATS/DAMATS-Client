@@ -4,9 +4,12 @@
 </div>
 
 <div class="panel-body">
-  <p> source selection not yet implemeted </p>
-  <p> user given name of the SITS</p>
-  <p> user given description of the SITS</p>
+  <div class="input-group">
+    <span class="input-group-addon fixed-sized-addon">Name</span>
+    <input type="text" class="form-control" placeholder="SITS name" id="txt-name">
+  </div>
+  <h6>Select Source Collection</h6>
+  <form name="source-selection"><div class="source-list" id="source-list"></div></form>
   <h6>Area of Interest</h6>
   <div class="input-group">
     <span class="input-group-addon fixed-sized-addon">Min X</span>
@@ -49,6 +52,6 @@
 -->
 </div>
 <div class="panel-footer">
-  <button class="btn btn-block btn-primary" id="btn-sits-create"  href="#modal-create-sits"><i class="fa fa-fw fa-plus"></i>&nbsp;Create New SITS</button>
+  <button class="btn btn-block btn-primary" id="btn-sits-create"  href="#modal-create-sits"><i class="fa fa-fw fa-plus-square"></i>&nbsp;Create New SITS</button>
 </div>
 

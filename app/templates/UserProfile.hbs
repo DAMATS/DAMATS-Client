@@ -3,7 +3,7 @@
     <h3 class="panel-title"><i class="fa fa-fw fa-user"></i>&nbsp;User Profile</h3>
 </div>
 <div class="panel-body">
-  <h4 {{#if description }}title="{{ description }}"{{/if}}>{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</h4>
+  <h4 {{#if description }}title="{{ description }}"{{/if}}><i class="fa fa-fw fa-user"></i>&nbsp;{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</h4>
 {{#if hasNoGroup }}
   <p class="alert">The user is not member of any group.</p>
 {{else}}
@@ -12,12 +12,6 @@
 {{/if}}
 <div class="panel-footer">
   <div class="form-horizontal">
-    <div class="form-group">
-      <label for="txt-id" class="col-sm-2 control-label">Id</label>
-      <div class="col-sm-10">
-        <p class="form-control-static" id="txt-id">{{ identifier }}</p>
-      </div>
-    </div>
     <div class="form-group">
       <label for="txt-name" class="col-sm-2 control-label">Name</label>
       <div class="col-sm-10">
@@ -31,6 +25,6 @@
       </div>
     </div>
   </div>
-  <button class="btn btn-block" id="btn-user-refresh"  href="#modal-user-refresh" title="Reload profile from the server."><i class="fa fa-fw fa-download"></i>&nbsp;Reload</button>
-  <button class="btn btn-block" id="btn-user-update"  href="#modal-user-update" title="Upload changed profile to the server."><i class="fa fa-fw fa-upload"></i>&nbsp;Update</button>
+  <button class="btn btn-block" id="btn-user-refresh"  href="#modal-user-refresh" title="Reload profile from the server."><i class="fa fa-fw fa-download"></i>&nbsp;Reload profile</button>
+  <button class="btn btn-block" id="btn-user-update"  href="#modal-user-update" title="Upload changed profile to the server."><i class="fa fa-fw fa-upload"></i>&nbsp;Update profile</button>
 </div>

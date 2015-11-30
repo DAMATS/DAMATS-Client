@@ -44,7 +44,15 @@ define(
                 processes: new DataModels.GroupCollection(),
                 sources: new DataModels.GroupCollection(),
                 groups: new DataModels.GroupCollection(),
-                user: new DataModels.UserModel()
+                user: new DataModels.UserModel(),
+                time_series: new DataModels.TimeSeriesCollection(),
+                fetchAll: function () {
+                    this.user.fetch();
+                    this.groups.fetch();
+                    this.sources.fetch();
+                    this.processes.fetch();
+                    this.time_series.fetch();
+                }
             }
         };
     }

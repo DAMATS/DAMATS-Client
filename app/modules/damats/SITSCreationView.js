@@ -33,12 +33,71 @@
         'backbone',
         'communicator',
         'hbs!tmpl/SITSCreation',
+        'hbs!tmpl/SITSCreationSourceItem',
         'underscore',
-        'bootstrap-datepicker'
+        'bootstrap-datepicker',
+        'bootstrap-select'
     ];
 
-    function init(Backbone, Communicator, SITSCreationTmpl) {
+    function init(
+        Backbone,
+        Communicator,
+        SITSCreationTmpl,
+        SITSCreationSourceItemTmpl
+    ) {
+        var SITSCreationSourceItemView = Backbone.Marionette.ItemView.extend({
+            tagName: 'div',
+            className: 'input-group source-item',
+            attributes: function () {
+                return {
+                    value: this.model.get('identifier')
+                };
+            },
+            events: {
+                'click': 'onClick'
+            },
+            initialize: function (options) {
+                this.parentModel = options.parentModel;
+                this.listenTo(this.parentModel, 'change:source', this.reset);
+            },
+            template: {
+                type: 'handlebars',
+                template: SITSCreationSourceItemTmpl
+            },
+            templateHelpers: function () {
+                return {is_selected: this.isSelected()};
+            },
+            onClick: function () {
+                this.check();
+                this.parentModel.set('source', this.model.get('identifier'));
+            },
+            check: function () {
+                //this.$('#rad-source').checked = true;
+                this.$('#rad-source').prop('checked', true);
+            },
+            reset: function () {
+                if (!this.isSelected()) {
+                    this.$('#rad-source').prop('checked', false);
+                }
+            },
+            isSelected: function () {
+                var selected = (
+                    this.parentModel ? this.parentModel.get('source') : null
+                );
+                return this.model.get('identifier') == selected;
+            }
+        });
+
         var SITSCreationView = Backbone.Marionette.CompositeView.extend({
+            itemView: SITSCreationSourceItemView,
+            itemViewOptions : function () {
+                return {
+                    parentModel: this.model
+                };
+            },
+            appendHtml: function (collectionView, itemView, index) {
+                collectionView.$('#source-list').append(itemView.el);
+            },
             tagName: 'div',
             className: 'panel panel-default sits-creation not-selectable',
             template: {type: 'handlebars', template: SITSCreationTmpl},
@@ -46,16 +105,19 @@
                 'click #btn-draw-bbox': 'onBBoxClick',
                 'click #btn-clear-bbox': 'onClearClick',
                 'click #btn-sits-create': 'onCreateClick',
-                'change #txt-minx': 'onBBoxChange',
-                'change #txt-maxx': 'onBBoxChange',
-                'change #txt-miny': 'onBBoxChange',
-                'change #txt-maxy': 'onBBoxChange',
+                'change #txt-name': 'onNameFormChange',
+                'change #txt-minx': 'onBBoxFormChange',
+                'change #txt-maxx': 'onBBoxFormChange',
+                'change #txt-miny': 'onBBoxFormChange',
+                'change #txt-maxy': 'onBBoxFormChange',
                 'hide': 'onCloseTimeWidget'
             },
 
             onShow: function (view) {
-                this.listenTo(Communicator.mediator, 'time:change', this.onTimeChange);
-                this.listenTo(Communicator.mediator, 'selection:changed', this.onSelectionChange);
+                this.listenTo(this.model, 'change:name', this.onNameChange);
+                this.listenTo(this.model, 'change:AoI', this.onAoIChange);
+                this.listenTo(this.model, 'change:ToI', this.onToIChange);
+                this.listenTo(this.model, 'change', this.onModelChange);
                 this.timeinterval = {};
                 this.delegateEvents(this.events);
                 this.$('.close').on('click', _.bind(this.onClose, this));
@@ -65,15 +127,9 @@
                     handle: '.panel-heading'
                 });
 
-                var aoi = this.model.get('AoI');
-                if (aoi) {
-                    $('#txt-minx').val(aoi.left);
-                    $('#txt-maxx').val(aoi.right);
-                    $('#txt-miny').val(aoi.bottom);
-                    $('#txt-maxy').val(aoi.top);
-                    this.$('#btn-sits-create').removeAttr('disabled');
-                } else {
-                    this.$('#btn-sits-create').attr('disabled', 'disabled');
+                var name = this.model.get('name');
+                if (name) {
+                    $('#txt-name').val(name);
                 }
 
                 this.$('#div-date-begin input[type="text"]').datepicker({
@@ -81,23 +137,17 @@
                         format: 'yyyy-mm-dd',
                         keyboardNavigation: false
                 });
-                this.$('#div-date-begin input[type="text"]').datepicker(
-                    'update', this.model.get('ToI').start
-                );
-                this.$('#div-date-begin input[type="text"]').datepicker(
-                    'setDate', this.model.get('ToI').start
-                );
-
                 this.$('#div-date-end input[type="text"]').datepicker({
                     autoclose: true,
-                    format: 'yyyy-mm-dd'
+                    format: 'yyyy-mm-dd',
+                    keyboardNavigation: false
                 });
-                this.$('#div-date-end input[type="text"]').datepicker(
-                    'update', this.model.get('ToI').end
-                );
-                this.$('#div-date-end input[type="text"]').datepicker(
-                    'setDate', this.model.get('ToI').end
-                );
+                // setDate
+
+                this.onNameChange();
+                this.onToIChange();
+                this.onAoIChange();
+                this.onModelChange();
 
                 $(document).on(
                     'touch click', '#div-date-begin .input-group-addon',
@@ -114,75 +164,109 @@
             },
 
             onBBoxClick: function () {
-                $('#txt-minx').val('');
-                $('#txt-maxx').val('');
-                $('#txt-miny').val('');
-                $('#txt-maxy').val('');
+                this.model.set('AoI', null);
                 Communicator.mediator.trigger(
                     'selection:activated', {id: 'bboxSelection', active: true}
                 );
             },
 
             onClearClick: function () {
+                this.$('#txt-minx').val('');
+                this.$('#txt-maxx').val('');
+                this.$('#txt-miny').val('');
+                this.$('#txt-maxy').val('');
+                this.model.set('AoI', null);
                 Communicator.mediator.trigger(
                     'selection:activated', {id: 'bboxSelection', active: false}
                 );
-                $('#txt-minx').val('');
-                $('#txt-maxx').val('');
-                $('#txt-miny').val('');
-                $('#txt-maxy').val('');
-                this.$('#btn-sits-create').attr('disabled', 'disabled');
             },
 
             onCreateClick: function () {
-                // to be implemeted
-                //Communicator.mediator.trigger('dialog:open:download', true);
-            },
-
-            onTimeChange: function (time) {
-                this.$('#div-date-begin input[type="text"]').datepicker(
-                    'update', this.model.get('ToI').start
-                );
-                this.$('#div-date-end input[type="text"]').datepicker(
-                    'update', this.model.get('ToI').end
-                );
+                Communicator.mediator.trigger('sits:creation:create', true);
             },
 
             onCloseTimeWidget: function (evt) {
-                var opt = {
-                    start: this.$('#div-date-begin input[type="text"]').datepicker('getDate'),
-                    end: this.$('#div-date-end input[type="text"]').datepicker('getDate')
-                };
-                Communicator.mediator.trigger('date:selection:change', opt);
+                var $start = this.$('#div-date-begin input[type="text"]');
+                var $stop = this.$('#div-date-end input[type="text"]');
+                Communicator.mediator.trigger('date:selection:change', {
+                    start: $start.datepicker('getDate'),
+                    end: $stop.datepicker('getDate')
+                });
             },
 
-            onSelectionChange: function (obj) {
-                if (obj) {
-                    $('#txt-minx').val(obj.bounds.left);
-                    $('#txt-maxx').val(obj.bounds.right);
-                    $('#txt-miny').val(obj.bounds.bottom);
-                    $('#txt-maxy').val(obj.bounds.top);
-                    this.$('#btn-sits-create').removeAttr('disabled');
+            onToIChange: function () {
+                var toi = this.model.get('ToI');
+                if (!toi) {
+                    toi = {start: null, end: null};
+                }
+                this.$('#div-date-begin input[type="text"]').datepicker(
+                    'setDate', toi.start
+                );
+                this.$('#div-date-end input[type="text"]').datepicker(
+                    'setDate', toi.end
+                );
+            },
+
+            onAoIChange: function () {
+                var aoi = this.model.get('AoI');
+                if (aoi) {
+                    this.$('#txt-minx').val(aoi.left);
+                    this.$('#txt-maxx').val(aoi.right);
+                    this.$('#txt-miny').val(aoi.bottom);
+                    this.$('#txt-maxy').val(aoi.top);
                 } else {
-                    this.$('#btn-sits-create').attr('disabled', 'disabled');
+                    this.$('#txt-minx').val('');
+                    this.$('#txt-maxx').val('');
+                    this.$('#txt-miny').val('');
+                    this.$('#txt-maxy').val('');
                 }
             },
 
-            onBBoxChange: function (event) {
-                var values = {
+            onBBoxFormChange: function (event) {
+                var aoi = {
                     left: parseFloat($('#txt-minx').val()),
                     right: parseFloat($('#txt-maxx').val()),
                     bottom: parseFloat($('#txt-miny').val()),
                     top: parseFloat($('#txt-maxy').val())
                 };
                 this.$('#btn-sits-create').attr('disabled', 'disabled');
-                if (!isNaN(values.left) && !isNaN(values.right) && !isNaN(values.bottom) && !isNaN(values.top)) {
-                    if (!(values.left > values.right || values.bottom > values.top)) {
+                if (
+                    !isNaN(aoi.left) && !isNaN(aoi.right) &&
+                    !isNaN(aoi.bottom) && !isNaN(aoi.top)
+                ) {
+                    if (aoi.bottom <= aoi.top) {
                         Communicator.mediator.trigger(
-                            'selection:bbox:changed', values
+                            'selection:bbox:changed', aoi
                         );
-                        this.$('#btn-sits-create').removeAttr('disabled');
+                        //NOTE: Model is changed by the controller.
                     }
+                }
+            },
+
+            onNameChange: function () {
+                $('#txt-name').val(this.model.get('name'));
+            },
+
+            onNameFormChange: function () {
+                this.model.set('name', $('#txt-name').val());
+            },
+
+            onModelChange: function () {
+                // This method takes care about enabling/disabling the
+                var has_name = this.model.get('name');
+                var has_source = this.model.get('source');
+                var toi = this.model.get('ToI');
+                var aoi = this.model.get('AoI');
+                var has_aoi = aoi && !(
+                    isNaN(aoi.left) || isNaN(aoi.right) ||
+                    isNaN(aoi.bottom) || isNaN(aoi.top)
+                ) && (aoi.bottom <= aoi.top);
+                var has_toi = toi;
+
+                if (has_name && has_source && has_aoi && has_toi) {
+                    this.$('#btn-sits-create').removeAttr('disabled');
+                } else {
+                    this.$('#btn-sits-create').attr('disabled', 'disabled');
                 }
             },
 
@@ -195,5 +279,4 @@
     };
 
     root.define(deps, init);
-
 }).call(this);

@@ -2,7 +2,6 @@
 //
 // Project: DAMATS Client
 // Authors: Martin Paces <martin.paces@eox.at>
-//          Daniel Santillan <daniel.santillan@eox.at>
 //
 //------------------------------------------------------------------------------
 // Copyright (C) 2015 EOX IT Services GmbH
@@ -29,19 +28,49 @@
 (function () {
     'use strict';
     var root = this;
-    var deps = ['backbone', 'communicator'];
-    function init(Backbone, Communicator) {
-        var SITSCreationModel = Backbone.Model.extend({
-            defaults: {
-                is_saved: true, // Has the model been saved already?
-                name: null,     // SITS name
-                ToI: null,      // time of interest
-                AoI: null,      // area of interest
-                source: null,   // source
-                extra: {}       // extra selection parameters
+    var deps = [
+        'backbone',
+        'communicator',
+        'hbs!tmpl/SITSRemoval',
+        'underscore'
+    ];
+
+    function init(
+        Backbone,
+        Communicator,
+        SITSRemovalTmpl
+    ) {
+        var SITSRemovalView = Backbone.Marionette.CompositeView.extend({
+            tagName: 'div',
+            className: 'modal fade',
+            template: {type: 'handlebars', template: SITSRemovalTmpl},
+            attributes: {
+                role: 'dialog',
+                tabindex: '-1',
+                'aria-labelledby': 'about-title',
+                'aria-hidden': true,
+                'data-keyboard': true,
+                'data-backdrop': 'static'
+            },
+            events: {
+                'click #sits-removal-accept': 'onAccept'
+            },
+            onShow: function (view) {
+                this.delegateEvents(this.events);
+                this.$el.on('hidden.bs.modal', _.bind(function () {
+                    Communicator.mediator.trigger(
+                        'dialog:close:SITSRemove', this.model
+                    );
+                }, this));
+            },
+            onAccept: function () {
+                Communicator.mediator.trigger(
+                    'time_series:removal:proceed', this.model
+                );
             }
         });
-        return {SITSCreationModel: SITSCreationModel};
+        return {SITSRemovalView: SITSRemovalView};
     };
+
     root.define(deps, init);
 }).call(this);

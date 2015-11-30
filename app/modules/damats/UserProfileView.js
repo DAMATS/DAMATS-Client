@@ -45,10 +45,9 @@
         UserProfileGroupItemTmpl
     ) {
         var UserProfileGroupItemView = Backbone.Marionette.ItemView.extend({
-            template: {
-                type: 'handlebars',
-                template: UserProfileGroupItemTmpl
-            }
+            tagName: "li",
+            className: "list-group-item user-group-item",
+            template: {type: 'handlebars', template: UserProfileGroupItemTmpl}
         });
 
         var UserProfileView = Backbone.Marionette.CompositeView.extend({
@@ -76,6 +75,8 @@
             onShow: function (view) {
                 console.log(this.collection);
                 this.listenTo(this.model, 'change', this.onModelChange);
+                this.listenTo(this.collection, 'reset', this.onModelChange);
+                this.listenTo(this.collection, 'update', this.onModelChange);
                 this.delegateEvents(this.events);
                 // TODO: check next line
                 this.$('.close').on('click', _.bind(this.onClose, this));
@@ -89,13 +90,14 @@
             },
 
             onUpdateClick: function () {
-                this.model.saveData();
+                this.model.save();
                 this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 
             onRefreshClick: function () {
-                this.model.fetchData();
-                this.collection.fetchData();
+                globals.damats.fetchAll();
+                //this.model.fetch();
+                //this.collection.fetch();
                 this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 

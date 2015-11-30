@@ -1,9 +1,9 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 // Project: DAMATS Client
 // Authors: Daniel Santillan <daniel.santillan@eox.at>
 //
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Copyright (C) 2014 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +13,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies of this Software or works derived from this Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies of this Software or works derived from this Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,7 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 (function () {
     'use strict';
@@ -43,7 +43,7 @@
 
             onShow: function () {
 
-                var mapView = this
+                var mapView = this;
 
                 this.tileManager = new OpenLayers.TileManager();
                 this.map = new OpenLayers.Map({
@@ -103,7 +103,7 @@
                 this.vectorLayer = new OpenLayers.Layer.Vector("Vector Layer");
                 this.markerLayer = new OpenLayers.Layer.Markers("Marker Layer");
 
-                this.map.addLayers([this.vectorLayer,this.markerLayer]);
+                this.map.addLayers([this.vectorLayer, this.markerLayer]);
                 this.map.addControl(new OpenLayers.Control.MousePosition());
 
                 this.drawControls = {
@@ -125,7 +125,7 @@
 
                 //create shared marker icons
                 globals.icons = {};
-                globals.icons.pinWhite = new OpenLayers.Icon('images/icons/marker_pin_white.png', {w:19,h:32}, {x:-9,y:-32});
+                globals.icons.pinWhite = new OpenLayers.Icon('images/icons/marker_pin_white.png', {w: 19, h: 32}, {x: -9, y: -32});
 
                 var that = this;
 
@@ -157,9 +157,9 @@
                 this.map.addControl(click);
                 click.activate();
 
-                for(var key in this.drawControls) {
+                for (var key in this.drawControls) {
                     this.map.addControl(this.drawControls[key]);
-                    this.drawControls[key].events.register("featureadded",'', this.onDone);
+                    this.drawControls[key].events.register("featureadded", '', this.onDone);
                 }
 
                 // Go through all baselayers and add them to the map.
@@ -168,12 +168,12 @@
                 }, this);
 
                 // Go through all products and add them to the map.
-                globals.products.each(function (item){
+                globals.products.each(function (item) {
                     this.map.addLayer(this.createLayer(item));
                 }, this);
 
                 // Go through all overlays and add them to the map.
-                globals.overlays.each(function (item){
+                globals.overlays.each(function (item) {
                     this.map.addLayer(this.createLayer(item));
                 }, this);
 
@@ -204,7 +204,7 @@
                 var return_layer = null;
                 var layer = layerdesc.get('view');
 
-                switch(layer.protocol){
+                switch (layer.protocol) {
                     case "WMTS":
                         return_layer = new OpenLayers.Layer.WMTS({
                             name: layerdesc.get("name"),
@@ -264,7 +264,7 @@
                         );
                         break;
 
-                };
+                }
                 // for progress indicator
                 return_layer.events.register("loadstart", this, function () {
                   Communicator.mediator.trigger("progress:change", true);
@@ -275,22 +275,22 @@
                 return return_layer;
             },
 
-            centerMap: function (data){
+            centerMap: function (data) {
                 this.map.setCenter(new OpenLayers.LonLat(data.lon, data.lat), data.zoomLevel);
             },
 
-            changeLayer: function (options){
-                if (options.isBaseLayer){
+            changeLayer: function (options) {
+                if (options.isBaseLayer) {
                     globals.baseLayers.forEach(function (model, index) {
                         model.set("visible", false);
                     });
                     globals.baseLayers.find(function (model) { return model.get('name') == options.name; }).set("visible", true);
                     this.map.setBaseLayer(this.map.getLayersByName(options.name)[0]);
-                }else{
+                } else {
                     var product = globals.products.find(function (model) { return model.get('name') == options.name; });
-                    if (product){
+                    if (product) {
                         product.set("visible", options.visible);
-                    }else{
+                    } else {
                         globals.overlays.find(function (model) { return model.get('name') == options.name; }).set("visible", options.visible);
                     }
                     this.map.getLayersByName(options.name)[0].setVisibility(options.visible);
@@ -299,13 +299,13 @@
             },
 
             changeLayerAttributes: function (options) {
-                var product = globals.products.find(function (model){return model.get('name') == options.name;});
+                var product = globals.products.find(function (model) {return model.get('name') == options.name;});
                 if (!product) return ;
                 var view = product.get('view');
 
                 var new_params = {};
 
-                if (view && (view.protocol="WMS")) {
+                if (view && (view.protocol == "WMS")) {
                     new_params['layers'] = product.get('layers');
                     new_params['dim_bands'] = product.get('bands') ? product.get('bands') : null;
                 }
@@ -325,16 +325,16 @@
 
             onUpdateOpacity: function (options) {
                 var layer = this.map.getLayersByName(options.model.get("name"))[0];
-                if (layer){
+                if (layer) {
                     layer.setOpacity(options.value);
                 }
             },
 
-            onSelectionActivated: function (arg){
-                if(arg.active){
-                    for(key in this.drawControls) {
+            onSelectionActivated: function (arg) {
+                if (arg.active) {
+                    for (var key in this.drawControls) {
                         var control = this.drawControls[key];
-                        if(arg.id == key) {
+                        if (arg.id == key) {
                             control.activate();
                         } else {
                             control.layer.removeAllFeatures();
@@ -342,8 +342,8 @@
                             Communicator.mediator.trigger("selection:changed", null);
                         }
                     }
-                }else{
-                    for(key in this.drawControls) {
+                } else {
+                    for (var key in this.drawControls) {
                         var control = this.drawControls[key];
                         control.layer.removeAllFeatures();
                         control.deactivate();
@@ -357,11 +357,11 @@
                 this.vectorLayer.removeAllFeatures();
                 var features = this.geojson.read(data);
                 var bounds;
-                if(features) {
-                    if(features.constructor != Array) {
+                if (features) {
+                    if (features.constructor != Array) {
                         features = [features];
                     }
-                    for(var i=0; i<features.length; ++i) {
+                    for (var i = 0; i < features.length; ++i) {
                         if (!bounds) {
                             bounds = features[i].geometry.getBounds();
                         } else {
@@ -377,7 +377,7 @@
             setMarker: function (lonlat) {
                 this.markerLayer.clearMarkers();
                 var marker = new OpenLayers.Marker(lonlat, globals.icons.pinWhite.clone());
-                this.markerLayer.addMarker(marker)
+                this.markerLayer.addMarker(marker);
             },
 
             clearMarkers: function () {
@@ -395,11 +395,11 @@
                         url: layer.get('view').urls[0] +
                             '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap' +
                             '&LAYERS=' + layer.get('layers') +
-                            '&BBOX=' + prm.bbox.toBBOX(10,map_crs_reverse_axes) + '&CRS=' + prm.crs +
+                            '&BBOX=' + prm.bbox.toBBOX(10, map_crs_reverse_axes) + '&CRS=' + prm.crs +
                             '&TIME=' + getISODateTimeString(prm.time.start) + '/' + getISODateTimeString(prm.time.end) +
                             '&HEIGHT=' + prm.size.h + '&WIDTH=' + prm.size.w + "&TRANSPARENT=true" + "&STYLES=" +
-                            '&FORMAT=' + prm.format + (layer.get('bands') ? '&DIM_BANDS='+layer.get('bands') : "")
-                    }
+                            '&FORMAT=' + prm.format + (layer.get('bands') ? '&DIM_BANDS=' + layer.get('bands') : "")
+                    };
                 }
 
                 // request Parameters
@@ -415,16 +415,16 @@
                 };
 
                 // run the passed callback
-                obj.action(getMapWMS13(obj.layer, prm))
+                obj.action(getMapWMS13(obj.layer, prm));
             },
 
-            onMapClick: function (clickEvent){
+            onMapClick: function (clickEvent) {
 
                 //TODO: move to global map configuration
                 var map_crs_reverse_axes = true;
 
                 // prepare getFeatureInfo request
-                function getFeatureInfoWMS13(info, prm){
+                function getFeatureInfoWMS13(info, prm) {
 
                     var format = "text/html" ;
                     var maxFeatureCount = 1 ;
@@ -432,7 +432,7 @@
                     var request = info.url +
                         '?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetFeatureInfo' +
                         '&LAYERS=' + info.id + '&QUERY_LAYERS=' + info.id +
-                        '&BBOX=' + prm.bbox.toBBOX(10,map_crs_reverse_axes) + '&CRS=' + prm.crs +
+                        '&BBOX=' + prm.bbox.toBBOX(10, map_crs_reverse_axes) + '&CRS=' + prm.crs +
                         '&TIME=' + getISODateTimeString(prm.time.start) + '/' + getISODateTimeString(prm.time.end) +
                         '&HEIGHT=' + prm.size.h + '&WIDTH=' + prm.size.w +
                         '&X=' + prm.xy.x + '&Y=' + prm.xy.y +
@@ -441,23 +441,23 @@
                     return {
                         type: 'GET',
                         url: request
-                    }
+                    };
                 }
 
                 // prepare getFeatureInfo request
-                function getCoverageInfoWPS10(info, prm){
+                function getCoverageInfoWPS10(info, prm) {
 
                     var request = info.url +
                         "?SERVICE=WPS&VERSION=1.0.0&REQUEST=Execute&IDENTIFIER=getCoverageInfo" +
                         "&RawDataOutput=info&DATAINPUTS=identifier%3D" + info.id +
                         "%3Bbegin_time%3D" + getISODateTimeString(prm.time.start) +
                         "%3Bend_time%3D" + getISODateTimeString(prm.time.end) +
-                        "%3Blongitude%3D" + prm.lonlat.lon + "%3Blatitude%3D" + prm.lonlat.lat
+                        "%3Blongitude%3D" + prm.lonlat.lon + "%3Blatitude%3D" + prm.lonlat.lat;
 
                     return {
                         type: 'GET',
                         url: request
-                    }
+                    };
                 }
 
                 // get active data-layers
@@ -485,24 +485,24 @@
                 // display a marker (if at least one layer selected)
                 if (layers.length > 0) {
                     // display marker only
-                    Communicator.mediator.trigger("map:marker:set",prm.lonlat);
+                    Communicator.mediator.trigger("map:marker:set", prm.lonlat);
                 } else {
                     // clear any displayed marker
                     Communicator.mediator.trigger("map:marker:clearAll");
                 }
 
                 // trigger an event reseting the view
-                Communicator.mediator.trigger("info:start",{ lonlat: prm.lonlat, products: layers})
+                Communicator.mediator.trigger("info:start", {lonlat: prm.lonlat, products: layers});
 
-                for (var i=0 ; i<layers.length ; ++i) {
+                for (var i = 0; i < layers.length; ++i) {
 
-                    var layer = layers[i]
-                    var info = layers[i].get('info') ;
+                    var layer = layers[i];
+                    var info = layers[i].get('info');
                     var request = null;
 
                     switch (info.protocol) {
                         case 'WMS': // WMS protocol - getFeatureInfo
-                            request = getFeatureInfoWMS13(info,prm);
+                            request = getFeatureInfoWMS13(info, prm);
                             break;
 
                         case 'WPS': // WPS protocol - EOxServer specific
@@ -510,15 +510,15 @@
                             break;
 
                         default:
-                            console.error('Unsupported info protocol "'+info.protocol+'" ! LAYER="'+layer.get('view').id+'"');
+                            console.error('Unsupported info protocol "' + info.protocol + '" ! LAYER="' + layer.get('view').id + '"');
                             continue;
                     }
 
                     // get the response
-                    $.ajax(_.extend(_.clone(request),{
+                    $.ajax(_.extend(_.clone(request), {
                         async: false,
                         global: false,
-                        success: function (data,status_,xhr,dtype) {
+                        success: function (data, status_, xhr, dtype) {
                             Communicator.mediator.trigger("info:response", {
                                 lonlat: prm.lonlat, // click coordinates
                                 protocol: info.protocol, // request protocol
@@ -530,15 +530,15 @@
                         },
                         error: function (xhr, status_, error) {
                             var url = request.url ;
-                            var url_short = (url.length > 40 ? url.substring(0, 37)+'...' : url);
+                            var url_short = url.length > 40 ? url.substring(0, 37) + '...' : url;
                             console.log(xhr);
                             $("#error-messages").append(
-                                '<div class="alert alert-warning alert-danger">'+
-                                  '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
-                                  '<strong>Warning!</strong> '
-                                  +'Info request failed!<br>'
-                                  +'ERROR: '+xhr.status+' '+xhr.statusText+'<br>'
-                                  +'URL: <a target="_blank" href="'+url+'">'+url_short+'</a><br>'+
+                                '<div class="alert alert-warning alert-danger">' +
+                                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                                '<strong>Warning!</strong> ' + 
+                                'Info request failed!<br>' +
+                                'ERROR: ' + xhr.status + ' ' + xhr.statusText + '<br>' +
+                                'URL: <a target="_blank" href="' + url + '">' + url_short + '</a><br>' +
                                 '</div>'
                             );
                         }
@@ -546,7 +546,7 @@
                 }
 
                 // trigger an event iindicating end of the responses
-                Communicator.mediator.trigger("info:stop")
+                Communicator.mediator.trigger("info:stop");
 
             },
 
@@ -581,7 +581,7 @@
             },
 
             onSelectionChanged: function (geometry) {
-                for(key in this.drawControls) {
+                for (var key in this.drawControls) {
                    this.drawControls[key].deactivate();
                 }
             },
@@ -597,12 +597,12 @@
                     zoomLevel: this.map.zoom
                 });
 
-                var string = getISODateTimeString(time.start) + "/"+ getISODateTimeString(time.end);
+                var string = getISODateTimeString(time.start) + "/" + getISODateTimeString(time.end);
 
                 globals.products.each(function (product) {
-                    if(product.get("timeSlider")){
+                    if (product.get("timeSlider")) {
                         var productLayer = this.map.getLayersByName(product.get("name"))[0];
-                        productLayer.mergeNewParams({'time':string});
+                        productLayer.mergeNewParams({'time': string});
                     }
 
                 }, this);
@@ -610,7 +610,7 @@
                 Communicator.mediator.trigger("map:time:change", {star: time.start, end: time.end});
             },
 
-            onGetMapExtent: function (){
+            onGetMapExtent: function () {
                 return this.map.getExtent();
             },
 
@@ -623,10 +623,10 @@
                 return this.geojson.write(this.vectorLayer.features, true);
             },
 
-            onPreviewLayerCreate: function (url, layers, params){
+            onPreviewLayerCreate: function (url, layers, params) {
 
                 // remove the previous layer if exists
-                this.onPreviewLayerRemove()
+                this.onPreviewLayerRemove();
 
                 // create new layer with the defualt options
                 this.previewLayer = new OpenLayers.Layer.WMS(
@@ -643,7 +643,7 @@
                 );
 
                 // merge any possible additional user parameters
-                if(typeof params !== 'undefined'){
+                if (typeof params !== 'undefined') {
                     this.previewLayer.mergeNewParams(params);
                 }
 
@@ -651,8 +651,8 @@
                 this.map.addLayer(this.previewLayer);
             },
 
-            onPreviewLayerRemove: function (){
-                if (this.previewLayer){
+            onPreviewLayerRemove: function () {
+                if (this.previewLayer) {
                     // unlink and reset the existing layer
                     this.map.removeLayer(this.previewLayer);
                     this.previewLayer = null;
