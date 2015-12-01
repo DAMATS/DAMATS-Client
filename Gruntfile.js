@@ -159,13 +159,22 @@ module.exports = function (grunt) {
         },
         coffee: {
             dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= yeoman.app %>/scripts',
-                    src: '{,*/}*.coffee',
-                    dest: '.tmp/scripts',
-                    ext: '.js'
-                }]
+                files: [
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>/scripts',
+                        src: '{,*/}*.coffee',
+                        dest: '.tmp/scripts',
+                        ext: '.js'
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>/modules',
+                        src: '{,*/}*.coffee',
+                        dest: '.tmp/modules',
+                        ext: '.js'
+                    },
+                ]
             }
         },
         compass: {
@@ -307,6 +316,13 @@ module.exports = function (grunt) {
                   dest: '<%= yeoman.dist %>/scripts/',   // Destination path prefix.
                   ext: '.js',   // Dest filepaths will have this extension.
                 },
+                {
+                  expand: true,     // Enable dynamic expansion.
+                  cwd: '<%= yeoman.app %>/modules',      // Src matches are relative to this path.
+                  src: ['**/*.js'], // Actual pattern(s) to match.
+                  dest: '<%= yeoman.dist %>/modules/',   // Destination path prefix.
+                  ext: '.js',   // Dest filepaths will have this extension.
+                },
               ]
             }
         },
@@ -348,6 +364,7 @@ module.exports = function (grunt) {
                         'bower_components/bootstrap/dist/*/*',
                         'bower_components/bootstrap-datepicker/js/bootstrap-datepicker.js',
                         'bower_components/bootstrap-datepicker/css/datepicker.css',
+                        'bower_components/bootstrap-select/dist/*/*',
                         'bower_components/font-awesome/css/*',
                         'bower_components/lm.js/lm.js',
                         'scripts/vendor/theme/default/style.css'

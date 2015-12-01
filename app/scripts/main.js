@@ -72,7 +72,7 @@
         // TODO: Separate static and dynamical configuration.
 
         // Load and parse client's configuration.
-        $.getJSON('scripts/config.json', function (values) {
+        $.getJSON('config.json', function (values) {
 
             var views = [];
             var models = [];
