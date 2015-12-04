@@ -62,7 +62,7 @@ html, body {
 }
 
 ul, li {
- 	list-style-type: none;
+  list-style-type: none;
   list-style-position: inside;
 }
 
@@ -298,6 +298,54 @@ button[active=active] {
   max-height: 10em;
   overflow-y: auto;
   overflow-x: auto;
+}
+
+.sits-creation .source-item {
+  width: 100%;
+}
+
+/*
+ * SITS Browser
+ */
+ .sits-browser {
+  width: 40em;
+  top: 10em;
+  right: 3em;
+  font-size: .9em;
+  position: relative;
+  float: right;
+ }
+
+.sits-browser .coverage-list {
+  max-height: 20em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.coverage-item-selected {
+  background-color: #fcc !important;
+}
+
+/*
+ * SITS Editor
+ */
+.sits-editor {
+  width: 40em;
+  top: 10em;
+  right: 3em;
+  font-size: .9em;
+  position: relative;
+  float: right;
+ }
+
+.sits-editor .coverage-list {
+  max-height: 20em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.coverage-item-selected {
+  background-color: #fcc !important;
 }
 
 /*

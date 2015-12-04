@@ -70,9 +70,11 @@
             onClick: function () {
                 this.check();
                 this.parentModel.set('source', this.model.get('identifier'));
+                Communicator.mediator.trigger(
+                    'map:layer:show:exclusive', this.model
+                );
             },
             check: function () {
-                //this.$('#rad-source').checked = true;
                 this.$('#rad-source').prop('checked', true);
             },
             reset: function () {
@@ -120,7 +122,7 @@
                 this.listenTo(this.model, 'change', this.onModelChange);
                 this.timeinterval = {};
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onClose, this));
+                this.$('.close').on('click', _.bind(this.onCloseClick, this));
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -270,7 +272,7 @@
                 }
             },
 
-            onClose: function () {
+            onCloseClick: function () {
                 this.close();
             }
         });

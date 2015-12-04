@@ -46,6 +46,8 @@ define(
                 groups: new DataModels.GroupCollection(),
                 user: new DataModels.UserModel(),
                 time_series: new DataModels.TimeSeriesCollection(),
+                productUrl: null,
+                productTemplate: {},
                 fetchAll: function () {
                     this.user.fetch();
                     this.groups.fetch();

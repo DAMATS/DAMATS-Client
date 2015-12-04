@@ -76,6 +76,8 @@
                 });
 
                 this.listenTo(Communicator.mediator, "map:center", this.centerMap);
+                this.listenTo(Communicator.mediator, "map:layer:add", this.addLayer);
+                this.listenTo(Communicator.mediator, "map:layer:remove", this.removeLayer);
                 this.listenTo(Communicator.mediator, "map:layer:change", this.changeLayer);
                 this.listenTo(Communicator.mediator, "map:layer:changeAttr", this.changeLayerAttributes);
                 this.listenTo(Communicator.mediator, 'map:set:extent', this.onSetExtent);
@@ -196,6 +198,23 @@
                     Communicator.mediator.trigger("map:size:change", this.map.getSize());
 
                 return this;
+            },
+
+            addLayer: function (layerdesc) {
+                var layers = this.map.getLayersByName(layerdesc.get('name'));
+                if (layers.length < 1) {
+                    console.log("Map.addLayer("+layerdesc.get('name')+")");
+                    this.map.addLayer(this.createLayer(layerdesc));
+                    this.onSortProducts();
+                }
+            },
+
+            removeLayer: function (layerdesc) {
+                var layers = this.map.getLayersByName(layerdesc.get('name'));
+                if (layers.length > 0) {
+                    console.log("Map.removeLayer("+layerdesc.get('name')+")");
+                    this.map.removeLayer(layers[0]);
+                }
             },
 
             //method to create layer depending on protocol
@@ -535,7 +554,7 @@
                             $("#error-messages").append(
                                 '<div class="alert alert-warning alert-danger">' +
                                 '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                                '<strong>Warning!</strong> ' + 
+                                '<strong>Warning!</strong> ' +
                                 'Info request failed!<br>' +
                                 'ERROR: ' + xhr.status + ' ' + xhr.statusText + '<br>' +
                                 'URL: <a target="_blank" href="' + url + '">' + url_short + '</a><br>' +
@@ -616,7 +635,6 @@
 
             onSetExtent: function (bbox) {
                 this.map.zoomToExtent(bbox);
-
             },
 
             onGetGeoJSON: function () {

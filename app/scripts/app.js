@@ -47,7 +47,10 @@
         'modules/damats/SITSManagerController',
         'modules/damats/SITSCreationController',
         'modules/damats/SITSRemovalController',
+        'modules/damats/SITSBrowserController',
+        'modules/damats/SITSEditorController',
         'modules/damats/UserProfileController',
+        'modules/damats/MapController',
         'router'
     ];
 
@@ -74,24 +77,6 @@
                 var views = {};
                 var models = {};
                 var templates = {};
-
-                // DAMATS specific URL configuration and data loading
-                globals.damats.user.url = (
-                    config.damats.url + '/' + config.damats.pathUser
-                );
-                globals.damats.groups.url = (
-                    config.damats.url + '/' + config.damats.pathGroups
-                );
-                globals.damats.sources.url = (
-                    config.damats.url + '/' + config.damats.pathSources
-                );
-                globals.damats.processes.url = (
-                    config.damats.url + '/' + config.damats.pathProcesses
-                );
-                globals.damats.time_series.url = (
-                    config.damats.url + '/' + config.damats.pathTimeSeries
-                );
-                globals.damats.fetchAll();
 
                 // Application regions are loaded and added
                 // to the Marionette Application
@@ -142,6 +127,43 @@
 
                 // Create and displaye map view.
                 this.map.show(new views.MapView({el: $('#map')}));
+
+                // DAMATS specific URL configuration and data loading
+                globals.damats.productTemplate = config.damats.productTemplate;
+                globals.damats.productUrl = (
+                    config.damats.url + config.damats.pathOWS
+                );
+                globals.damats.getProduct = function (id, description, has_time_slider) {
+                    // start with a deep copy of the template
+                    var obj = $.extend(true, {}, globals.damats.productTemplate);
+                    obj.description = description || null;
+                    obj.name = id;
+                    obj.download.id = id;
+                    obj.download.url = globals.damats.productUrl;
+                    obj.info.id = id;
+                    obj.info.url = globals.damats.productUrl;
+                    obj.view.id = id;
+                    obj.view.urls = [globals.damats.productUrl];
+                    obj.timeSlider = has_time_slider || false;
+                    return models.parseProductLayer(obj);
+                };
+                globals.damats.user.url = (
+                    config.damats.url + config.damats.pathUser
+                );
+                globals.damats.groups.url = (
+                    config.damats.url + config.damats.pathGroups
+                );
+                globals.damats.sources.url = (
+                    config.damats.url + config.damats.pathSources
+                );
+                globals.damats.processes.url = (
+                    config.damats.url + config.damats.pathProcesses
+                );
+                globals.damats.time_series.url = (
+                    config.damats.url + config.damats.pathTimeSeries
+                );
+                globals.damats.fetchAll();
+
 
                 // If Navigation Bar is set in configuration go through the
                 // defined elements creating a item collection to rendered
@@ -321,7 +343,7 @@
                     );
                 });
 
-                // Go through Navigation Bar items and for each throw 
+                // Go through Navigation Bar items and for each throw
                 // an activation event
                 // elements that are marked with show == true
                 if (config.navBarConfig) {

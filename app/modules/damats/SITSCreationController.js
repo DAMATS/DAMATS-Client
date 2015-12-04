@@ -64,14 +64,11 @@
             view: null,
 
             initialize: function (options) {
-                //this.model.set('products', {});
-                //this.listenTo(Communicator.mediator, 'map:layer:change', this.onChangeLayer);
                 this.listenTo(Communicator.mediator, 'sits:creation:create', this.onCreate);
                 this.listenTo(Communicator.mediator, 'sits:creation:name:set', this.onNameChange);
                 this.listenTo(Communicator.mediator, 'time:change', this.onTOIChange);
                 this.listenTo(Communicator.mediator, 'selection:changed', this.onAOIChange);
                 this.listenTo(Communicator.mediator, 'selection:bbox:changed', this.onAOIChange);
-                //this.listenTo(Communicator.mediator, 'dialog:open:download', this.onDownloadToolOpen);
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSCreation', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSCreation', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSCreation', this.onToggle);
@@ -129,10 +126,6 @@
                 }
             },
 
-            isClosed: function () {
-                return _.isUndefined(this.view.isClosed) || this.view.isClosed;
-            },
-
             onCreate: function () {
                 var model = this.model;
                 globals.damats.time_series.create({ // new object
@@ -153,6 +146,10 @@
                         );
                     }
                 });
+            },
+
+            isClosed: function () {
+                return _.isUndefined(this.view.isClosed) || this.view.isClosed;
             },
 
             onOpen: function (event_) {

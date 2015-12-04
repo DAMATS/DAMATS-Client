@@ -64,9 +64,7 @@
                 }, this));
             },
             onAccept: function () {
-                Communicator.mediator.trigger(
-                    'time_series:removal:proceed', this.model
-                );
+                this.model.destroy();
             }
         });
         return {SITSRemovalView: SITSRemovalView};

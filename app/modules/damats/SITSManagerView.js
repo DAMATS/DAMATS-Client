@@ -45,9 +45,6 @@
         var SITSManagerItemView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
             className: 'input-group sits-item',
-//            attributes: function () {
-//                return {type: 'button'};
-//            },
             template: {type: 'handlebars', template: SITSManagerItemTmpl},
             events: {
                 'click .btn-browse': 'onBrowse',
@@ -58,18 +55,24 @@
             },
 
             onClick: function () {
-                console.log(this.model.get('identifier') + '.onClick()');
+                this.onBrowse();
+            },
+
+            onReset: function () {
                 this.onBrowse();
             },
 
             onBrowse: function () {
-                console.log(this.model.get('identifier') + '.onBrowse()');
+                Communicator.mediator.trigger(
+                    'sits:browser:browse', this.model
+                );
             },
 
             onEdit: function () {
-                if (!this.model.get('locked'))
-                {
-                    console.log(this.model.get('identifier') + '.onEdit()');
+                if (!this.model.get('locked')) {
+                    Communicator.mediator.trigger(
+                        'sits:editor:edit', this.model
+                    );
                 }
             },
 
@@ -91,15 +94,15 @@
             },
             templateHelpers: function () {
                 return {
-                    numberOfSITS: this.collection.length,
-                    hasNoSITS: this.collection.length < 1
+                    length: this.collection.length,
+                    is_empty: this.collection.length < 1
                 };
             },
             tagName: 'div',
             className: 'panel panel-default sits-manager not-selectable',
             template: {type: 'handlebars', template: SITSManagerTmpl},
             events: {
-                'click #btn-sits-create': 'onSITSCreateClick'
+                'click #btn-sits-create': 'onCreateClick'
             },
 
             onShow: function (view) {
@@ -107,9 +110,10 @@
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
+                this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onClose, this));
+                this.$('.close').on('click', _.bind(this.onCloseClick, this));
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -117,12 +121,11 @@
                 });
             },
 
-            onSITSCreateClick: function () {
-                console.log('onSITSCreateClick()');
+            onCreateClick: function () {
                 Communicator.mediator.trigger('dialog:open:SITSCreation', true);
             },
 
-            onClose: function () {
+            onCloseClick: function () {
                 this.close();
             }
         });

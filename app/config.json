@@ -3,12 +3,38 @@
   "debug":true,
 
   "damats": {
-    "pathUser": "user",
-    "pathGroups": "groups",
-    "pathSources": "sources",
-    "pathTimeSeries": "time_series",
-    "pathProcesses": "processes",
-    "url": "http://127.0.0.1:8100/eoxs/damats"
+    "pathUser": "/damats/user",
+    "pathGroups": "/damats/groups",
+    "pathSources": "/damats/sources",
+    "pathTimeSeries": "/damats/time_series",
+    "pathProcesses": "/damats/processes",
+    "pathOWS": "/ows",
+    "url": "http://127.0.0.1:8100/eoxs",
+    "productTemplate": {
+        "description": null,
+        "download": {
+            "id": null,
+            "protocol": "EOWCS",
+            "rectified": true,
+            "url": null
+        },
+        "info": {
+            "id": null,
+            "protocol": "WPS",
+            "url": null
+        },
+        "name": null,
+        "timeSlider": true,
+        "timeSliderProtocol": "WPS",
+        "view": {
+            "extraLayers": {},
+            "id": null,
+            "protocol": "WMS",
+            "style": "default",
+            "urls": []
+        },
+        "visible": false
+    }
   },
 
   "mapConfig": {

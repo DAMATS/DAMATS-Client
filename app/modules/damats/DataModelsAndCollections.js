@@ -2,7 +2,6 @@
 //
 // Project: DAMATS Client
 // Authors: Martin Paces <martin.paces@eox.at>
-//          Daniel Santillan <daniel.santillan@eox.at>
 //
 //------------------------------------------------------------------------------
 // Copyright (C) 2015 EOX IT Services GmbH
@@ -61,6 +60,10 @@
                 owned: true
             }, defaults_baseline)
         });
+        var CoverageModel =  Backbone.Model.extend({
+            idAttribute: 'id',
+            defaults: {}
+        });
 
         var GroupCollection = Backbone.Collection.extend({
             model: GroupModel
@@ -71,6 +74,9 @@
         var TimeSeriesCollection = Backbone.Collection.extend({
             model: TimeSeriesModel
         });
+        var CoverageCollection = Backbone.Collection.extend({
+            model: CoverageModel
+        });
 
         return {
             UserModel: UserModel,
@@ -79,7 +85,9 @@
             SourceSeriesModel: SourceSeriesModel,
             SourceSeriesCollection: SourceSeriesCollection,
             TimeSeriesModel: TimeSeriesModel,
-            TimeSeriesCollection: TimeSeriesCollection
+            TimeSeriesCollection: TimeSeriesCollection,
+            CoverageModel: CoverageModel,
+            CoverageCollection: CoverageCollection
         };
     };
     root.define(deps, init);

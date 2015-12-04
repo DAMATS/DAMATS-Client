@@ -33,7 +33,8 @@
         'communicator',
         'globals',
         'app',
-        'modules/damats/SITSManagerView'
+        'modules/damats/DataModelsAndCollections',
+        'modules/damats/SITSEditorView'
     ];
 
     function init(
@@ -41,23 +42,40 @@
         Communicator,
         globals,
         App,
-        SITSManagerView
+        DataModels,
+        SITSEditorView
     ) {
-        var SITSManagerController = Backbone.Marionette.Controller.extend({
-            model: new Backbone.Model(),
-            collection: globals.damats.time_series,
+        var SITSEditorController = Backbone.Marionette.Controller.extend({
+            model: null,
+            collection: null,
             view: null,
 
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'dialog:open:SITSManager', this.onOpen);
-                this.listenTo(Communicator.mediator, 'dialog:close:SITSManager', this.onClose);
-                this.listenTo(Communicator.mediator, 'dialog:toggle:SITSManager', this.onToggle);
-                this.listenTo(Communicator.mediator, 'time_series:removal:proceed', this.onItemRemove);
+                this.listenTo(Communicator.mediator, 'sits:editor:edit', this.onEdit);
+                this.listenTo(Communicator.mediator, 'dialog:open:SITSEditor', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:SITSEditor', this.onClose);
+                this.listenTo(Communicator.mediator, 'dialog:toggle:SITSEditor', this.onToggle);
+            },
 
-                this.view = new SITSManagerView.SITSManagerView({
+            onEdit: function (model) {
+                if (
+                    !this.model || !this.collection || (
+                        this.model.get('identifier') !=
+                        sits_model.get('identifier')
+                    )
+                ) {
+                    this.collection = new DataModels.CoverageCollection();
+                    this.collection.url = sits_model.url();
+                    this.collection.fetch({
+                        url: this.collection.url + '?all'
+                    });
+                }
+                this.model = model;
+                this.view = new SITSEditorView.SITSEditorView({
                     model: this.model,
                     collection: this.collection
                 });
+                this.onOpen(true);
             },
 
             isClosed: function () {
@@ -65,19 +83,19 @@
             },
 
             onOpen: function (event_) {
-                if (this.isClosed()) {
+                if (this.view && this.isClosed()) {
                     App.viewContent.show(this.view);
                 }
             },
 
             onClose: function (event_) {
-                if (!this.isClosed()) {
+                if (this.view && !this.isClosed()) {
                     this.view.close();
                 }
             },
 
             onToggle: function (event_) {
-                if (this.isClosed()) {
+                if (this.view && this.isClosed()) {
                     this.onOpen(event_);
                 } else {
                     this.onClose(event_);
@@ -85,7 +103,7 @@
             }
         });
 
-        return new SITSManagerController();
+        return new SITSEditorController();
     };
 
     root.require(deps, init);
