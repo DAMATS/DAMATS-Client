@@ -53,15 +53,16 @@
                 'data-backdrop': 'static'
             },
             events: {
-                'click #sits-removal-accept': 'onAccept'
+                'click #sits-removal-accept': 'onAccept',
+                'hidden.bs.modal': 'onCancel'
             },
             onShow: function (view) {
                 this.delegateEvents(this.events);
-                this.$el.on('hidden.bs.modal', _.bind(function () {
-                    Communicator.mediator.trigger(
-                        'dialog:close:SITSRemove', this.model
-                    );
-                }, this));
+            },
+            onCancel: function () {
+                Communicator.mediator.trigger(
+                    'dialog:close:SITSRemove', this.model
+                );
             },
             onAccept: function () {
                 this.model.destroy();

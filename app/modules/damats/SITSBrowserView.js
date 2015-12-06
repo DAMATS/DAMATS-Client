@@ -126,7 +126,8 @@
             className: 'panel panel-default sits-browser not-selectable',
             template: {type: 'handlebars', template: SITSBrowserTmpl},
             events: {
-                'click #btn-focus': 'onFocusClick'
+                'click #btn-focus': 'onFocusClick',
+                'click .close': 'close'
             },
 
             onShow: function (view) {
@@ -137,7 +138,6 @@
                 this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onCloseClick, this));
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model
                 );
@@ -167,10 +167,6 @@
                 Communicator.mediator.trigger('map:set:extent', [
                     ext.x0, ext.y0, ext.x1, ext.y1
                 ]);
-            },
-
-            onCloseClick: function () {
-                this.close();
             }
         });
 

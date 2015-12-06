@@ -57,18 +57,18 @@
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSBrowser', this.onToggle);
             },
 
-            onBrowse: function (sits_model) {
+            onBrowse: function (model) {
                 if (
                     !this.model || !this.collection || (
                         this.model.get('identifier') !=
-                        sits_model.get('identifier')
+                        model.get('identifier')
                     )
                 ) {
                     this.collection = new DataModels.CoverageCollection();
-                    this.collection.url = sits_model.url();
+                    this.collection.url = model.url();
                     this.collection.fetch();
                 }
-                this.model = sits_model;
+                this.model = model;
 
                 this.view = new SITSBrowserView.SITSBrowserView({
                     model: this.model,

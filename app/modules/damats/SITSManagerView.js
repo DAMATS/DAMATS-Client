@@ -102,7 +102,8 @@
             className: 'panel panel-default sits-manager not-selectable',
             template: {type: 'handlebars', template: SITSManagerTmpl},
             events: {
-                'click #btn-sits-create': 'onCreateClick'
+                'click #btn-sits-create': 'onCreateClick',
+                'click .close': 'close'
             },
 
             onShow: function (view) {
@@ -113,7 +114,6 @@
                 this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onCloseClick, this));
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -123,10 +123,6 @@
 
             onCreateClick: function () {
                 Communicator.mediator.trigger('dialog:open:SITSCreation', true);
-            },
-
-            onCloseClick: function () {
-                this.close();
             }
         });
 

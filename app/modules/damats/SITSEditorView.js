@@ -53,12 +53,12 @@
                 return {is_selected: this.is_selected};
             },
             events: {
-                'click': 'onClick'
+                //'click': 'onClick',
+                'click #checkbox': 'onCheckboxClick'
             },
             initialize: function (options) {
                 this.parentModel = options.parentModel;
-                //this.listenTo(this.parentModel, 'change:selection', this.reset);
-                //this.is_selected = false;
+                this.listenTo(this.model, 'change:in', this.render);
             },
             onShow: function () {
             /*
@@ -66,6 +66,9 @@
                     this.$el.addClass("coverage-item-selected");
                 }
             */
+            },
+            onCheckboxClick: function () {
+                this.model.set('in', !this.model.get('in'))
             },
             onClick: function () {
                 console.log(this.model.get('id'));
@@ -94,13 +97,10 @@
             */
             },
             isSelected: function () {
-            /*
                 var selected = (
                     this.parentModel ? this.parentModel.get('selection') : null
                 );
                 return this.model.get('identifier') == selected;
-            */
-                return false;
             }
         });
 
@@ -124,7 +124,8 @@
             className: 'panel panel-default sits-editor not-selectable',
             template: {type: 'handlebars', template: SITSEditorTmpl},
             events: {
-                'click #btn-focus': 'onFocusClick'
+                'click #btn-focus': 'onFocusClick',
+                'click .close': 'close'
             },
 
             onShow: function (view) {
@@ -135,7 +136,11 @@
                 this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onCloseClick, this));
+                this.$el.draggable({
+                    containment: '#content' ,
+                    scroll: false,
+                    handle: '.panel-heading'
+                });
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model
                 );
@@ -163,10 +168,6 @@
                 Communicator.mediator.trigger('map:set:extent', [
                     ext.x0, ext.y0, ext.x1, ext.y1
                 ]);
-            },
-
-            onCloseClick: function () {
-                this.close();
             }
         });
 

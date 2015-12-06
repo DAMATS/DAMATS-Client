@@ -69,7 +69,8 @@
                 'click #btn-user-update': 'onUpdateClick',
                 'click #btn-user-refresh': 'onRefreshClick',
                 'change #txt-user-name': 'onNameChange',
-                'change #txt-user-description': 'onDescriptionChange'
+                'change #txt-user-description': 'onDescriptionChange',
+                'click .close': 'close'
             },
 
             onShow: function (view) {
@@ -78,8 +79,6 @@
                 this.listenTo(this.collection, 'reset', this.onModelChange);
                 this.listenTo(this.collection, 'update', this.onModelChange);
                 this.delegateEvents(this.events);
-                // TODO: check next line
-                this.$('.close').on('click', _.bind(this.onClose, this));
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -96,8 +95,6 @@
 
             onRefreshClick: function () {
                 globals.damats.fetchAll();
-                //this.model.fetch();
-                //this.collection.fetch();
                 this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 
@@ -121,10 +118,6 @@
             onDescriptionChange: function () {
                 this.model.set({description: $('#txt-user-description').val()});
                 this.$('#btn-user-update').removeAttr('disabled');
-            },
-
-            onClose: function () {
-                this.close();
             }
         });
 
@@ -132,6 +125,5 @@
     };
 
     root.define(deps, init);
-
 }).call(this);
 

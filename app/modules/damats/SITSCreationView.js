@@ -58,7 +58,7 @@
             },
             initialize: function (options) {
                 this.parentModel = options.parentModel;
-                this.listenTo(this.parentModel, 'change:source', this.reset);
+                this.listenTo(this.parentModel, 'change:source', this.render);
             },
             template: {
                 type: 'handlebars',
@@ -68,19 +68,10 @@
                 return {is_selected: this.isSelected()};
             },
             onClick: function () {
-                this.check();
                 this.parentModel.set('source', this.model.get('identifier'));
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model
                 );
-            },
-            check: function () {
-                this.$('#rad-source').prop('checked', true);
-            },
-            reset: function () {
-                if (!this.isSelected()) {
-                    this.$('#rad-source').prop('checked', false);
-                }
             },
             isSelected: function () {
                 var selected = (
@@ -112,7 +103,8 @@
                 'change #txt-maxx': 'onBBoxFormChange',
                 'change #txt-miny': 'onBBoxFormChange',
                 'change #txt-maxy': 'onBBoxFormChange',
-                'hide': 'onCloseTimeWidget'
+                'hide': 'onCloseTimeWidget',
+                'click .close': 'this.close'
             },
 
             onShow: function (view) {
@@ -122,7 +114,6 @@
                 this.listenTo(this.model, 'change', this.onModelChange);
                 this.timeinterval = {};
                 this.delegateEvents(this.events);
-                this.$('.close').on('click', _.bind(this.onCloseClick, this));
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -270,10 +261,6 @@
                 } else {
                     this.$('#btn-sits-create').attr('disabled', 'disabled');
                 }
-            },
-
-            onCloseClick: function () {
-                this.close();
             }
         });
 

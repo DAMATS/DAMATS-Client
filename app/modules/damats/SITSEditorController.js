@@ -65,7 +65,7 @@
                     )
                 ) {
                     this.collection = new DataModels.CoverageCollection();
-                    this.collection.url = sits_model.url();
+                    this.collection.url = model.url();
                     this.collection.fetch({
                         url: this.collection.url + '?all'
                     });
