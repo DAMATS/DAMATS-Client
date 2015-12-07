@@ -88,7 +88,7 @@
             libcoverage: '../bower_components/libcoverage/libcoverage.min',
             filesaver: '../bower_components/filesaver/FileSaver',
             lm: '../bower_components/lm.js/lm',
-            'bootstrap-datepicker': '../bower_components/bootstrap-datepicker/js/bootstrap-datepicker',
+            'bootstrap-datepicker': '../bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min',
             'bootstrap-select': '../bower_components/bootstrap-select/dist/js/bootstrap-select.min',
 
             /* alias all marionette libs */

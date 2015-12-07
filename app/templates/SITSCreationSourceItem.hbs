@@ -1,8 +1,6 @@
-<div class="input-group">
-    <span class="input-group-addon" id="radio">
-        {{#if is_selected}}<i class="fa fa-fw fa-check text-success"></i>{{else}}<i class="fa fa-fw fa-circle-o"></i>{{/if}}
-    </span>
-    <span class="form-control" {{#if description }}title="{{ description }}"{{/if}}>
-      <i class="fa fa-fw fa-list"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}
-    </span>
-</div>
+<span class="input-group-addon" id="radio">
+    {{#if is_selected}}<i class="fa fa-fw fa-check text-success"></i>{{else}}<i class="fa fa-fw fa-circle-o"></i>{{/if}}
+</span>
+<span class="form-control" {{#if description }}title="{{ description }}"{{/if}} style="height:auto;">
+  <i class="fa fa-fw fa-list"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}
+</span>
