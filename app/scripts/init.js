@@ -42,11 +42,13 @@
         ],
 
         shim: {
-            /*jqueryui: 'jquery',*/
             handlebars: {
                 exports: 'Handlebars'
             },
 
+            jqueryui: {
+                deps: ['jquery']
+            },
             backbone: {
                 deps: [
                     'underscore',
