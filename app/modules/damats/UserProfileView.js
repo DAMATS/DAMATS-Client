@@ -45,8 +45,8 @@
         UserProfileGroupItemTmpl
     ) {
         var UserProfileGroupItemView = Backbone.Marionette.ItemView.extend({
-            tagName: "li",
-            className: "list-group-item user-group-item",
+            tagName: 'li',
+            className: 'list-group-item user-group-item',
             template: {type: 'handlebars', template: UserProfileGroupItemTmpl}
         });
 
@@ -57,8 +57,14 @@
             },
             templateHelpers: function () {
                 return {
-                    numberOfGroups: this.collection.length,
-                    hasNoGroup: this.collection.length < 1
+                    is_fetching: (
+                        this.model.is_fetching || this.collection.is_fetching
+                    ),
+                    fetch_failed: (
+                        this.model.fetch_failed || this.collection.fetch_failed
+                    ),
+                    length: this.collection.length,
+                    is_empty: this.collection.length < 1
                 };
             },
 
@@ -78,6 +84,10 @@
                 this.listenTo(this.model, 'change', this.onModelChange);
                 this.listenTo(this.collection, 'reset', this.onModelChange);
                 this.listenTo(this.collection, 'update', this.onModelChange);
+                this.listenTo(this.model, 'fetch:start', this.render);
+                this.listenTo(this.model, 'fetch:stop', this.render);
+                this.listenTo(this.collection, 'fetch:start', this.render);
+                this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,

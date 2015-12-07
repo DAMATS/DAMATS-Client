@@ -41,19 +41,46 @@
                 description: null
         };
 
+        function fetch(options) {
+            options = options ? _.clone(options) : {};
+            var this_ = this;
+            var success = options.success;
+            var error = options.error;
+            options.success = function (model, resp, options) {
+                this_.is_fetching = false;
+                this_.fetch_failed = false;
+                this_.trigger('fetch:stop');
+                if (success) success.call(this, model, resp, options);
+            };
+            options.error = function (xhr, textStatus, errorThrown) {
+                this_.is_fetching = false;
+                this_.fetch_failed = true;
+                this_.trigger('fetch:stop');
+                if (error) error.call(this, xhr, textStatus, errorThrown);
+            };
+            this.is_fetching = true;
+            this.fetch_failed = null ;
+            this.trigger('fetch:start');
+            return this.constructor.__super__.fetch.call(this, options);
+        }
+
         var UserModel = Backbone.Model.extend({
+            fetch: fetch,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var GroupModel = Backbone.Model.extend({
+            fetch: fetch,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var SourceSeriesModel = Backbone.Model.extend({
+            fetch: fetch,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var TimeSeriesModel = Backbone.Model.extend({
+            fetch: fetch,
             idAttribute: 'identifier',
             defaults: _.extend({
                 locked: true,
@@ -61,20 +88,25 @@
             }, defaults_baseline)
         });
         var CoverageModel =  Backbone.Model.extend({
+            fetch: fetch,
             idAttribute: 'id',
             defaults: {}
         });
 
         var GroupCollection = Backbone.Collection.extend({
+            fetch: fetch,
             model: GroupModel
         });
         var SourceSeriesCollection = Backbone.Collection.extend({
+            fetch: fetch,
             model: SourceSeriesModel
         });
         var TimeSeriesCollection = Backbone.Collection.extend({
+            fetch: fetch,
             model: TimeSeriesModel
         });
         var CoverageCollection = Backbone.Collection.extend({
+            fetch: fetch,
             model: CoverageModel
         });
 

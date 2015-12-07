@@ -70,7 +70,7 @@
                         url: this.collection.url + '?all'
                     });
                 }
-                this.model = model;
+                this.model = model.clone();
                 this.view = new SITSEditorView.SITSEditorView({
                     model: this.model,
                     collection: this.collection

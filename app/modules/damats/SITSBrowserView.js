@@ -51,7 +51,7 @@
             },
             templateHelpers: function () {
                 return {
-                    is_selected: this.is_selected
+                    is_selected: this.isSelected
                 };
             },
             events: {
@@ -59,50 +59,41 @@
             },
             initialize: function (options) {
                 this.parentModel = options.parentModel;
-                //this.listenTo(this.parentModel, 'change:selection', this.reset);
-                //this.is_selected = false;
+                this.listenTo(this.parentModel, 'change:selected', this.onSelectionChange);
             },
-            onShow: function () {
-            /*
-                if (this.is_selected) {
-                    this.$el.addClass("coverage-item-selected");
-                }
-            */
+
+            onRender: function () {
+                this.onSelectionChange();
             },
+
             onClick: function () {
-                console.log(this.model.get('id'));
-                //this.is_selected = true;
-                //this.$el.addClass("coverage-item-selected");
-                this.$el.addClass('label-primary');
-                //this.parentModel.set('selection', this.model);
+                this.parentModel.set('selected', this.model.get('id'));
+            },
+
+            setLayer: function () {
                 Communicator.mediator.trigger(
                     'time:change', {
                         start: new Date(this.model.get('t0')),
                         end: new Date(this.model.get('t1'))
                 });
-                /*
-                Communicator.mediator.trigger("map:set:extent", [
-                    this.model.get('x0'), this.model.get('y0'),
-                    this.model.get('x1'), this.model.get('y1')
-                ]);
-                */
             },
-            reset: function () {
-            /*
-                if(this.is_selected) {
-                    this.is_selected = false;
-                    this.$el.removeClass("coverage-item-selected");
+
+            onSelectionChange: function () {
+                var previous = this.parentModel.previous('selected');
+                var current = this.parentModel.get('selected');
+                var id = this.model.get('id');
+                var className = 'list-group-item-info';
+                if ((id == current) && (id != previous)) {
+                    this.$el.addClass(className);
+                    this.setLayer();
+                } else if ((id != current) && (id == previous)) {
+                    this.$el.removeClass(className);
                 }
-            */
             },
+
             isSelected: function () {
-            /*
-                var selected = (
-                    this.parentModel ? this.parentModel.get('selection') : null
-                );
-                return this.model.get('identifier') == selected;
-            */
-                return false;
+                var selected = this.parentModel.get('selected');
+                return this.model.get('id') == selected;
             }
         });
 
@@ -118,6 +109,8 @@
             },
             templateHelpers: function () {
                 return {
+                    is_fetching: this.collection.is_fetching,
+                    fetch_failed: this.collection.fetch_failed,
                     length: this.collection.length,
                     is_empty: this.collection.length < 1
                 };
@@ -131,12 +124,14 @@
             },
 
             onShow: function (view) {
-                this.listenTo(this.model, 'change', this.render);
+                //this.listenTo(this.model, 'change', this.render);
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
                 this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
+                this.listenTo(this.collection, 'fetch:start', this.render);
+                this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.delegateEvents(this.events);
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model

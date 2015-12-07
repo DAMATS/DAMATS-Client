@@ -4,11 +4,21 @@
 </div>
 <div class="panel-body">
 <h5>Available SITS:</h5>
-{{#if is_empty }}
-  <p class="alert">No time series avaialable.</p>
+{{#if is_fetching }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-cog fa-spin"></i> Loading data ...
+  </p>
+{{else}}{{#if fetch_failed }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-warning"></i> Failed to load the data from the server!
+  </p>
+{{else}}{{#if is_empty }}
+  <p class="text-danger" id="alert">
+    No time series avaialable.</p>
+  </p>
 {{else}}
   <div class="list-group sits-list" id="sits-list"></div>
-{{/if}}
+{{/if}}{{/if}}{{/if}}
 </div>
 <div class="panel-footer">
   <button class="btn btn-block btn-primary" id="btn-sits-create"  href="#modal-sits-create" title="Create a new time series."><i class="fa fa-fw fa-plus-square"></i>&nbsp;Create new SIST</button>

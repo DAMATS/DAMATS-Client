@@ -94,6 +94,8 @@
             },
             templateHelpers: function () {
                 return {
+                    is_fetching: this.collection.is_fetching,
+                    fetch_failed: this.collection.fetch_failed,
                     length: this.collection.length,
                     is_empty: this.collection.length < 1
                 };
@@ -113,6 +115,8 @@
                 this.listenTo(this.collection, 'reset', this.render);
                 this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
+                this.listenTo(this.collection, 'fetch:start', this.render);
+                this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,

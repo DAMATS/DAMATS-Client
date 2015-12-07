@@ -68,7 +68,7 @@
                     this.collection.url = model.url();
                     this.collection.fetch();
                 }
-                this.model = model;
+                this.model = model.clone();
 
                 this.view = new SITSBrowserView.SITSBrowserView({
                     model: this.model,

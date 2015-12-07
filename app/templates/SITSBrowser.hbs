@@ -4,11 +4,21 @@
 </div>
 <div class="panel-body">
   <h5 {{#if description }}title="{{ description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;{{#if name }}<strong>{{ name }}</strong><br>({{ identifier }}){{ else }}<strong>{{ identifier}}</strong>{{/if}}</h5>
-  {{#if is_empty }}
-    <p class="alert">The SITS has no product.</p>
-  {{else}}
-    <ul class="list-group coverage-list" id="coverage-list"></ul>
-  {{/if}}
+{{#if is_fetching }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-cog fa-spin"></i> Loading data ...
+  </p>
+{{else}}{{#if fetch_failed }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-warning"></i> Failed to load the data from the server!
+  </p>
+{{else}}{{#if is_empty }}
+  <p class="text-danger" id="alert">
+    The SIST has no product.</p>
+  </p>
+{{else}}
+  <ul class="list-group coverage-list" id="coverage-list"></ul>
+{{/if}}{{/if}}{{/if}}
 <div class="panel-footer">
   <button class="btn btn-block" id="btn-focus"  href="#modal-focus" title="Focus to the SIST extent."><i class="fa fa-fw fa-arrows-alt"></i>&nbsp;Focus</button>
 </div>

@@ -3,13 +3,24 @@
     <h3 class="panel-title"><i class="fa fa-fw fa-user"></i>&nbsp;User Profile</h3>
 </div>
 <div class="panel-body">
+{{#if is_fetching }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-cog fa-spin"></i> Loading user profile ...
+  </p>
+{{else}}{{#if fetch_failed }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-warning"></i> Failed to load the user profile from the server!
+  </p>
+{{else}}
   <h4 {{#if description }}title="{{ description }}"{{/if}}><i class="fa fa-fw fa-user"></i>&nbsp;{{#if name }}{{ name }} ({{ identifier }}){{ else }}{{ identifier}}{{/if}}</h4>
-{{#if hasNoGroup }}
-  <p class="alert">The user is not member of any group.</p>
+{{#if is_empty }}
+  <p class="text-danger" id="alert">
+    The user is not member of any group.
+  </p>
 {{else}}
   <p>The user is member of following groups:</p>
   <ul class="list-group user-group-list" id="user-group-list"></ul>
-{{/if}}
+{{/if}}{{/if}}{{/if}}
 <div class="panel-footer">
   <div class="form-horizontal">
     <div class="form-group">
