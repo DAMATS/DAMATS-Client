@@ -31,6 +31,7 @@
     var deps = [
         'backbone',
         'communicator',
+        'globals',
         'hbs!tmpl/SITSBrowser',
         'hbs!tmpl/SITSBrowserCoverageItem',
         'underscore'
@@ -39,6 +40,7 @@
     function init(
         Backbone,
         Communicator,
+        globals,
         SITSBrowserTmpl,
         SITSBrowserCoverageItemTmpl
     ) {
@@ -75,11 +77,21 @@
             },
 
             setLayer: function () {
+                var product = globals.damats.getProduct(
+                    this.model.get('id'), null, false
+                );
+                Communicator.mediator.trigger(
+                    'map:preview:set', globals.damats.productUrl,
+                    this.model.get('id') + ',' +
+                    this.model.get('id') + '_outlines'
+                );
+                /*
                 Communicator.mediator.trigger(
                     'time:change', {
                         start: new Date(this.model.get('t0')),
                         end: new Date(this.model.get('t1'))
                 });
+                */
             },
 
             onSelectionChange: function () {
@@ -156,7 +168,8 @@
                     handle: '.panel-heading'
                 });
                 Communicator.mediator.trigger(
-                    'map:layer:show:exclusive', this.model
+                    'map:layer:hide:all', true
+                    //'map:layer:show:exclusive', this.model
                 );
             },
 

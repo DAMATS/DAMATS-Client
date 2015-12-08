@@ -31,6 +31,7 @@
     var deps = [
         'backbone',
         'communicator',
+        'globals',
         'hbs!tmpl/SITSEditor',
         'hbs!tmpl/SITSEditorCoverageItem',
         'underscore'
@@ -39,6 +40,7 @@
     function init(
         Backbone,
         Communicator,
+        globals,
         SITSEditorTmpl,
         SITSEditorCoverageItemTmpl
     ) {
@@ -92,13 +94,25 @@
                 var id = this.model.get('id');
                 this.parentModel.set('selected', this.model.get('id'));
             },
+
             setLayer: function () {
+                var product = globals.damats.getProduct(
+                    this.model.get('id'), null, false
+                );
+                Communicator.mediator.trigger(
+                    'map:preview:set', globals.damats.productUrl,
+                    this.model.get('id') + ',' +
+                    this.model.get('id') + '_outlines'
+                );
+                /*
                 Communicator.mediator.trigger(
                     'time:change', {
                         start: new Date(this.model.get('t0')),
                         end: new Date(this.model.get('t1'))
                 });
+                */
             },
+
             onSelectionChange: function () {
                 var previous = this.parentModel.previous('selected');
                 var current = this.parentModel.get('selected');
@@ -111,6 +125,7 @@
                     this.$('#item').removeClass(className);
                 }
             },
+
             isSelected: function () {
                 var selected = this.parentModel.get('selected');
                 return this.model.get('id') == selected;
@@ -172,7 +187,8 @@
                     handle: '.panel-heading'
                 });
                 Communicator.mediator.trigger(
-                    'map:layer:show:exclusive', this.model
+                    'map:layer:hide:all', true
+                    //'map:layer:show:exclusive', this.model
                 );
             },
 
@@ -189,6 +205,7 @@
             scrollTo: function (id) {
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
+                if ($item.get().length < 1) return;
                 $list.scrollTop(
                     $list.scrollTop() + $item.offset().top - $list.offset().top
                 );

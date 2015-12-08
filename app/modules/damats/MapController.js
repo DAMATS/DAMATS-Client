@@ -50,6 +50,7 @@
                 this.listenTo(Communicator.mediator, 'map:layer:show:exclusive', this.showLayerExlusive);
                 this.listenTo(Communicator.mediator, 'map:layer:show', this.showLayer);
                 this.listenTo(Communicator.mediator, 'map:layer:hide', this.hideLayer);
+                this.listenTo(Communicator.mediator, 'map:layer:hide:all', this.hideAllLayers);
                 // TODO Hide them all!
             },
             onAddLayer: function (model) {
@@ -69,6 +70,17 @@
                 }
             },
             showLayerExlusive: function (model) {
+                this.hideAllLayers();
+                this.showLayer(model);
+            },
+            showLayer: function (model) {
+                this.changeLayer({
+                    name: model.get('identifier'),
+                    isBaseLayer: false,
+                    visible: true
+                });
+            },
+            hideAllLayers: function () {
                 var that = this;
                 globals.products.each(function (model) {
                     if (model.get('visible')) {
@@ -78,14 +90,6 @@
                             visible: false
                         });
                     }
-                });
-                this.showLayer(model);
-            },
-            showLayer: function (model) {
-                this.changeLayer({
-                    name: model.get('identifier'),
-                    isBaseLayer: false,
-                    visible: true
                 });
             },
             hideLayer: function (model) {
