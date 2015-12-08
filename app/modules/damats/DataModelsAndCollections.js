@@ -42,20 +42,23 @@
         };
 
         function fetch(options) {
-            options = options ? _.clone(options) : {};
             var this_ = this;
-            var success = options.success;
-            var error = options.error;
+            var success, error;
+            options = options ? _.clone(options) : {};
+            success = options.success;
+            error = options.error;
             options.success = function (model, resp, options) {
                 this_.is_fetching = false;
                 this_.fetch_failed = false;
                 this_.trigger('fetch:stop');
+                this_.trigger('fetch:success');
                 if (success) success.call(this, model, resp, options);
             };
             options.error = function (xhr, textStatus, errorThrown) {
                 this_.is_fetching = false;
                 this_.fetch_failed = true;
                 this_.trigger('fetch:stop');
+                this_.trigger('fetch:error');
                 if (error) error.call(this, xhr, textStatus, errorThrown);
             };
             this.is_fetching = true;
@@ -64,23 +67,60 @@
             return this.constructor.__super__.fetch.call(this, options);
         }
 
+        function save(key, val, options) {
+            var this_ = this;
+            var success, error, attributes;
+            // process input arguments
+            if (key == null || typeof key === 'object') {
+                attributes = key;
+                options = val;
+            } else {
+                (attributes = {})[key] = val;
+            }
+            options = options ? _.clone(options) : {};
+            success = options.success;
+            error = options.error;
+            options.success = function (model, resp, options) {
+                this_.is_saving = false;
+                this_.save_failed = false;
+                this_.trigger('save:stop');
+                this_.trigger('save:success');
+                if (success) success.call(this, model, resp, options);
+            };
+            options.error = function (xhr, textStatus, errorThrown) {
+                this_.is_saving = false;
+                this_.save_failed = true;
+                this_.trigger('save:stop');
+                this_.trigger('save:error');
+                if (error) error.call(this, xhr, textStatus, errorThrown);
+            };
+            this_.is_saving = true;
+            this_.save_failed = null;
+            this_.trigger('save:start');
+            return this.constructor.__super__.save.call(this, attributes, options);
+        }
+
         var UserModel = Backbone.Model.extend({
             fetch: fetch,
+            save: save,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var GroupModel = Backbone.Model.extend({
             fetch: fetch,
+            save: save,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var SourceSeriesModel = Backbone.Model.extend({
             fetch: fetch,
+            save: save,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
         var TimeSeriesModel = Backbone.Model.extend({
             fetch: fetch,
+            save: save,
             idAttribute: 'identifier',
             defaults: _.extend({
                 locked: true,
@@ -89,6 +129,7 @@
         });
         var CoverageModel =  Backbone.Model.extend({
             fetch: fetch,
+            save: save,
             idAttribute: 'id',
             defaults: {}
         });

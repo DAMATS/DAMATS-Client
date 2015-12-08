@@ -45,12 +45,18 @@
         var SITSEditorItemView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
             className: 'input-group coverage-item',
+            attributes: function () {
+                return {id: this.model.get('id')};
+            },
             template: {
                 type: 'handlebars',
                 template: SITSEditorCoverageItemTmpl
             },
             templateHelpers: function () {
-                return {is_selected: this.is_selected};
+                return {
+                    is_saving: this.is_saving,
+                    is_selected: this.isSelected()
+                };
             },
             events: {
                 'click #item': 'onClick',
@@ -58,21 +64,34 @@
             },
             initialize: function (options) {
                 this.parentModel = options.parentModel;
-                this.listenTo(this.model, 'change:in', this.render);
+                this.listenTo(this.model, 'save:stop', this.onSaveStop);
                 this.listenTo(this.parentModel, 'change:selected', this.onSelectionChange);
+                this.is_saving = false;
             },
             onRender: function () {
                 this.onSelectionChange();
             },
             onCheckboxClick: function () {
-                this.model.set('in', !this.model.get('in'))
+                var model = this.model;
+                if (!this.is_saving) {
+                    this.model.save('in', !this.model.get('in'), {
+                        error: function () {
+                            // in case of a save failure revert
+                            // to the previous state
+                            model.set('in', model.previous('in'));
+                        }
+                    });
+                    this.is_saving = true;
+                }
+            },
+            onSaveStop: function () {
+                this.is_saving = false;
+                this.render();
             },
             onClick: function () {
                 var id = this.model.get('id');
-                console.log("click("+id+")")
                 this.parentModel.set('selected', this.model.get('id'));
             },
-
             setLayer: function () {
                 Communicator.mediator.trigger(
                     'time:change', {
@@ -80,22 +99,18 @@
                         end: new Date(this.model.get('t1'))
                 });
             },
-
             onSelectionChange: function () {
                 var previous = this.parentModel.previous('selected');
                 var current = this.parentModel.get('selected');
                 var id = this.model.get('id');
                 var className = 'alert-info';
                 if ((id == current) && (id != previous)) {
-                    console.log("select("+id+")")
                     this.$('#item').addClass(className);
                     this.setLayer();
                 } else if ((id != current) && (id == previous)) {
-                    console.log("unselect("+id+")")
                     this.$('#item').removeClass(className);
                 }
             },
-
             isSelected: function () {
                 var selected = this.parentModel.get('selected');
                 return this.model.get('id') == selected;
@@ -125,11 +140,24 @@
             template: {type: 'handlebars', template: SITSEditorTmpl},
             events: {
                 'click #btn-focus': 'onFocusClick',
+                'click #btn-open-manager': 'openManager',
+                'click #btn-open-browser': 'openBrowser',
+                'click #btn-refetch': 'refetch',
+                'click #btn-delete': 'removeSITS',
+                'click #btn-first': 'selectFirst',
+                'click #btn-last': 'selectLast',
+                'click #btn-prev': 'selectPrevious',
+                'click #btn-next': 'selectNext',
+                'click #btn-current': 'scrollToCurrent',
                 'click .close': 'close'
             },
 
+            initialize: function (options) {
+                this.sourceModel = options.sourceModel;
+            },
+
             onShow: function (view) {
-                //this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.sourceModel, 'destroy', this.openManager);
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
@@ -146,6 +174,83 @@
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model
                 );
+            },
+
+            onRender: function () {
+                this.scrollToCurrent();
+            },
+
+            removeSITS: function () {
+                Communicator.mediator.trigger(
+                    'time_series:removal:confirm', this.sourceModel
+                );
+            },
+
+            scrollTo: function (id) {
+                var $list = this.$('#coverage-list');
+                var $item = this.$('#' + id);
+                $list.scrollTop(
+                    $list.scrollTop() + $item.offset().top - $list.offset().top
+                );
+            },
+
+            getIndexOf: function (id) {
+                 // TODO: Change to findIndex after upgrading Underscore.js
+                var model = this.collection.find(function (model) {
+                    return model.get('id') == id;
+                });
+                return this.collection.indexOf(model);
+            },
+
+            selectByIndex: function (index) {
+                if (this.collection.length < 1) return;
+                index = index % this.collection.length;
+                if (index < 0) {
+                    index += this.collection.length;
+                }
+                var selected = this.collection.at(index).get('id');
+                if (selected != this.model.get('selected'))
+                {
+                    this.model.set('selected', selected);
+                    this.scrollTo(selected);
+                }
+            },
+
+            selectFirst: function () {
+                this.selectByIndex(0);
+            },
+
+            selectLast: function () {
+                this.selectByIndex(-1);
+            },
+
+            scrollToCurrent: function () {
+                this.scrollTo(this.model.get('selected'));
+            },
+
+            selectPrevious: function () {
+                var index = this.getIndexOf(this.model.get('selected'));
+                this.selectByIndex(Math.max(0, index - 1));
+            },
+
+            selectNext: function () {
+                var length = this.collection.length;
+                var index = this.getIndexOf(this.model.get('selected'));
+                this.selectByIndex(Math.min(length - 1, index + 1));
+            },
+
+            openManager: function () {
+                Communicator.mediator.trigger('dialog:open:SITSManager', true);
+            },
+
+            openBrowser: function () {
+                Communicator.mediator.trigger(
+                    'sits:browser:browse', this.sourceModel
+                );
+            },
+
+            refetch: function () {
+                Communicator.mediator.trigger('sits:editor:fetch', true);
             },
 
             onFocusClick: function () {

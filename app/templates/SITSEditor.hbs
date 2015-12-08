@@ -20,5 +20,23 @@
   <div class="coverage-list" id="coverage-list"></div>
 {{/if}}{{/if}}{{/if}}
 <div class="panel-footer">
-  <button class="btn btn-block" id="btn-focus"  href="#modal-focus" title="Focus to the SIST extent."><i class="fa fa-fw fa-arrows-alt"></i>&nbsp;Focus</button>
+  <span class="btn-group" role="button">
+    <button type="button" class="btn btn-default" id="btn-focus"><i class="fa fa-fw fa-arrows-alt" title="Zoom to extent."></i></button>
+  </span>
+  <span class="btn-group" role="button" style="margin-left:2em">
+    <button type="button" class="btn btn-default" id="btn-first"><i class="fa fa-fw fa-fast-backward" title="Go to first."></i></button>
+    <button type="button" class="btn btn-default" id="btn-prev"><i class="fa fa-fw fa-step-backward" title="Go to previous."></i></button>
+    <button type="button" class="btn btn-default" id="btn-current"><i class="fa fa-fw fa-repeat" title="Scroll to current."></i></button>
+    <button type="button" class="btn btn-default" id="btn-next"><i class="fa fa-fw fa-step-forward" title="Go to next."></i></button>
+    <button type="button" class="btn btn-default" id="btn-last"><i class="fa fa-fw fa-fast-forward" title="Go to last."></i></button>
+  </span>
+  <span class="btn-group dropup" style="float:right">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other actions ...</button>
+    <ul class="dropdown-menu">
+      <li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change SITS</a></li>
+      <li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload Items</a></li>
+      <li><a id="btn-open-browser"><i class="fa fa-eye"></i>&nbsp;&nbsp;Browse SIST</a></li>
+      <li><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete SIST</a></li>
+    </ul>
+  </span>
 </div>

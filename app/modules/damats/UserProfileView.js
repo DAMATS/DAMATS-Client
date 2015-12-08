@@ -80,12 +80,12 @@
             },
 
             onShow: function (view) {
-                console.log(this.collection);
-                this.listenTo(this.model, 'change', this.onModelChange);
-                this.listenTo(this.collection, 'reset', this.onModelChange);
-                this.listenTo(this.collection, 'update', this.onModelChange);
+                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.collection, 'reset', this.render);
+                this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.model, 'fetch:start', this.render);
                 this.listenTo(this.model, 'fetch:stop', this.render);
+                this.listenTo(this.model, 'save:error', this.onSaveError);
                 this.listenTo(this.collection, 'fetch:start', this.render);
                 this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.delegateEvents(this.events);
@@ -98,19 +98,22 @@
                 this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 
+            onRender: function () {
+                this.fillForm();
+            },
+
             onUpdateClick: function () {
                 this.model.save();
                 this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 
+            onSaveError: function () {
+                this.$('#btn-user-update').removeAttr('disabled');
+            },
+
             onRefreshClick: function () {
                 globals.damats.fetchAll();
                 this.$('#btn-user-update').attr('disabled', 'disabled');
-            },
-
-            onModelChange: function () {
-                this.render();
-                this.fillForm();
             },
 
             fillForm: function () {

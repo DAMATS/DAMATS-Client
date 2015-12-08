@@ -51,31 +51,35 @@
             view: null,
 
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'sits:browser:browse', this.onBrowse);
+                this.listenTo(Communicator.mediator, 'sits:browser:browse', this.browse);
+                this.listenTo(Communicator.mediator, 'sits:browser:fetch', this.fetch);
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSBrowser', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSBrowser', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSBrowser', this.onToggle);
             },
 
-            onBrowse: function (model) {
+            browse: function (model) {
                 if (
                     !this.model || !this.collection || (
-                        this.model.get('identifier') !=
-                        model.get('identifier')
+                        this.model.get('identifier') != model.get('identifier')
                     )
                 ) {
                     this.collection = new DataModels.CoverageCollection();
                     this.collection.url = model.url();
-                    this.collection.fetch();
+                    this.fetch();
                 }
-                this.model = model.clone();
-
+                this.sourceModel = model; // keep reference to the orig. model
+                this.model = model.clone(); // but work with a copy of the model
                 this.view = new SITSBrowserView.SITSBrowserView({
+                    sourceModel: this.sourceModel,
                     model: this.model,
                     collection: this.collection
                 });
-
                 this.onOpen(true);
+            },
+
+            fetch: function () {
+                this.collection.fetch();
             },
 
             isClosed: function () {
