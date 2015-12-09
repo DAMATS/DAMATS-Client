@@ -35,22 +35,22 @@
     ];
     function init(Backbone, Communicator, ToolControlTmpl) {
         var ToolControlLayout = Backbone.Marionette.Layout.extend({
-            template: {type: 'handlebars', template: ToolControlTmpl},
-            regions: {selection: '#selection', visualization: '#visualization'},
             className: 'panel panel-default toolcontrol not-selectable',
-            events: {},
-            initialize: function (options) {},
+            template: {type: 'handlebars', template: ToolControlTmpl},
+            regions: {
+                selection: '#selection',
+                visualization: '#visualization'
+            },
+            events: {
+                'click .close': 'close'
+            },
             onShow: function (view) {
-                this.$('.close').on('click', _.bind(this.onClose, this));
                 this.$el.draggable({ 
                     containment: '#content',
                     scroll: false,
                     handle: '.panel-heading'
                 });
             },
-            onClose: function () {
-                this.close();
-            }
         });
         return ToolControlLayout;
     }
