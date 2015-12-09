@@ -273,6 +273,8 @@
 
 
   "views": [
+    "modules/damats/SITSEditorView",
+    "modules/damats/SITSBrowserView",
     "modules/damats/SITSManagerView",
     "modules/damats/SITSCreationView",
     "modules/damats/SITSRemovalView",
@@ -301,6 +303,14 @@
   ],
 
   "templates":[
+    {
+      "id": "SITSManager",
+      "template": "hbs!tmpl/SITSBrowser"
+    },
+    {
+      "id": "SITSManager",
+      "template": "hbs!tmpl/SITSEditor"
+    },
     {
       "id": "SITSManager",
       "template": "hbs!tmpl/SITSManager"
