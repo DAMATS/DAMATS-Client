@@ -277,7 +277,7 @@
     "modules/damats/SITSCreationView",
     "modules/damats/SITSRemovalView",
     "modules/damats/UserProfileView",
-    "modules/map/MapView",
+    "views/MapView",
     "views/NavBarCollectionView",
     "views/NavBarItemView",
     "views/BaseLayerSelectionView",
@@ -292,8 +292,8 @@
 
   "models":[
     "modules/damats/DataModelsAndCollections",
-    "modules/layer/LayerModel",
-    "modules/map/MapModel",
+    "models/LayerModel",
+    "models/MapModel",
     "models/NavBarCollection",
     "models/NavBarItemModel",
     "models/ToolModel",

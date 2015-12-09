@@ -33,7 +33,7 @@
         'communicator',
         'globals',
         'openlayers',
-        'modules/map/MapModel',
+        'models/MapModel',
         'filesaver'
     ];
 
