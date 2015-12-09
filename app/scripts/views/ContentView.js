@@ -31,11 +31,16 @@
     var deps = [
         'backbone',
         'communicator',
+        'globals',
         'underscore'
     ];
-    function init(Backbone, Communicator) {
+    function init(Backbone, Communicator, globals) {
         var ContentView = Backbone.Marionette.ItemView.extend({
-            initialize: function (options) {}
+            templateHelpers: function () {
+                return {
+                    version: globals.version
+                };
+            }
         });
         return {ContentView: ContentView};
     };

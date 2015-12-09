@@ -26,7 +26,7 @@
 // THE SOFTWARE.
 //------------------------------------------------------------------------------
 
-// Global shared model instances.
+// global shared content
 define(
     [
         'backbone',
@@ -35,6 +35,7 @@ define(
     ],
     function (Backbone, ObjectStore, DataModels) {
         return {
+            version: "0.1.0dev",
             objects: new ObjectStore(),
             selections: new ObjectStore(),
             baseLayers: new Backbone.Collection(),

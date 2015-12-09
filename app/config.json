@@ -209,8 +209,8 @@
   ],
 
   "navBarConfig": {
-    "title" : "EOxClient",
-    "url" : "http://www.eox.at",
+    "title" : "DAMATS",
+    "url" : "http://damats.terrasigna.com/",
     "items" : [
       {
         "name" : "Layers",
