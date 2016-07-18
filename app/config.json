@@ -9,7 +9,7 @@
     "pathTimeSeries": "/damats/time_series",
     "pathProcesses": "/damats/processes",
     "pathOWS": "/ows",
-    "url": "http://127.0.0.1:8100/eoxs",
+    "url": "http://127.0.0.1:8110/eoxs",
     "productTemplate": {
         "description": null,
         "download": {
