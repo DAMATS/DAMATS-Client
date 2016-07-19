@@ -44,6 +44,7 @@
         SITSEditorTmpl,
         SITSEditorCoverageItemTmpl
     ) {
+
         var SITSEditorItemView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
             className: 'input-group coverage-item',
@@ -91,28 +92,24 @@
                 this.render();
             },
             onClick: function () {
-                var id = this.model.get('id');
                 this.parentModel.set('selected', this.model.get('id'));
             },
-
             setLayer: function () {
-                var product = globals.damats.getProduct(
-                    this.model.get('id'), null, false
-                );
+                /*
                 Communicator.mediator.trigger(
                     'map:preview:set', globals.damats.productUrl,
                     this.model.get('id') + ',' +
                     this.model.get('id') + '_outlines'
                 );
-                /*
-                Communicator.mediator.trigger(
-                    'time:change', {
+                */
+                Communicator.mediator.trigger('time:change', {
                         start: new Date(this.model.get('t0')),
                         end: new Date(this.model.get('t1'))
                 });
-                */
+                Communicator.mediator.trigger(
+                    'date:tick:set', new Date(this.model.get('t0'))
+                );
             },
-
             onSelectionChange: function () {
                 var previous = this.parentModel.previous('selected');
                 var current = this.parentModel.get('selected');
@@ -125,7 +122,6 @@
                     this.$('#item').removeClass(className);
                 }
             },
-
             isSelected: function () {
                 var selected = this.parentModel.get('selected');
                 return this.model.get('id') == selected;
@@ -166,11 +162,9 @@
                 'click #btn-current': 'scrollToCurrent',
                 'click .close': 'close'
             },
-
             initialize: function (options) {
                 this.sourceModel = options.sourceModel;
             },
-
             onShow: function (view) {
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
                 this.listenTo(this.collection, 'sync', this.render);
@@ -180,28 +174,28 @@
                 this.listenTo(this.collection, 'remove', this.render);
                 this.listenTo(this.collection, 'fetch:start', this.render);
                 this.listenTo(this.collection, 'fetch:stop', this.render);
+                this.listenTo(Communicator.mediator, 'product:selected', this.selectById);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                Communicator.mediator.trigger(
-                    'map:layer:hide:all', true
-                    //'map:layer:show:exclusive', this.model
-                );
+                Communicator.mediator.trigger('date:selection:disable')
+                Communicator.mediator.trigger('map:layer:show:exclusive', this.model.get('source'));
             },
-
+            onClose: function () {
+                Communicator.mediator.trigger('map:layer:hide:all');
+                Communicator.mediator.trigger('date:tick:remove');
+            },
             onRender: function () {
                 this.scrollToCurrent();
             },
-
             removeSITS: function () {
                 Communicator.mediator.trigger(
                     'time_series:removal:confirm', this.sourceModel
                 );
             },
-
             scrollTo: function (id) {
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
@@ -210,7 +204,6 @@
                     $list.scrollTop() + $item.offset().top - $list.offset().top
                 );
             },
-
             getIndexOf: function (id) {
                  // TODO: Change to findIndex after upgrading Underscore.js
                 var model = this.collection.find(function (model) {
@@ -218,58 +211,50 @@
                 });
                 return this.collection.indexOf(model);
             },
-
-            selectByIndex: function (index) {
-                if (this.collection.length < 1) return;
-                index = index % this.collection.length;
-                if (index < 0) {
-                    index += this.collection.length;
-                }
-                var selected = this.collection.at(index).get('id');
+            selectById: function(selected) {
                 if (selected != this.model.get('selected'))
                 {
                     this.model.set('selected', selected);
                     this.scrollTo(selected);
                 }
             },
-
+            selectByIndex: function (index) {
+                if (this.collection.length < 1) return;
+                index = index % this.collection.length;
+                if (index < 0) {
+                    index += this.collection.length;
+                }
+                this.selectById(this.collection.at(index).get('id'));
+            },
             selectFirst: function () {
                 this.selectByIndex(0);
             },
-
             selectLast: function () {
                 this.selectByIndex(-1);
             },
-
             scrollToCurrent: function () {
                 this.scrollTo(this.model.get('selected'));
             },
-
             selectPrevious: function () {
                 var index = this.getIndexOf(this.model.get('selected'));
                 this.selectByIndex(Math.max(0, index - 1));
             },
-
             selectNext: function () {
                 var length = this.collection.length;
                 var index = this.getIndexOf(this.model.get('selected'));
                 this.selectByIndex(Math.min(length - 1, index + 1));
             },
-
             openManager: function () {
                 Communicator.mediator.trigger('dialog:open:SITSManager', true);
             },
-
             openBrowser: function () {
                 Communicator.mediator.trigger(
                     'sits:browser:browse', this.sourceModel
                 );
             },
-
             refetch: function () {
                 Communicator.mediator.trigger('sits:editor:fetch', true);
             },
-
             onFocusClick: function () {
                 if (this.collection.length < 1) { return ; }
                 var ext = this.collection.reduce(function (ext, model) {

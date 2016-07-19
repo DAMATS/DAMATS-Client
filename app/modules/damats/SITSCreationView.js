@@ -61,7 +61,7 @@
                 this.listenTo(this.parentModel, 'change:source', this.render);
                 if (this.isSelected()) {
                     Communicator.mediator.trigger(
-                        'map:layer:show:exclusive', this.model
+                        'map:layer:show:exclusive', this.model.get('identifier')
                     );
                 }
             },
@@ -73,10 +73,9 @@
                 return {is_selected: this.isSelected()};
             },
             onClick: function () {
-                this.parentModel.set('source', this.model.get('identifier'));
-                Communicator.mediator.trigger(
-                    'map:layer:show:exclusive', this.model
-                );
+                var id = this.model.get('identifier');
+                this.parentModel.set('source', id);
+                Communicator.mediator.trigger('map:layer:show:exclusive', id);
             },
             isSelected: function () {
                 var selected = (
@@ -159,6 +158,7 @@
                         $('input[type="text"]', $(this).parent()).focus();
                     }
                 );
+                Communicator.mediator.trigger('date:selection:enable')
             },
 
             onBBoxClick: function () {

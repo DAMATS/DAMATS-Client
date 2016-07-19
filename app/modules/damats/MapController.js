@@ -69,13 +69,13 @@
                     globals.products.remove(product);
                 }
             },
-            showLayerExlusive: function (model) {
+            showLayerExlusive: function (identifier) {
                 this.hideAllLayers();
-                this.showLayer(model);
+                this.showLayer(identifier);
             },
-            showLayer: function (model) {
+            showLayer: function (identifier) {
                 this.changeLayer({
-                    name: model.get('identifier'),
+                    name: identifier,
                     isBaseLayer: false,
                     visible: true
                 });
@@ -92,9 +92,9 @@
                     }
                 });
             },
-            hideLayer: function (model) {
+            hideLayer: function (identifier) {
                 this.changeLayer({
-                    name: model.get('identifier'),
+                    name: identifier,
                     isBaseLayer: false,
                     visible: true
                 });

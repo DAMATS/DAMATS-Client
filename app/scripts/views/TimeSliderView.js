@@ -63,9 +63,12 @@
       onShow: function(view) {
 
         this.listenTo(Communicator.mediator, 'date:selection:change', this.onDateSelectionChange);
+        this.listenTo(Communicator.mediator, 'date:selection:enable', this.onDateSelectionEnable);
+        this.listenTo(Communicator.mediator, 'date:selection:disable', this.onDateSelectionDisable);
+        this.listenTo(Communicator.mediator, 'date:tick:set', this.onDateTickSet);
+        this.listenTo(Communicator.mediator, 'date:tick:remove', this.onDateTickRemove);
         this.listenTo(Communicator.mediator, "map:layer:change", this.changeLayer);
         this.listenTo(Communicator.mediator, "map:position:change", this.updateExtent);
-        this.listenTo(Communicator.mediator, "date:selection:change", this.onDateSelectionChange);
 
         var selectionstart = new Date(this.options.brush.start);
         var selectionend = new Date(this.options.brush.end);
@@ -97,8 +100,24 @@
         Communicator.mediator.trigger('time:change', evt.originalEvent.detail);
       },
 
+      onDateTickRemove: function() {
+        this.slider.setTimetick();
+      },
+
+      onDateTickSet: function(date) {
+        this.slider.setTimetick(date);
+      },
+
       onDateSelectionChange: function(opt) {
         this.slider.select(opt.start, opt.end);
+      },
+
+      onDateSelectionEnable: function() {
+        this.slider.setBrush(true)
+      },
+
+      onDateSelectionDisable: function() {
+        this.slider.setBrush(false)
       },
 
       changeLayer: function (options) {
@@ -193,11 +212,15 @@
       },
 
       onCoverageSelected: function(evt) {
-        if (evt.originalEvent.detail.bbox) {
-          var bbox = evt.originalEvent.detail.bbox.replace(/[()]/g, '').split(',').map(parseFloat);
-          this.slider.select(evt.originalEvent.detail.start, evt.originalEvent.detail.end);
-          Communicator.mediator.trigger("map:set:extent", bbox);
+        var detail = evt.originalEvent.detail;
+        if (detail.bbox) {
+          Communicator.mediator.trigger("map:set:extent",
+            detail.bbox.replace(/[()]/g, '').split(',').map(parseFloat)
+          );
         }
+        //this.slider.select(detail.start, detail.end);
+        console.log("selection: " + detail.id)
+        Communicator.mediator.trigger("product:selected", detail.id);
       }
 
     });

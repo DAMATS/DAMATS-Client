@@ -59,15 +59,13 @@
             },
 
             edit: function (model) {
-                if (
-                    !this.model || !this.collection || (
-                        this.model.get('identifier') != model.get('identifier')
-                    )
-                ) {
+                if (!this.model || !this.collection || (
+                    this.model.get('identifier') != model.get('identifier')
+                )) {
                     this.collection = new DataModels.CoverageCollection();
                     this.collection.url = model.url();
-                    this.fetch();
                 }
+                this.fetch();
                 this.sourceModel = model; // keep reference to the orig. model
                 this.model = model.clone(); // but work with a copy of the model
                 this.view = new SITSEditorView.SITSEditorView({
