@@ -48,12 +48,18 @@
                 'slide .ui-slider': 'onOpacityAdjust'
             },
             initialize: function (options) {
+                this.listenTo(this.model, 'change:visible', this.onModelChange);
                 this.$slider = $('<div>').slider({
                     range: "max",
                     max: 100,
                     min: 0
                 });
                 this.$slider.width(100);
+            },
+            onModelChange: function () {
+                console.log("LayerItemView.onModelChange")
+                console.log(this.model.attributes)
+                this.render()
             },
             onShow: function (view) {
                 $(".sortable").sortable({
@@ -79,6 +85,7 @@
                 });
             },
             onChange: function (evt) {
+                console.log('LayerItemView.onChange()')
                 var isBaseLayer = false;
                 if (this.model.get('view').isBaseLayer)
                     isBaseLayer = true;
