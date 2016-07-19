@@ -62,20 +62,16 @@
             events: {
                 'click': 'onClick'
             },
-
             initialize: function (options) {
                 this.parentModel = options.parentModel;
                 this.listenTo(this.parentModel, 'change:selected', this.onSelectionChange);
             },
-
             onRender: function () {
                 this.onSelectionChange();
             },
-
             onClick: function () {
                 this.parentModel.set('selected', this.model.get('id'));
             },
-
             setLayer: function () {
                 var product = globals.damats.getProduct(
                     this.model.get('id'), null, false
@@ -93,7 +89,6 @@
                 });
                 */
             },
-
             onSelectionChange: function () {
                 var previous = this.parentModel.previous('selected');
                 var current = this.parentModel.get('selected');
@@ -106,7 +101,6 @@
                     this.$el.removeClass(className);
                 }
             },
-
             isSelected: function () {
                 var selected = this.parentModel.get('selected');
                 return this.model.get('id') == selected;
@@ -147,11 +141,9 @@
                 'click #btn-current': 'scrollToCurrent',
                 'click .close': 'close'
             },
-
             initialize: function (options) {
                 this.sourceModel = options.sourceModel;
             },
-
             onShow: function (view) {
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
                 this.listenTo(this.collection, 'sync', this.render);
@@ -172,11 +164,9 @@
                     //'map:layer:show:exclusive', this.model
                 );
             },
-
             onRender: function () {
                 this.scrollToCurrent();
             },
-
             removeSITS: function () {
                 if (!this.sourceModel.get('locked')) {
                     Communicator.mediator.trigger(
@@ -184,7 +174,6 @@
                     );
                 }
             },
-
             scrollTo: function (id) {
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
@@ -193,7 +182,6 @@
                     $list.scrollTop() + $item.offset().top - $list.offset().top
                 );
             },
-
             getIndexOf: function (id) {
                  // TODO: Change to findIndex after upgrading Underscore.js
                 var model = this.collection.find(function (model) {
@@ -201,7 +189,6 @@
                 });
                 return this.collection.indexOf(model);
             },
-
             selectByIndex: function (index) {
                 if (this.collection.length < 1) return;
                 index = index % this.collection.length;
@@ -215,34 +202,27 @@
                     this.scrollTo(selected);
                 }
             },
-
             selectFirst: function () {
                 this.selectByIndex(0);
             },
-
             selectLast: function () {
                 this.selectByIndex(-1);
             },
-
             scrollToCurrent: function () {
                 this.scrollTo(this.model.get('selected'));
             },
-
             selectPrevious: function () {
                 var index = this.getIndexOf(this.model.get('selected'));
                 this.selectByIndex(Math.max(0, index - 1));
             },
-
             selectNext: function () {
                 var length = this.collection.length;
                 var index = this.getIndexOf(this.model.get('selected'));
                 this.selectByIndex(Math.min(length - 1, index + 1));
             },
-
             openManager: function () {
                 Communicator.mediator.trigger('dialog:open:SITSManager', true);
             },
-
             openEditor: function () {
                 if (!this.sourceModel.get('locked')) {
                     Communicator.mediator.trigger(
@@ -250,11 +230,9 @@
                     );
                 }
             },
-
             refetch: function () {
                 Communicator.mediator.trigger('sits:browser:fetch', true);
             },
-
             onFocusClick: function () {
                 if (this.collection.length < 1) { return ; }
                 var ext = this.collection.reduce(function (ext, model) {

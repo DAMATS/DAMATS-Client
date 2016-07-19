@@ -45,11 +45,11 @@
         DataModels,
         SITSBrowserView
     ) {
+
         var SITSBrowserController = Backbone.Marionette.Controller.extend({
             model: null,
             collection: null,
             view: null,
-
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'sits:browser:browse', this.browse);
                 this.listenTo(Communicator.mediator, 'sits:browser:fetch', this.fetch);
@@ -57,7 +57,6 @@
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSBrowser', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSBrowser', this.onToggle);
             },
-
             browse: function (model) {
                 if (!this.model || !this.collection || (
                   this.model.get('identifier') != model.get('identifier')
@@ -75,27 +74,22 @@
                 });
                 this.onOpen(true);
             },
-
             fetch: function () {
                 this.collection.fetch();
             },
-
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;
             },
-
             onOpen: function (event_) {
                 if (this.view && this.isClosed()) {
                     App.viewContent.show(this.view);
                 }
             },
-
             onClose: function (event_) {
                 if (this.view && !this.isClosed()) {
                     this.view.close();
                 }
             },
-
             onToggle: function (event_) {
                 if (this.view && this.isClosed()) {
                     this.onOpen(event_);

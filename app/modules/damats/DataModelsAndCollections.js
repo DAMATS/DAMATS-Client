@@ -106,18 +106,21 @@
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
+
         var GroupModel = Backbone.Model.extend({
             fetch: fetch,
             save: save,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
+
         var SourceSeriesModel = Backbone.Model.extend({
             fetch: fetch,
             save: save,
             idAttribute: 'identifier',
             defaults: defaults_baseline
         });
+
         var TimeSeriesModel = Backbone.Model.extend({
             fetch: fetch,
             save: save,
@@ -127,6 +130,7 @@
                 owned: true
             }, defaults_baseline)
         });
+
         var CoverageModel =  Backbone.Model.extend({
             fetch: fetch,
             save: save,
@@ -138,14 +142,17 @@
             fetch: fetch,
             model: GroupModel
         });
+
         var SourceSeriesCollection = Backbone.Collection.extend({
             fetch: fetch,
             model: SourceSeriesModel
         });
+
         var TimeSeriesCollection = Backbone.Collection.extend({
             fetch: fetch,
             model: TimeSeriesModel
         });
+
         var CoverageCollection = Backbone.Collection.extend({
             fetch: fetch,
             model: CoverageModel
