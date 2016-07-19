@@ -59,6 +59,11 @@
             initialize: function (options) {
                 this.parentModel = options.parentModel;
                 this.listenTo(this.parentModel, 'change:source', this.render);
+                if (this.isSelected()) {
+                    Communicator.mediator.trigger(
+                        'map:layer:show:exclusive', this.model
+                    );
+                }
             },
             template: {
                 type: 'handlebars',
@@ -104,7 +109,7 @@
                 'change #txt-miny': 'onBBoxFormChange',
                 'change #txt-maxy': 'onBBoxFormChange',
                 'hide': 'onCloseTimeWidget',
-                'click .close': 'this.close'
+                'click .close': 'close'
             },
 
             onShow: function (view) {
