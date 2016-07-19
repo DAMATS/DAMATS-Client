@@ -126,7 +126,7 @@
             save: save,
             idAttribute: 'identifier',
             defaults: _.extend({
-                locked: true,
+                editable: false,
                 owned: true
             }, defaults_baseline)
         });

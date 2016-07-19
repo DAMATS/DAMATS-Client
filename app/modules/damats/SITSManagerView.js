@@ -69,7 +69,7 @@
             },
 
             onEdit: function () {
-                if (!this.model.get('locked')) {
+                if (this.model.get('editable')) {
                     Communicator.mediator.trigger(
                         'sits:editor:edit', this.model
                     );

@@ -44,6 +44,7 @@
         SITSBrowserTmpl,
         SITSBrowserCoverageItemTmpl
     ) {
+
         var SITSBrowserItemView = Backbone.Marionette.ItemView.extend({
             tagName: 'li',
             className: 'list-group-item coverage-item',
@@ -168,7 +169,7 @@
                 this.scrollToCurrent();
             },
             removeSITS: function () {
-                if (!this.sourceModel.get('locked')) {
+                if (this.sourceModel.get('editable')) {
                     Communicator.mediator.trigger(
                         'time_series:removal:confirm', this.sourceModel
                     );
@@ -224,7 +225,7 @@
                 Communicator.mediator.trigger('dialog:open:SITSManager', true);
             },
             openEditor: function () {
-                if (!this.sourceModel.get('locked')) {
+                if (this.sourceModel.get('editable')) {
                     Communicator.mediator.trigger(
                         'sits:editor:edit', this.sourceModel
                     );

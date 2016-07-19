@@ -35,8 +35,12 @@
     <ul class="dropdown-menu">
       <li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change SITS</a></li>
       <li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload Items</a></li>
+{{#if editable}}
       <li><a id="btn-open-editor"><i class="fa fa-pencil"></i>&nbsp;&nbsp;Edit SITS</a></li>
+{{/if}}
+{{#if owned}}
       <li><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete SITS</a></li>
+{{/if}}
     </ul>
   </span>
 </div>

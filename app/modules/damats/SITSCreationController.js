@@ -129,7 +129,7 @@
             onCreate: function () {
                 var model = this.model;
                 globals.damats.time_series.create({ // new object
-                    locked: false,
+                    editable: true,
                     source: this.model.get('source'),
                     name: this.model.get('name'),
                     description: null,
