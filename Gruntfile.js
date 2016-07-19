@@ -366,7 +366,10 @@ module.exports = function (grunt) {
                         'bower_components/bootstrap-select/dist/*/*',
                         'bower_components/font-awesome/css/*',
                         'bower_components/lm.js/lm.js',
-                        'scripts/vendor/theme/default/style.css'
+                        'scripts/vendor/theme/default/style.css',
+                        'scripts/vendor/d3.timeslider.min.css',
+                        'scripts/vendor/d3.timeslider.min.js',
+                        'scripts/vendor/d3.timeslider.plugins.min.js',
                     ]
                 },{
                     expand: true,

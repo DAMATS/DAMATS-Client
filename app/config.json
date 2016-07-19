@@ -102,48 +102,7 @@
         "attribution": "Blue Marble { &copy; <a href=\"http://nasa.gov\" target=\"_blank\">NASA</a> }"
       }
     ],
-    "products": [
-      {
-        "name": "PanEuropean Fractional Snow Cover",
-        "visible": false,
-        "timeSlider": true,
-        "timeSliderProtocol":"EOWCS",
-        "color":"green",
-        "view": {
-          "id": "daily_FSC_PanEuropean_Optical",
-          "protocol": "WMS",
-          "urls": [
-              "http://neso.cryoland.enveo.at/cryoland/ows"
-          ],
-          "style": "default"
-        },
-        "download": {
-          "id": "daily_FSC_PanEuropean_Optical",
-          "protocol": "EOWCS",
-          "url": "http://neso.cryoland.enveo.at/cryoland/ows"
-        }
-      },
-      {
-        "name": "PanEuropean Snow Water Equivalent",
-        "visible": false,
-        "timeSlider": true,
-        "timeSliderProtocol":"EOWCS",
-        "color":"red",
-        "view": {
-          "id": "daily_SWE_PanEuropean_Microwave",
-          "protocol": "WMS",
-          "urls": [
-              "http://neso.cryoland.enveo.at/cryoland/ows"
-          ],
-          "style": "default"
-        },
-        "download": {
-          "id": "daily_SWE_PanEuropean_Microwave",
-          "protocol": "EOWCS",
-          "url": "http://neso.cryoland.enveo.at/cryoland/ows"
-        }
-      }
-    ],
+    "products": [],
     "overlays": [
        {
         "name": "Streets",
@@ -262,12 +221,12 @@
 
   "timeSlider": {
     "domain": {
-      "start": "2012-07-01T00:00:00Z",
-      "end": "2013-07-01T00:00:00Z"
+      "start": "1970-01-01T00:00:00Z",
+      "end": "2019-12-31T00:00:00Z"
     },
     "brush": {
-       "start": "2013-06-05T00:00:00Z",
-      "end": "2013-06-08T00:00:00Z"
+      "start": "2015-06-01T00:00:00Z",
+      "end": "2015-07-31T00:00:00Z"
     }
   },
 
