@@ -146,6 +146,7 @@
             },
             onShow: function (view) {
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
+                this.listenTo(this.sourceModel, 'change', this.refreshSITSGeometry);
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
@@ -161,14 +162,98 @@
                     handle: '.panel-heading'
                 });
                 Communicator.mediator.trigger('date:selection:disable')
-                Communicator.mediator.trigger('map:layer:show:exclusive', this.model.get('identifier'));
+                Communicator.mediator.trigger(
+                    'map:layer:show:exclusive', this.model.get('identifier')
+                );
+                this.displaySITSGeometry();
             },
             onClose: function () {
                 Communicator.mediator.trigger('map:layer:hide:all');
                 Communicator.mediator.trigger('date:tick:remove');
+                this.removeSISTGeometry()
             },
             onRender: function () {
                 this.scrollToCurrent();
+            },
+            refreshSITSGeometry: function () {
+                this.removeSISTGeometry()
+                this.displaySITSGeometry()
+            },
+            removeSISTGeometry: function () {
+                Communicator.mediator.trigger('map:geometry:remove:all')
+            },
+            displaySITSGeometry: function () {
+                // TODO: find a better place for the style configuration
+                function coords_to_geom(coords) {
+                    return new OpenLayers.Geometry.MultiPolygon(_.map(
+                        coords,
+                        function (item) {
+                            return new OpenLayers.Geometry.Polygon(
+                                new OpenLayers.Geometry.LinearRing(
+                                    _.map(item, function (xy) {
+                                        return new OpenLayers.Geometry.Point(
+                                            xy[0], xy[1]
+                                        );
+                                    })
+                                )
+                            )
+                        }
+                    ));
+                };
+                // clear the geometry layer
+                this.removeSISTGeometry()
+                // display the selected polygon
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: coords_to_geom(
+                        this.sourceModel.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: this.sourceModel.get('identifier'),
+                        type: 'selected-area'
+                    },
+                    style: {
+                        fill: false,
+                        stroke: true,
+                        strokeColor: '#ffff88',
+                        strokeOpacity: 0.6,
+                        strokeWidth: 2.5,
+                        strokeDashstyle: 'dot',
+                    }
+                });
+                // display the selection polygon
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: coords_to_geom(
+                        this.sourceModel.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: this.sourceModel.get('identifier'),
+                        type: 'selection-area'
+                    },
+                    style: {
+                        fill: false,
+                        stroke: true,
+                        strokeColor: '#ffff88',
+                        strokeOpacity: 0.6,
+                        strokeWidth: 2.5,
+                    }
+                });
+                // display the CIA
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: coords_to_geom(
+                        this.sourceModel.get('common_intersection_area')
+                    ),
+                    attributes: {
+                        identifer: this.sourceModel.get('identifier'),
+                        type: 'common-area'
+                    },
+                    style: {
+                        fill: false,
+                        stroke: true,
+                        strokeColor: '#88ffff',
+                        strokeOpacity: 0.5,
+                        strokeWidth: 2.5,
+                    }
+                });
             },
             removeSITS: function () {
                 if (this.sourceModel.get('editable')) {
@@ -239,6 +324,7 @@
                 Communicator.mediator.trigger('sits:browser:fetch', true);
             },
             onFocusClick: function () {
+            /*
                 if (this.collection.length < 1) { return ; }
                 var ext = this.collection.reduce(function (ext, model) {
                     var x0 = model.get('x0');
@@ -260,6 +346,10 @@
                 Communicator.mediator.trigger('map:set:extent', [
                     ext.x0, ext.y0, ext.x1, ext.y1
                 ]);
+            */
+                Communicator.mediator.trigger(
+                    'map:set:extent', this.model.get('selection_extent')
+                )
             }
         });
 

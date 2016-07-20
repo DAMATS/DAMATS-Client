@@ -64,8 +64,8 @@
                     this.collection = new DataModels.CoverageCollection();
                     this.collection.url = model.url();
                 }
-                this.fetch(); // always refresh the collection
                 this.sourceModel = model; // keep reference to the orig. model
+                this.fetch(); // always refresh the collection
                 this.model = model.clone(); // but work with a copy of the model
                 this.view = new SITSBrowserView.SITSBrowserView({
                     sourceModel: this.sourceModel,
@@ -75,7 +75,8 @@
                 this.onOpen(true);
             },
             fetch: function () {
-                this.collection.fetch();
+                this.sourceModel.fetch();
+                this.collection.fetch({data: $.param({list: true, all: false})});
             },
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;

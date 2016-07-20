@@ -158,7 +158,12 @@
                         $('input[type="text"]', $(this).parent()).focus();
                     }
                 );
-                Communicator.mediator.trigger('date:selection:enable')
+                Communicator.mediator.trigger('date:selection:enable');
+                Communicator.mediator.trigger('selection:show');
+            },
+
+            onClose: function () {
+                Communicator.mediator.trigger('selection:hide');
             },
 
             onBBoxClick: function () {

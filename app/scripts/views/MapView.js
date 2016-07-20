@@ -87,6 +87,8 @@
                 this.listenTo(Communicator.mediator, "map:load:geojson", this.onLoadGeoJSON);
                 this.listenTo(Communicator.mediator, "map:export:geojson", this.onExportGeoJSON);
                 this.listenTo(Communicator.mediator, 'time:change', this.onTimeChange);
+                this.listenTo(Communicator.mediator, "selection:hide", this.onSelectionHide);
+                this.listenTo(Communicator.mediator, "selection:show", this.onSelectionShow);
                 this.listenTo(Communicator.mediator, 'selection:changed', this.onSelectionChanged);
                 this.listenTo(Communicator.mediator, 'selection:bbox:changed', this.onSelectionBBoxChanged);
                 this.listenTo(Communicator.mediator, 'map:marker:set', this.setMarker);
@@ -94,6 +96,9 @@
                 this.listenTo(Communicator.mediator, 'map:layer:save', this.getLayerURL);
                 this.listenTo(Communicator.mediator, 'map:preview:set', this.onPreviewLayerCreate);
                 this.listenTo(Communicator.mediator, 'map:preview:clear', this.onPreviewLayerRemove);
+                this.listenTo(Communicator.mediator, 'map:geometry:add', this.addGeometry);
+                this.listenTo(Communicator.mediator, 'map:geometry:remove', this.removeGeometry);
+                this.listenTo(Communicator.mediator, 'map:geometry:remove:all', this.removeGeometryAll);
 
                 Communicator.reqres.setHandler('map:get:extent', _.bind(this.onGetMapExtent, this));
                 Communicator.reqres.setHandler('get:selection:json', _.bind(this.onGetGeoJSON, this));
@@ -101,11 +106,18 @@
                 // preview layer - set later by the callback
                 this.previewLayer = null;
 
+                // layer displaying the geometry features
+                this.geometryLayer = new OpenLayers.Layer.Vector("Geometry Layer");
+
                 // Add layers for different selection methods
                 this.vectorLayer = new OpenLayers.Layer.Vector("Vector Layer");
                 this.markerLayer = new OpenLayers.Layer.Markers("Marker Layer");
 
-                this.map.addLayers([this.vectorLayer, this.markerLayer]);
+                this.map.addLayers([
+                    this.geometryLayer,
+                    this.vectorLayer,
+                    this.markerLayer
+                ]);
                 this.map.addControl(new OpenLayers.Control.MousePosition());
 
                 this.drawControls = {
@@ -349,6 +361,9 @@
                 }
             },
 
+            onSelectionHide: function () {this.vectorLayer.display(false);},
+            onSelectionShow: function () {this.vectorLayer.display(true);},
+
             onSelectionActivated: function (arg) {
                 if (arg.active) {
                     for (var key in this.drawControls) {
@@ -367,9 +382,26 @@
                         control.layer.removeAllFeatures();
                         control.deactivate();
                         Communicator.mediator.trigger("selection:changed", null);
-
                     }
                 }
+            },
+
+            // control of the geometry vector layer
+            removeGeometryAll: function () {
+                this.geometryLayer.removeAllFeatures();
+            },
+
+            addGeometry: function (options) {
+                console.log('addGeometry')
+                console.log(options)
+                var feature = new OpenLayers.Feature.Vector(
+                    options.geometry, options.attributes, options.style
+                )
+                this.geometryLayer.addFeatures([feature])
+            },
+
+            removeGeometry: function (attributes) {
+                //this.geometyLayer.removeAllFeatures();
             },
 
             onLoadGeoJSON: function (data) {
