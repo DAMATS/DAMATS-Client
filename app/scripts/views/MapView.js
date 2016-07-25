@@ -361,7 +361,12 @@
                 }
             },
 
-            onSelectionHide: function () {this.vectorLayer.display(false);},
+            onSelectionHide: function () {
+                // removing all features seems to be the only reliable
+                // way how to get rid of the selection bounding box
+                this.vectorLayer.removeAllFeatures();
+                this.vectorLayer.display(false);
+            },
             onSelectionShow: function () {this.vectorLayer.display(true);},
 
             onSelectionActivated: function (arg) {

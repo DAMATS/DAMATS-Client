@@ -170,7 +170,7 @@
                 Communicator.mediator.trigger('time:change', {
                     start: new Date(this.model.get('selection').toi.start),
                     end: new Date(this.model.get('selection').toi.end)
-                })
+                });
             },
             onClose: function () {
                 Communicator.mediator.trigger('map:layer:hide:all');

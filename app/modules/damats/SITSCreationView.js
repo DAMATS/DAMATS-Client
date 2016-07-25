@@ -144,6 +144,7 @@
                 this.onNameChange();
                 this.onToIChange();
                 this.onAoIChange();
+                this.onBBoxFormChange();
                 this.onModelChange();
 
                 $(document).on(
