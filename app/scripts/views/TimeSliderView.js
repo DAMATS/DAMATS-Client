@@ -67,6 +67,7 @@
         this.listenTo(Communicator.mediator, 'date:selection:disable', this.onDateSelectionDisable);
         this.listenTo(Communicator.mediator, 'date:tick:set', this.onDateTickSet);
         this.listenTo(Communicator.mediator, 'date:tick:remove', this.onDateTickRemove);
+        this.listenTo(Communicator.mediator, 'timeslider:zoom', this.onTimesliderZoom);
         this.listenTo(Communicator.mediator, "map:layer:change", this.changeLayer);
         this.listenTo(Communicator.mediator, "map:position:change", this.updateExtent);
 
@@ -98,6 +99,10 @@
 
       onChangeTime: function(evt) {
         Communicator.mediator.trigger('time:change', evt.originalEvent.detail);
+      },
+
+      onTimesliderZoom: function(options) {
+        this.slider.zoom(options.start, options.end);
       },
 
       onDateTickRemove: function() {

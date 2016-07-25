@@ -129,7 +129,7 @@
             className: 'panel panel-default sits-browser not-selectable',
             template: {type: 'handlebars', template: SITSBrowserTmpl},
             events: {
-                'click #btn-focus': 'onFocusClick',
+                'click #btn-focus': 'focusToSelection',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-open-editor': 'openEditor',
                 'click #btn-refetch': 'refetch',
@@ -166,6 +166,11 @@
                     'map:layer:show:exclusive', this.model.get('identifier')
                 );
                 this.displaySITSGeometry();
+                this.focusToSelection();
+                Communicator.mediator.trigger('time:change', {
+                    start: new Date(this.model.get('selection').toi.start),
+                    end: new Date(this.model.get('selection').toi.end)
+                })
             },
             onClose: function () {
                 Communicator.mediator.trigger('map:layer:hide:all');
@@ -323,7 +328,7 @@
             refetch: function () {
                 Communicator.mediator.trigger('sits:browser:fetch', true);
             },
-            onFocusClick: function () {
+            focusToSelection: function () {
             /*
                 if (this.collection.length < 1) { return ; }
                 var ext = this.collection.reduce(function (ext, model) {
@@ -350,6 +355,10 @@
                 Communicator.mediator.trigger(
                     'map:set:extent', this.model.get('selection_extent')
                 )
+                Communicator.mediator.trigger('timeslider:zoom', {
+                    start: new Date(this.model.get('selection').toi.start),
+                    end: new Date(this.model.get('selection').toi.end)
+                });
             }
         });
 
