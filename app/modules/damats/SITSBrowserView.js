@@ -133,6 +133,7 @@
                 'click #btn-open-manager': 'openManager',
                 'click #btn-open-editor': 'openEditor',
                 'click #btn-refetch': 'refetch',
+                'click #btn-process': 'processSITS',
                 'click #btn-delete': 'removeSITS',
                 'click #btn-first': 'selectFirst',
                 'click #btn-last': 'selectLast',
@@ -259,6 +260,9 @@
                         strokeWidth: 2.5,
                     }
                 });
+            },
+            processSITS: function () {
+                Communicator.mediator.trigger('dialog:open:ProcessList');
             },
             removeSITS: function () {
                 if (this.sourceModel.get('editable')) {

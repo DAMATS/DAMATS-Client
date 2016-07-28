@@ -213,6 +213,20 @@
         "show": false
       },
       {
+        "name" : "Processes",
+        "icon" : "fa-gears",
+        "eventToRaise" : "dialog:toggle:ProcessList",
+        "template" : "ProcessList",
+        "show": false
+      },
+      {
+        "name" : "Jobs",
+        "icon" : "fa-tasks",
+        "eventToRaise" : "dialog:toggle:JobList",
+        "template" : "ProcessJob",
+        "show": false
+      },
+      {
         "name" : "Profile",
         "icon" : "fa-user",
         "eventToRaise" : "dialog:toggle:UserProfile",
@@ -265,6 +279,7 @@
     "modules/damats/SITSCreationView",
     "modules/damats/SITSRemovalView",
     "modules/damats/UserProfileView",
+    "modules/damats/ProcessListView",
     "views/MapView",
     "views/NavBarCollectionView",
     "views/NavBarItemView",
@@ -290,11 +305,11 @@
 
   "templates":[
     {
-      "id": "SITSManager",
+      "id": "SITSBrowser",
       "template": "hbs!tmpl/SITSBrowser"
     },
     {
-      "id": "SITSManager",
+      "id": "SITSEditor",
       "template": "hbs!tmpl/SITSEditor"
     },
     {
@@ -308,6 +323,10 @@
     {
       "id": "SITSRemoval",
       "template": "hbs!tmpl/SITSRemoval"
+    },
+    {
+      "id": "ProcessList",
+      "template": "hbs!tmpl/ProcessList"
     },
     {
       "id": "UserProfile",

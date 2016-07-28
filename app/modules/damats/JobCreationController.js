@@ -2,10 +2,9 @@
 //
 // Project: DAMATS Client
 // Authors: Martin Paces <martin.paces@eox.at>
-//          Daniel Santillan <daniel.santillan@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2015 EOX IT Services GmbH
+// Copyright (C) 2016 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +33,8 @@
         'communicator',
         'globals',
         'app',
-        'modules/damats/SITSCreationModel',
-        'modules/damats/SITSCreationView'
+        'modules/damats/JobCreationModel',
+        'modules/damats/JobCreationView'
     ];
 
     function init(
@@ -43,12 +42,12 @@
         Communicator,
         globals,
         App,
-        SITSCreationModel,
-        SITSCreationView
+        JobCreationModel,
+        JobCreationView
     ) {
-        function getDefaultSITSName() {
+        function getDefaultJobName() {
             var date = new Date();
-            var name = 'SITS ';
+            var name = 'Job ';
             name += String('000' + date.getFullYear()).slice(-4) ;
             name += '-' + String('0' + (1 + date.getMonth())).slice(-2);
             name += '-' + String('0' + date.getDate()).slice(-2);
@@ -58,22 +57,19 @@
             return name;
         };
 
-        var SITSCreationController = Backbone.Marionette.Controller.extend({
-            model: new SITSCreationModel.SITSCreationModel(),
+        var JobCreationController = Backbone.Marionette.Controller.extend({
+            model: new JobCreationModel.JobCreationModel(),
             collection: globals.damats.sources,
             view: null,
 
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'sits:creation:create', this.onCreate);
-                this.listenTo(Communicator.mediator, 'sits:creation:name:set', this.onNameChange);
-                this.listenTo(Communicator.mediator, 'time:change', this.onTOIChange);
-                this.listenTo(Communicator.mediator, 'selection:changed', this.onAOIChange);
-                this.listenTo(Communicator.mediator, 'selection:bbox:changed', this.onAOIChange);
-                this.listenTo(Communicator.mediator, 'dialog:open:SITSCreation', this.onOpen);
-                this.listenTo(Communicator.mediator, 'dialog:close:SITSCreation', this.onClose);
-                this.listenTo(Communicator.mediator, 'dialog:toggle:SITSCreation', this.onToggle);
+                this.listenTo(Communicator.mediator, 'job:creation:create', this.onCreate);
+                this.listenTo(Communicator.mediator, 'job:creation:name:set', this.onNameChange);
+                this.listenTo(Communicator.mediator, 'dialog:open:JobCreation', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:JobCreation', this.onClose);
+                this.listenTo(Communicator.mediator, 'dialog:toggle:JobCreation', this.onToggle);
 
-                this.view = new SITSCreationView.SITSCreationView({
+                this.view = new JobCreationView.JobCreationView({
                     model: this.model,
                     collection: this.collection
                 });
@@ -83,35 +79,10 @@
                 this.model.set('name', name);
             },
 
-            onTOIChange: function (time) {
-                this.model.set('ToI', time);
-            },
-
-            onAOIChange: function (bbox) {
-                if (bbox != null) {
-                    if (bbox.CLASS_NAME == 'OpenLayers.Geometry.Polygon') {
-                        this.model.set('AoI', {
-                            left: bbox.bounds.left,
-                            right: bbox.bounds.right,
-                            bottom: bbox.bounds.bottom,
-                            top: bbox.bounds.top
-                        });
-                    } else {
-                        this.model.set('AoI', {
-                            left: bbox.left,
-                            right: bbox.right,
-                            bottom: bbox.bottom,
-                            top: bbox.top
-                        });
-                    }
-                } else {
-                    this.model.set('AoI', null);
-                }
-            },
-
             onCreate: function () {
+            /*
                 var model = this.model;
-                globals.damats.time_series.create({ // new object
+                globals.damats.jobs.create({ // new object
                     editable: true,
                     source: this.model.get('source'),
                     name: this.model.get('name'),
@@ -125,10 +96,11 @@
                     success: function () {
                         model.set('is_saved', true);
                         Communicator.mediator.trigger(
-                            'dialog:open:SITSManager', true
+                            'dialog:open:Job', true
                         );
                     }
                 });
+            */
             },
 
             isClosed: function () {
@@ -137,9 +109,9 @@
 
             onOpen: function (event_) {
                 if (this.model.get('is_saved')) {
-                    // set a new SIST
+                    // set a new Job
                     this.model.set('is_saved', false);
-                    this.model.set('name', getDefaultSITSName());
+                    this.model.set('name', getDefaultJobName());
                 }
                 if (this.isClosed()) {
                     App.viewContent.show(this.view);
@@ -161,7 +133,7 @@
             }
         });
 
-        return new SITSCreationController();
+        return new JobCreationController();
     };
 
     root.require(deps, init);

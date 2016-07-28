@@ -377,6 +377,34 @@ button[active=active] {
 }
 
 /*
+ * Process List
+ */
+ .process-list-view {
+  width: 32em;
+  top: 10em;
+  left: 50%;
+  margin: 0 0 0 -15em;
+  font-size: 1em;
+  position: absolute;
+ }
+
+.process-list-view .process-list {
+  max-height: 20em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.process-list-view .process-item {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.process-list-view .btn-group {
+  margin-top: .6em;
+}
+
+/*
  * User Profile
  */
  .user-profile {

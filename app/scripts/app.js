@@ -48,6 +48,7 @@
         'modules/damats/SITSRemovalController',
         'modules/damats/SITSBrowserController',
         'modules/damats/SITSEditorController',
+        'modules/damats/ProcessListController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
         'router'
