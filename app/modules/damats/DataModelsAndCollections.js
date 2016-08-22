@@ -165,6 +165,9 @@
 
         var TimeSeriesCollection = Backbone.Collection.extend({
             fetch: fetch,
+            comparator: function(m1, m2) {
+                return -m1.get('created').localeCompare(m2.get('created'));
+            },
             model: TimeSeriesModel
         });
 
@@ -180,6 +183,9 @@
 
         var JobCollection = Backbone.Collection.extend({
             fetch: fetch,
+            comparator: function(m1, m2) {
+                return -m1.get('created').localeCompare(m2.get('created'));
+            },
             model: JobModel
         });
 

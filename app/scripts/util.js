@@ -25,6 +25,9 @@
 // THE SOFTWARE.
 //-------------------------------------------------------------------------------
 
+var formatISOTime = function (iso_datetime) {
+    return iso_datetime.replace('T', ' ').replace(/\.\d*/, '');
+}
 
 var padLeft = function(str, pad, size) {
   while (str.length < size) {

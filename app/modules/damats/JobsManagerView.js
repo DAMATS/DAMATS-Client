@@ -4,7 +4,7 @@
 // Authors: Martin Paces <martin.paces@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2015 EOX IT Services GmbH
+// Copyright (C) 2016 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,35 +31,86 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/SITSManager',
-        'hbs!tmpl/SITSManagerItem',
+        'hbs!tmpl/JobsManager',
+        'hbs!tmpl/JobsManagerItem',
         'underscore'
     ];
 
     function init(
         Backbone,
         Communicator,
-        SITSManagerTmpl,
-        SITSManagerItemTmpl
+        JobsManagerTmpl,
+        JobsManagerItemTmpl
     ) {
-        var SITSManagerItemView = Backbone.Marionette.ItemView.extend({
+        var JobsManagerItemView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
-            className: 'input-group sits-item',
+            className: 'input-group job-item',
             attributes: {
                 'data-toggle': 'popover',
                 'data-trigger': 'hover'
             },
-            template: {type: 'handlebars', template: SITSManagerItemTmpl},
+            template: {type: 'handlebars', template: JobsManagerItemTmpl},
             templateHelpers: function () {
-                var toi = this.model.get('selection').toi;
-                var ext = this.model.get('selection_extent');
+                var status_ = this.model.get('status');
+                var editable = this.model.get('editable');
+                var wps_status = this.model.get('wps_status') ;
+                if (!wps_status) {wps_status = {};}
+
+                var icon = {
+                    "CREATED": editable ? "fa-pencil" : "fa-eye",
+                    "ACCEPTED": "fa-hourglass text-warning",
+                    "IN_PROGRESS": "fa-gears text-primary",
+                    "FAILED": "fa-times text-danger",
+                    "ABORTED": "fa-times text-danger",
+                    "FINISHED": "fa-check text-success"
+                };
+
+                var status_info = {
+                    "CREATED": "The job has not been started yet.",
+                    "ACCEPTED": "The job has beed enqueued for execution.",
+                    "IN_PROGRESS": "The job is running.",
+                    "FAILED": "The job ended with an error.",
+                    "ABORTED": "The job was terminated before completion.",
+                    "FINISHED": "The job ended sucessfully."
+                };
+
+                var status_code = {
+                    "CREATED": "CREATED",
+                    "ACCEPTED": "SUBMITTED [0% completed]",
+                    "IN_PROGRESS": "RUNNIG [" + wps_status.percent_completed + "% completed]",
+                    "FAILED": "FAILED",
+                    "ABORTED": "ABORTED",
+                    "FINISHED": "FINISHED [100% completed]"
+                };
+
+                var status_message;
+
+                if (wps_status.message) {
+                    status_message = wps_status.message;
+                } else {
+                    status_message = status_info[status_];
+                }
+
+                if (status_ == 'FAILED') {
+                    if (wps_status.locator) {
+                        status_message = wps_status.locator + ': ' + status_message;
+                    }
+                    if (wps_status.code && (wps_status.code != 'NoApplicableCode')) {
+                        status_message = wps_status.code + ': ' + status_message;
+                    }
+                }
+
                 return {
-                    start: formatISOTime(toi.start),
-                    end: formatISOTime(toi.end),
-                    lats: '[' + ext[1].toFixed(3) + ", " + ext[3].toFixed(3) + ']',
-                    lons: '[' + ext[0].toFixed(3) + ", " + ext[2].toFixed(3) + ']',
                     created: formatISOTime(this.model.get('created')),
-                    updated: formatISOTime(this.model.get('updated'))
+                    updated: formatISOTime(this.model.get('updated')),
+                    icon: icon[status_],
+                    status_info: status_info[status_],
+                    status_code: status_code[status_],
+                    status_message: status_message,
+                    is_removable: (
+                        (status_ != "ACCEPTED") && (status_ != "IN_PROGRESS") &&
+                        editable
+                    )
                 };
             },
             events: {
@@ -75,17 +126,14 @@
                 this.$el.popover({
                     html: true,
                     container: 'body',
-                    title: attr.name ? attr.name : attr.identifier,
+                    title: attr.status_code,
                     content: ( // TODO: proper content template
-                        (attr.description ? attr.description : '') +
+                        '<div class="job-info-popup">' + attr.status_message +
                         '<br>&nbsp;<table class="table"><tbody>' +
-                        '<tr><td>source:</td><td>' + attr.source + '</td></tr>' +
-                        '<tr><td>latitude:</td><td>' + attr.lats + '</td></tr>' +
-                        '<tr><td>longitude:</td><td>' + attr.lons + '</td></tr>' +
-                        '<tr><td>start:</td><td>' + attr.start + '</td></tr>' +
-                        '<tr><td>end:</td><td>' + attr.end + '</td></tr>' +
+                        '<tr><td>process:</td><td>' + attr.process + '</td></tr>' +
                         '<tr><td>created:</td><td>' + attr.created + '</td></tr>' +
                         '<tr><td>updated:</td><td>' + attr.updated + '</td></tr>' +
+                        (attr.description ? '<tr><td colspan="2">' + attr.description + '</td></tr>' : '') +
                         '</tbody><table>' +
                         '</div>'
                     )
@@ -100,10 +148,10 @@
                 this.onBrowse();
             },
 
-            onBrowse: function () {
+            onView: function () {
                 this.$el.popover('hide');
                 Communicator.mediator.trigger(
-                    'sits:browser:browse', this.model
+                    'job:viewer:view', this.model
                 );
             },
 
@@ -111,14 +159,14 @@
                 if (this.model.get('editable')) {
                     this.$el.popover('hide');
                     Communicator.mediator.trigger(
-                        'sits:editor:edit', this.model
+                        'job:editor:edit', this.model
                     );
                 }
             },
 
             onRemove: function () {
                 Communicator.mediator.trigger(
-                    'time_series:removal:confirm', this.model
+                    'job:removal:confirm', this.model
                 );
             },
 
@@ -127,10 +175,10 @@
             }
         });
 
-        var SITSManagerView = Backbone.Marionette.CompositeView.extend({
-            itemView: SITSManagerItemView,
+        var JobsManagerView = Backbone.Marionette.CompositeView.extend({
+            itemView: JobsManagerItemView,
             appendHtml: function (collectionView, itemView, index) {
-                collectionView.$('#sits-list').append(itemView.el);
+                collectionView.$('#jobs-list').append(itemView.el);
             },
             templateHelpers: function () {
                 return {
@@ -141,8 +189,8 @@
                 };
             },
             tagName: 'div',
-            className: 'panel panel-default sits-manager not-selectable',
-            template: {type: 'handlebars', template: SITSManagerTmpl},
+            className: 'panel panel-default jobs-manager not-selectable',
+            template: {type: 'handlebars', template: JobsManagerTmpl},
             events: {
                 'click #btn-sits-create': 'onCreateClick',
                 'click .close': 'close'
@@ -166,11 +214,11 @@
             },
 
             onCreateClick: function () {
-                Communicator.mediator.trigger('dialog:open:SITSCreation', true);
+                Communicator.mediator.trigger('dialog:open:JobsCreation', true);
             }
         });
 
-        return {SITSManagerView: SITSManagerView};
+        return {JobsManagerView: JobsManagerView};
     };
 
     root.define(deps, init);

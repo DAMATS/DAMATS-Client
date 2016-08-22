@@ -9,6 +9,17 @@
       <div class="well well-sm">
           <p><strong><i class="fa fa-fw fa-list"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}</strong></p>
           {{#if description }}<p>{{ description }}</p>{{/if}}
+          <table class="table">
+            <tbody>
+              <tr><td>Source:</td><td>{{ source }}</td></tr>
+              <tr><td>Latitude:</td><td>{{ lats }}</td></tr>
+              <tr><td>Longitude:</td><td>{{ lons }}</td></tr>
+              <tr><td>Start:</td><td>{{ start }}</td></tr>
+              <tr><td>End:</td><td>{{ end }}</td></tr>
+              <tr><td>Created:</td><td>{{ created }}</td></tr>
+              <tr><td>Updated:</td><td>{{ updated }}</td></tr>
+            </tbody>
+          </table>
       </div>
     <div class="modal-footer">
       <button type="button" class="btn" data-dismiss="modal" id="sits-removal-abort">No</button>

@@ -44,6 +44,18 @@
             tagName: 'div',
             className: 'modal fade',
             template: {type: 'handlebars', template: SITSRemovalTmpl},
+            templateHelpers: function () {
+                var toi = this.model.get('selection').toi;
+                var ext = this.model.get('selection_extent');
+                return {
+                    start: formatISOTime(toi.start),
+                    end: formatISOTime(toi.end),
+                    lats: '[' + ext[1].toFixed(3) + ", " + ext[3].toFixed(3) + ']',
+                    lons: '[' + ext[0].toFixed(3) + ", " + ext[2].toFixed(3) + ']',
+                    created: formatISOTime(this.model.get('created')),
+                    updated: formatISOTime(this.model.get('updated'))
+                };
+            },
             attributes: {
                 role: 'dialog',
                 tabindex: '-1',

@@ -73,7 +73,6 @@
             template: {type: 'handlebars', template: UserProfileTmpl},
             events: {
                 'click #btn-user-update': 'onUpdateClick',
-                'click #btn-user-refresh': 'onRefreshClick',
                 'change #txt-user-name': 'onNameChange',
                 'change #txt-user-description': 'onDescriptionChange',
                 'click .close': 'close'
@@ -109,11 +108,6 @@
 
             onSaveError: function () {
                 this.$('#btn-user-update').removeAttr('disabled');
-            },
-
-            onRefreshClick: function () {
-                globals.damats.fetchAll();
-                this.$('#btn-user-update').attr('disabled', 'disabled');
             },
 
             fillForm: function () {

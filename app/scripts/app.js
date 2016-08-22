@@ -43,6 +43,7 @@
         'controller/ContentController',
         'controller/SelectionManagerController',
         'controller/LoadingController',
+        'modules/damats/DataController',
         'modules/damats/SITSManagerController',
         'modules/damats/SITSCreationController',
         'modules/damats/SITSRemovalController',
@@ -50,7 +51,7 @@
         'modules/damats/SITSEditorController',
         'modules/damats/ProcessListController',
         'modules/damats/JobsManagerController',
-        'modules/damats/JobRemovalController',
+        'modules/damats/JobCreationController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
         'router'

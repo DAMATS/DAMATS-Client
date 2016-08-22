@@ -214,15 +214,8 @@
         "show": false
       },
       {
-        "name" : "Processes",
-        "icon" : "fa-gears",
-        "eventToRaise" : "dialog:toggle:ProcessList",
-        "template" : "ProcessList",
-        "show": false
-      },
-      {
         "name" : "Jobs",
-        "icon" : "fa-tasks",
+        "icon" : "fa-gears",
         "eventToRaise" : "dialog:toggle:JobsManager",
         "template" : "JobsManager",
         "show": false
@@ -235,10 +228,10 @@
         "show": false
       },
       {
-        "name" : "Tools",
+        "name" : "Processes",
         "icon" : "fa-wrench",
-        "eventToRaise" : "ui:open:toolselection",
-        "template" : "ToolSelection",
+        "eventToRaise" : "dialog:toggle:ProcessList",
+        "template" : "ProcessList",
         "show": false
       },
       {
@@ -257,6 +250,13 @@
           "template" : "help"
           }
         ]
+      },
+      {
+        "name" : "Refresh",
+        "icon" : "fa-refresh",
+        "eventToRaise" : "data:fetch:all",
+        "template" : "",
+        "show": false
       }
     ]
   },

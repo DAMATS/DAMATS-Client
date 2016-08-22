@@ -31,56 +31,28 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/JobRemoval',
-        'underscore'
+        'globals',
+        'app',
     ];
 
     function init(
         Backbone,
         Communicator,
-        JobRemovalTmpl
+        globals,
+        App
     ) {
-        var JobRemovalView = Backbone.Marionette.CompositeView.extend({
-            tagName: 'div',
-            className: 'modal fade',
-            template: {type: 'handlebars', template: JobRemovalTmpl},
-            templateHelpers: function () {
-                return {
-                    created: formatISOTime(this.model.get('created')),
-                    updated: formatISOTime(this.model.get('updated'))
-                };
+        var DataController = Backbone.Marionette.Controller.extend({
+            initialize: function (options) {
+                this.listenTo(Communicator.mediator, 'data:fetch:all', this.fetchAll);
             },
-            attributes: {
-                role: 'dialog',
-                tabindex: '-1',
-                'aria-labelledby': 'about-title',
-                'aria-hidden': true,
-                'data-keyboard': true,
-                'data-backdrop': 'static'
+
+            fetchAll: function () {
+                globals.damats.fetchAll();
             },
-            events: {
-                'click #job-removal-accept': 'onAccept',
-                'hidden.bs.modal': 'onCancel'
-            },
-            onShow: function (view) {
-                this.delegateEvents(this.events);
-            },
-            onCancel: function () {
-                Communicator.mediator.trigger(
-                    'dialog:close:JobRemove', this.model
-                );
-            },
-            onAccept: function () {
-                this.model.destroy({
-                    wait: true,
-                    success: function(model) {
-                        Communicator.mediator.trigger('job:removed', model);
-                    }
-                });
-            }
         });
-        return {JobRemovalView: JobRemovalView};
+
+        return new DataController();
     };
 
-    root.define(deps, init);
+    root.require(deps, init);
 }).call(this);

@@ -1,5 +1,5 @@
 <span class="input-group-addon btn-view" title="{{ status_info }}"> <i class="fa fa-fw {{ icon }}"></i> </span>
-<span class="form-control" style="height:auto;" {{#if description }}title="{{ description }}"{{/if}}>
+<span class="form-control" style="height:auto;" data-toggle="popover">
 <i class="fa fa-fw fa-gear"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}<br>
 </span>
 {{#if is_removable}}
