@@ -138,6 +138,21 @@
             defaults: {}
         });
 
+        var ProcessModel =  Backbone.Model.extend({
+            fetch: fetch,
+            save: save,
+            idAttribute: 'identifier',
+            defaults: {}
+        });
+
+        var JobModel =  Backbone.Model.extend({
+            fetch: fetch,
+            save: save,
+            idAttribute: 'identifier',
+            defaults: {}
+        });
+
+
         var GroupCollection = Backbone.Collection.extend({
             fetch: fetch,
             model: GroupModel
@@ -158,6 +173,16 @@
             model: CoverageModel
         });
 
+        var ProcessCollection = Backbone.Collection.extend({
+            fetch: fetch,
+            model: ProcessModel
+        });
+
+        var JobCollection = Backbone.Collection.extend({
+            fetch: fetch,
+            model: JobModel
+        });
+
         return {
             UserModel: UserModel,
             GroupModel: GroupModel,
@@ -167,7 +192,11 @@
             TimeSeriesModel: TimeSeriesModel,
             TimeSeriesCollection: TimeSeriesCollection,
             CoverageModel: CoverageModel,
-            CoverageCollection: CoverageCollection
+            CoverageCollection: CoverageCollection,
+            ProcessModel: ProcessModel,
+            ProcessCollection: ProcessCollection,
+            JobModel: JobModel,
+            JobCollection: JobCollection
         };
     };
     root.define(deps, init);

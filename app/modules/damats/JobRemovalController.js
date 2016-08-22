@@ -4,7 +4,7 @@
 // Authors: Martin Paces <martin.paces@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2015 EOX IT Services GmbH
+// Copyright (C) 2016 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,50 +31,56 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/SITSRemoval',
-        'underscore'
+        'globals',
+        'app',
+        'modules/damats/JobRemovalView'
     ];
 
     function init(
         Backbone,
         Communicator,
-        SITSRemovalTmpl
+        globals,
+        App,
+        JobRemovalView
     ) {
-        var SITSRemovalView = Backbone.Marionette.CompositeView.extend({
-            tagName: 'div',
-            className: 'modal fade',
-            template: {type: 'handlebars', template: SITSRemovalTmpl},
-            attributes: {
-                role: 'dialog',
-                tabindex: '-1',
-                'aria-labelledby': 'about-title',
-                'aria-hidden': true,
-                'data-keyboard': true,
-                'data-backdrop': 'static'
+        var JobRemovalController = Backbone.Marionette.Controller.extend({
+            model: null,
+            view: null,
+
+            initialize: function (options) {
+                this.listenTo(Communicator.mediator, 'job:removal:confirm', this.onRequest);
+                this.listenTo(Communicator.mediator, 'dialog:close:JobRemove', this.onClose);
             },
-            events: {
-                'click #sits-removal-accept': 'onAccept',
-                'hidden.bs.modal': 'onCancel'
-            },
-            onShow: function (view) {
-                this.delegateEvents(this.events);
-            },
-            onCancel: function () {
-                Communicator.mediator.trigger(
-                    'dialog:close:SITSRemove', this.model
-                );
-            },
-            onAccept: function () {
-                this.model.destroy({
-                    wait: true,
-                    success: function(model) {
-                        Communicator.mediator.trigger('sits:removed', model);
-                    }
+
+            onRequest: function (model) {
+                // only owned time series can be removed
+                if (!model.get('owned')) { return; }
+                if (!this.isClosed()) {
+                    this.view.close();
+                }
+                this.model = model;
+                this.view = new JobRemovalView.JobRemovalView({
+                    model: model
                 });
+                App.dialogRegion.show(this.view);
+            },
+
+            isClosed: function () {
+                return !this.view || _.isUndefined(this.view.isClosed) || this.view.isClosed;
+            },
+
+            onClose: function (event_) {
+                if (!this.isClosed()) {
+                    this.view.close();
+                }
+                this.view = null;
+                // Region.empty() not available. Might be a version issue.
+                //App.dialogRegion.empty();
             }
         });
-        return {SITSRemovalView: SITSRemovalView};
+
+        return new JobRemovalController();
     };
 
-    root.define(deps, init);
+    root.require(deps, init);
 }).call(this);

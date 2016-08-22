@@ -4,7 +4,7 @@
 // Authors: Martin Paces <martin.paces@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2015 EOX IT Services GmbH
+// Copyright (C) 2016 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,50 +31,62 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/SITSRemoval',
-        'underscore'
+        'globals',
+        'app',
+        'modules/damats/JobsManagerView'
     ];
 
     function init(
         Backbone,
         Communicator,
-        SITSRemovalTmpl
+        globals,
+        App,
+        JobsManagerView
     ) {
-        var SITSRemovalView = Backbone.Marionette.CompositeView.extend({
-            tagName: 'div',
-            className: 'modal fade',
-            template: {type: 'handlebars', template: SITSRemovalTmpl},
-            attributes: {
-                role: 'dialog',
-                tabindex: '-1',
-                'aria-labelledby': 'about-title',
-                'aria-hidden': true,
-                'data-keyboard': true,
-                'data-backdrop': 'static'
-            },
-            events: {
-                'click #sits-removal-accept': 'onAccept',
-                'hidden.bs.modal': 'onCancel'
-            },
-            onShow: function (view) {
-                this.delegateEvents(this.events);
-            },
-            onCancel: function () {
-                Communicator.mediator.trigger(
-                    'dialog:close:SITSRemove', this.model
-                );
-            },
-            onAccept: function () {
-                this.model.destroy({
-                    wait: true,
-                    success: function(model) {
-                        Communicator.mediator.trigger('sits:removed', model);
-                    }
+        var JobsManagerController = Backbone.Marionette.Controller.extend({
+            model: new Backbone.Model(),
+            collection: globals.damats.jobs,
+            view: null,
+
+            initialize: function (options) {
+                this.listenTo(Communicator.mediator, 'dialog:open:JobsManager', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:JobsManager', this.onClose);
+                this.listenTo(Communicator.mediator, 'dialog:toggle:JobsManager', this.onToggle);
+                //this.listenTo(Communicator.mediator, 'job:removal:proceed', this.onItemRemove);
+
+                this.view = new JobsManagerView.JobsManagerView({
+                    model: this.model,
+                    collection: this.collection
                 });
+            },
+
+            isClosed: function () {
+                return _.isUndefined(this.view.isClosed) || this.view.isClosed;
+            },
+
+            onOpen: function (event_) {
+                if (this.isClosed()) {
+                    App.viewContent.show(this.view);
+                }
+            },
+
+            onClose: function (event_) {
+                if (!this.isClosed()) {
+                    this.view.close();
+                }
+            },
+
+            onToggle: function (event_) {
+                if (this.isClosed()) {
+                    this.onOpen(event_);
+                } else {
+                    this.onClose(event_);
+                }
             }
         });
-        return {SITSRemovalView: SITSRemovalView};
+
+        return new JobsManagerController();
     };
 
-    root.define(deps, init);
+    root.require(deps, init);
 }).call(this);

@@ -52,7 +52,7 @@
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSManager', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSManager', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSManager', this.onToggle);
-                this.listenTo(Communicator.mediator, 'time_series:removal:proceed', this.onItemRemove);
+                //this.listenTo(Communicator.mediator, 'time_series:removal:proceed', this.onItemRemove);
 
                 this.view = new SITSManagerView.SITSManagerView({
                     model: this.model,

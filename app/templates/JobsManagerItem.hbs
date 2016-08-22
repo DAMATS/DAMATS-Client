@@ -1,0 +1,9 @@
+<span class="input-group-addon btn-view" title="{{ status_info }}"> <i class="fa fa-fw {{ icon }}"></i> </span>
+<span class="form-control" style="height:auto;" {{#if description }}title="{{ description }}"{{/if}}>
+<i class="fa fa-fw fa-gear"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}<br>
+</span>
+{{#if is_removable}}
+<span class="input-group-addon btn-remove" title="Click to remove this job.."><i class="fa fa-fw fa-times"></i></span>
+{{else}}
+<span class="input-group-addon btn-remove-locked" title="This job cannot be removed."><i class="fa fa-fw fa-lock"></i></span>
+{{/if}}

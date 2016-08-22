@@ -35,18 +35,19 @@ define(
     ],
     function (Backbone, ObjectStore, DataModels) {
         return {
-            version: "0.1.0dev",
+            version: "0.2.0dev",
             objects: new ObjectStore(),
             selections: new ObjectStore(),
             baseLayers: new Backbone.Collection(),
             products: new Backbone.Collection(),
             overlays: new Backbone.Collection(),
             damats: {
-                processes: new DataModels.GroupCollection(),
-                sources: new DataModels.GroupCollection(),
                 groups: new DataModels.GroupCollection(),
                 user: new DataModels.UserModel(),
+                sources: new DataModels.SourceSeriesCollection(),
                 time_series: new DataModels.TimeSeriesCollection(),
+                processes: new DataModels.ProcessCollection(),
+                jobs: new DataModels.JobCollection(),
                 productUrl: null,
                 productTemplate: {},
                 fetchAll: function () {
@@ -55,6 +56,7 @@ define(
                     this.sources.fetch();
                     this.processes.fetch();
                     this.time_series.fetch();
+                    this.jobs.fetch();
                 }
             }
         };

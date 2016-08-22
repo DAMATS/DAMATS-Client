@@ -1,0 +1,25 @@
+<div class="panel-heading">
+    <button type="button" class="close"><i class="fa fa-times-circle"></i></button>
+    <h3 class="panel-title"><i class="fa fa-fw fa-list"></i>&nbsp;Jobs Manager</h3>
+</div>
+<div class="panel-body">
+<h5>Available Jobs:</h5>
+{{#if is_fetching }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-cog fa-spin"></i> Loading data ...
+  </p>
+{{else}}{{#if fetch_failed }}
+  <p class="text-danger" id="alert">
+    <i class="fa fa-warning"></i> Failed to load the data from the server!
+  </p>
+{{else}}{{#if is_empty }}
+  <p class="text-danger" id="alert">
+    No time series avaialable.
+  </p>
+{{else}}
+  <div class="list-group jobs-list" id="jobs-list"></div>
+{{/if}}{{/if}}{{/if}}
+</div>
+<div class="panel-footer">
+  <button class="btn btn-block btn-primary" id="btn-job-create"  href="#modal-job-create" title="Create a new time series."><i class="fa fa-fw fa-plus-square"></i>&nbsp;Create new Job</button>
+</div>

@@ -8,6 +8,7 @@
     "pathSources": "/damats/sources",
     "pathTimeSeries": "/damats/time_series",
     "pathProcesses": "/damats/processes",
+    "pathJobs": "/damats/jobs",
     "pathOWS": "/ows",
     "url": "http://127.0.0.1:8110/eoxs",
     "productTemplate": {
@@ -222,8 +223,8 @@
       {
         "name" : "Jobs",
         "icon" : "fa-tasks",
-        "eventToRaise" : "dialog:toggle:JobList",
-        "template" : "ProcessJob",
+        "eventToRaise" : "dialog:toggle:JobsManager",
+        "template" : "JobsManager",
         "show": false
       },
       {

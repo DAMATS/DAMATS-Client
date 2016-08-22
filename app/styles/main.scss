@@ -405,6 +405,34 @@ button[active=active] {
 }
 
 /*
+ * Jobs Manager
+ */
+ .jobs-manager {
+  width: 32em;
+  top: 10em;
+  left: 50%;
+  margin: 0 0 0 -15em;
+  font-size: 1em;
+  position: absolute;
+ }
+
+.jobs-manager .jobs-list {
+  max-height: 20em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.jobs-manager .jobs-item {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.jobs-manager .btn-group {
+  margin-top: .6em;
+}
+
+/*
  * User Profile
  */
  .user-profile {

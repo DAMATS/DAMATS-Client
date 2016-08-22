@@ -49,6 +49,8 @@
         'modules/damats/SITSBrowserController',
         'modules/damats/SITSEditorController',
         'modules/damats/ProcessListController',
+        'modules/damats/JobsManagerController',
+        'modules/damats/JobRemovalController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
         'router'
@@ -161,6 +163,9 @@
                 );
                 globals.damats.time_series.url = (
                     config.damats.url + config.damats.pathTimeSeries
+                );
+                globals.damats.jobs.url = (
+                    config.damats.url + config.damats.pathJobs
                 );
                 globals.damats.fetchAll();
 

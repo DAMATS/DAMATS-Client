@@ -4,7 +4,7 @@
 // Authors: Martin Paces <martin.paces@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2015 EOX IT Services GmbH
+// Copyright (C) 2016 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,19 +31,19 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/SITSRemoval',
+        'hbs!tmpl/JobRemoval',
         'underscore'
     ];
 
     function init(
         Backbone,
         Communicator,
-        SITSRemovalTmpl
+        JobRemovalTmpl
     ) {
-        var SITSRemovalView = Backbone.Marionette.CompositeView.extend({
+        var JobRemovalView = Backbone.Marionette.CompositeView.extend({
             tagName: 'div',
             className: 'modal fade',
-            template: {type: 'handlebars', template: SITSRemovalTmpl},
+            template: {type: 'handlebars', template: JobRemovalTmpl},
             attributes: {
                 role: 'dialog',
                 tabindex: '-1',
@@ -53,7 +53,7 @@
                 'data-backdrop': 'static'
             },
             events: {
-                'click #sits-removal-accept': 'onAccept',
+                'click #job-removal-accept': 'onAccept',
                 'hidden.bs.modal': 'onCancel'
             },
             onShow: function (view) {
@@ -61,19 +61,19 @@
             },
             onCancel: function () {
                 Communicator.mediator.trigger(
-                    'dialog:close:SITSRemove', this.model
+                    'dialog:close:JobRemove', this.model
                 );
             },
             onAccept: function () {
                 this.model.destroy({
                     wait: true,
                     success: function(model) {
-                        Communicator.mediator.trigger('sits:removed', model);
+                        Communicator.mediator.trigger('job:removed', model);
                     }
                 });
             }
         });
-        return {SITSRemovalView: SITSRemovalView};
+        return {JobRemovalView: JobRemovalView};
     };
 
     root.define(deps, init);

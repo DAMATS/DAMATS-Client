@@ -1,0 +1,25 @@
+<div class="modal-dialog modal-confirm" id="job-remove-confirm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+      <h3 class="panel-title" id="about-title"><i class="fa fa-fw fa-question-circle"></i>&nbsp;Confirm job removal.</h3>
+    </div>
+    <div class="modal-body modal-body-about">
+      <h5>Are you sure to remove following job?</h5>
+      <div class="well well-sm">
+          <p><strong><i class="fa fa-fw fa-gear"></i>&nbsp;&nbsp;{{#if name }}{{ name }}<br>({{ identifier }}){{ else }}{{ identifier}}{{/if}}</strong></p>
+          {{#if description }}<p>{{ description }}</p>{{/if}}
+          <table class="table">
+            <tbody>
+              <tr><td>Status:</td><td>{{ status }}</td></tr>
+              <tr><td>Created:</td><td>{{ created }}</td></tr>
+              <tr><td>Updated:</td><td>{{ updated }}</td></tr>
+            </tbody>
+          </table>
+      </div>
+    <div class="modal-footer">
+      <button type="button" class="btn" data-dismiss="modal" id="job-removal-abort">No</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" id="job-removal-accept">Yes</button>
+    </div>
+  </div>
+</div>
