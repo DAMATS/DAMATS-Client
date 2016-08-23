@@ -51,7 +51,8 @@
         'modules/damats/SITSEditorController',
         'modules/damats/ProcessListController',
         'modules/damats/JobsManagerController',
-        'modules/damats/JobCreationController',
+        'modules/damats/JobRemovalController',
+        'modules/damats/JobViewerController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
         'router'

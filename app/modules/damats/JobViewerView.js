@@ -4,7 +4,7 @@
 // Authors: Martin Paces <martin.paces@eox.at>
 //
 //------------------------------------------------------------------------------
-// Copyright (C) 2016 EOX IT Services GmbH
+// Copyright (C) 2015 EOX IT Services GmbH
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,26 +31,23 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/JobsManager',
-        'hbs!tmpl/JobsManagerItem',
+        'globals',
+        'hbs!tmpl/JobViewer',
         'underscore'
     ];
 
     function init(
         Backbone,
         Communicator,
-        JobsManagerTmpl,
-        JobsManagerItemTmpl
+        globals,
+        JobViewerTmpl
     ) {
-        var JobsManagerItemView = Backbone.Marionette.ItemView.extend({
+        var JobViewerView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
-            className: 'input-group job-item',
-            attributes: {
-                'data-toggle': 'popover',
-                'data-trigger': 'hover'
-            },
-            template: {type: 'handlebars', template: JobsManagerItemTmpl},
+            className: 'panel panel-default job-viewer not-selectable',
+            template: {type: 'handlebars', template: JobViewerTmpl},
             templateHelpers: function () {
+                // TODO: get rid of the duplicated code
                 var status_ = this.model.get('status');
                 var editable = this.model.get('editable');
                 var wps_status = this.model.get('wps_status') ;
@@ -100,7 +97,47 @@
                     }
                 }
 
+                // resolve the process model
+                var process_model = globals.damats.processes.findWhere(
+                    {'identifier': this.model.get('process')}
+                );
+                var process = null;
+                if (process_model) {
+                    process = process_model.attributes
+                } else {
+                    process = {
+                        'identifier': this.model.get('process'),
+                        'name': 'Invalid process.'
+                    };
+                }
+
+                // resolve the time series model
+                var time_series_model = globals.damats.time_series.findWhere(
+                    {'identifier': this.model.get('time_series')}
+                );
+                var time_series = null;
+                if (time_series_model) {
+                    time_series = time_series_model.attributes
+                } else {
+                    time_series = {
+                        'identifier': this.model.get('process'),
+                        'name': 'Invalid SITS.'
+                    };
+                }
+
                 return {
+                    process: process,
+                    time_series: time_series,
+                    is_submittable: status_ == "CREATED",
+                    is_submitted: status_ != "CREATED",
+                    is_terminable: (
+                        (status_ == "IN_PROGRESS") || (status_ == "ACCEPTED")
+                    ),
+                    is_terminated: (
+                        (status_ == "FINISHED") || (status_ == "FAILED") ||
+                        (status_ == "ABORTED")
+                    ),
+                    is_completed: status_ == "FINISHED",
                     created: formatISOTime(this.model.get('created')),
                     updated: formatISOTime(this.model.get('updated')),
                     icon: icon[status_],
@@ -114,79 +151,17 @@
                 };
             },
             events: {
-                'click .btn-view': 'onView',
-                'click .btn-remove-locked': 'onRemoveLocked',
-                'click .btn-remove': 'onRemove',
-                'click .form-control': 'onView'
-            },
-
-            onRender: function () {
-                var attr = _.extend(this.model.attributes, this.templateHelpers());
-                this.$el.popover({
-                    html: true,
-                    container: 'body',
-                    title: attr.status_code,
-                    content: ( // TODO: proper content template
-                        '<div class="job-info-popup">' + attr.status_message +
-                        '<br>&nbsp;<table class="table"><tbody>' +
-                        '<tr><td>process:</td><td>' + attr.process + '</td></tr>' +
-                        '<tr><td>created:</td><td>' + attr.created + '</td></tr>' +
-                        '<tr><td>updated:</td><td>' + attr.updated + '</td></tr>' +
-                        (attr.description ? '<tr><td colspan="2">' + attr.description + '</td></tr>' : '') +
-                        '</tbody><table>' +
-                        '</div>'
-                    )
-                });
-            },
-
-            onReset: function () {
-                this.onBrowse();
-            },
-
-            onView: function () {
-                this.$el.popover('hide');
-                Communicator.mediator.trigger('job:viewer:view', this.model);
-            },
-
-            onRemove: function () {
-                Communicator.mediator.trigger('job:removal:confirm', this.model);
-            },
-
-            onRemoveLocked: function () {
-                console.log(this.model.get('identifier') + '.onRemoveLocked()');
-            }
-        });
-
-        var JobsManagerView = Backbone.Marionette.CompositeView.extend({
-            itemView: JobsManagerItemView,
-            appendHtml: function (collectionView, itemView, index) {
-                collectionView.$('#jobs-list').append(itemView.el);
-            },
-            templateHelpers: function () {
-                return {
-                    is_fetching: this.collection.is_fetching,
-                    fetch_failed: this.collection.fetch_failed,
-                    length: this.collection.length,
-                    is_empty: this.collection.length < 1
-                };
-            },
-            tagName: 'div',
-            className: 'panel panel-default jobs-manager not-selectable',
-            template: {type: 'handlebars', template: JobsManagerTmpl},
-            events: {
-                'click #btn-sits-create': 'onCreateClick',
+                'click #btn-clone': 'cloneJob',
+                'click #btn-open-manager': 'openManager',
+                'click #btn-refetch': 'refetch',
+                'click #btn-delete': 'removeJob',
                 'click .close': 'close'
             },
-
+            initialize: function (options) {
+            },
             onShow: function (view) {
+                this.listenTo(this.model, 'destroy', this.openManager);
                 this.listenTo(this.model, 'change', this.render);
-                this.listenTo(this.collection, 'sync', this.render);
-                this.listenTo(this.collection, 'update', this.render);
-                this.listenTo(this.collection, 'reset', this.render);
-                this.listenTo(this.collection, 'add', this.render);
-                this.listenTo(this.collection, 'remove', this.render);
-                this.listenTo(this.collection, 'fetch:start', this.render);
-                this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
@@ -194,13 +169,21 @@
                     handle: '.panel-heading'
                 });
             },
-
-            onCreateClick: function () {
-                Communicator.mediator.trigger('dialog:open:JobsCreation', true);
-            }
+            //onClose: function () {},
+            //onRender: function () {},
+            cloneJob: function () {},
+            removeJob: function () {
+                Communicator.mediator.trigger('job:removal:confirm', this.model);
+            },
+            openManager: function () {
+                Communicator.mediator.trigger('dialog:open:JobsManager', true);
+            },
+            refetch: function () {
+                Communicator.mediator.trigger('job:viewer:fetch', true);
+            },
         });
 
-        return {JobsManagerView: JobsManagerView};
+        return {JobViewerView: JobViewerView};
     };
 
     root.define(deps, init);

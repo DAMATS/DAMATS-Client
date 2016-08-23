@@ -45,13 +45,12 @@
         DataModels,
         JobViewerView
     ) {
-
         var JobViewerController = Backbone.Marionette.Controller.extend({
             model: null,
             collection: null,
             view: null,
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'job:viewer:view', this.browse);
+                this.listenTo(Communicator.mediator, 'job:viewer:view', this.view);
                 this.listenTo(Communicator.mediator, 'job:viewer:fetch', this.fetch);
                 this.listenTo(Communicator.mediator, 'dialog:open:JobViewer', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobViewer', this.onClose);

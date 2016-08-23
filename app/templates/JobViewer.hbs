@@ -1,0 +1,66 @@
+<div class="panel-heading">
+    <button type="button" class="close"><i class="fa fa-times-circle"></i></button>
+    <h3 class="panel-title"><i class="fa fa-fw {{#if editable }}fa-pencil{{ else }}fa-eye{{/if}}"></i>&nbsp;Job Viewer</h3>
+</div>
+<div class="panel-body">
+  <h5><i class="fa fa-fw fa-gear"></i>&nbsp;{{#if name }}<strong>{{ name }}</strong><br>({{ identifier }}){{ else }}<strong>{{ identifier}}</strong>{{/if}}</h5>
+  {{#if description }}<p>{{ description }}</p>{{/if}}
+  <ul class="list-group">
+    {{#unless is_submittable }}
+    <li class="list-group-item" id="btn-process">
+      <span title="{{ status_info }}"><i class="fa fa-fw {{ icon }}"></i>&nbsp;{{ status_code }}<br>{{ status_message }}</span>
+    </li>
+    {{/unless}}
+    <li class="list-group-item" id="box-process">
+      <span {{#if process.description }}title="{{ process.description }}"{{/if}}><i class="fa fa-fw fa-wrench"></i>&nbsp;Process:&nbsp;{{#if process.name }}{{ process.name }}<br>({{ process.identifier }}){{ else }}{{ process.identifier}}{{/if}}</span>
+    </li>
+    <li class="list-group-item" id="box-sits">
+      <span {{#if time_series.description }}title="{{ time_series.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if time_series.name }}{{ time_series.name }}<br>({{ time_series.identifier }}){{ else }}{{ time_series.identifier}}{{/if}}</span>
+    </li>
+    <li class="list-group-item" id="box-inputs">
+      <i class="fa fa-fw fa-sign-in"></i>&nbsp;Inputs:
+      {{#if is_empty }}
+        <p>This job has no inputs.</p>
+      {{else}}
+        <p>This job has some input.</p>
+      {{/if}}
+    </li>
+    {{#if is_completed }}
+    <li class="list-group-item" id="box-inputs">
+      <i class="fa fa-fw fa-sign-out"></i>&nbsp;Outputs:
+      {{#if is_empty }}
+        <p>This job has no outputs.</p>
+      {{else}}
+        <p>This job has some output.</p>
+      {{/if}}
+    {{/if}}
+    </li>
+  </ul
+</div>
+<div class="panel-footer">
+  {{#if is_submittable }}
+  <span class="btn-group" role="button">
+    <button type="button" class="btn btn-primary" id="btn-submit"><i class="fa fa-fw fa-thumbs-up" title="Proceed with the job execution."></i>&nbsp;Execute</button>
+  </span>
+  <span class="btn-group" role="button">
+    <button type="button" class="btn btn-default" id="btn-save"><i class="fa fa-fw fa-save" title="Save the changed inputs."></i>&nbsp;Save</button>
+  </span>
+  {{/if}}
+  {{#if is_terminable }}
+  <span class="btn-group" role="button">
+    <button type="button" class="btn btn-default disabled" id="btn-abort"><i class="fa fa-fw fa-times" title="Terminate execution execution."></i>&nbsp;Abort</button>
+  </span>
+  {{/if}}
+  <span class="btn-group dropup" style="float:right">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other actions ...</button>
+    <ul class="dropdown-menu">
+      <li><a id="btn-clone"><i class="fa fa-clone"></i>&nbsp;&nbsp;Clone job</a></li>
+      <li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change job</a></li>
+      <li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload</a></li>
+      <li {{#if is_terminable }}class="disabled"{{/if}}><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete job</a></li>
+    </ul>
+  </span>
+{{#if is_terminated}}
+  &nbsp;<br>&nbsp;
+{{/if}}
+</div>

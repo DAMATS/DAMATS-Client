@@ -262,7 +262,9 @@
                 });
             },
             processSITS: function () {
-                Communicator.mediator.trigger('dialog:open:ProcessList');
+                Communicator.mediator.trigger(
+                    'dialog:open:JobCreation', {'sits': this.sourceModel}
+                );
             },
             removeSITS: function () {
                 if (this.sourceModel.get('editable')) {
