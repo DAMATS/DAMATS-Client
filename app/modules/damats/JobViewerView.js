@@ -163,6 +163,7 @@
             onShow: function (view) {
                 this.listenTo(this.model, 'destroy', this.openManager);
                 this.listenTo(this.model, 'change', this.render);
+                this.listenTo(Communicator.mediator, 'data:fetch:all', this.refetch);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,

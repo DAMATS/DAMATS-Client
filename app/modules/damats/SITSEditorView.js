@@ -186,6 +186,7 @@
                 this.listenTo(this.collection, 'fetch:start', this.render);
                 this.listenTo(this.collection, 'fetch:stop', this.render);
                 this.listenTo(Communicator.mediator, 'product:selected', this.selectById);
+                this.listenTo(Communicator.mediator, 'data:fetch:all', this.refetch);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
