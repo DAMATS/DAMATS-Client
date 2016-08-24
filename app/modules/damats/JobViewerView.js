@@ -155,6 +155,7 @@
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
+                'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
             initialize: function (options) {
@@ -171,6 +172,11 @@
             },
             //onClose: function () {},
             //onRender: function () {},
+            editMetadata: function () {
+                Communicator.mediator.trigger(
+                    'object:metadata:edit', this.model
+                );
+            },
             cloneJob: function () {},
             removeJob: function () {
                 Communicator.mediator.trigger('job:removal:confirm', this.model);

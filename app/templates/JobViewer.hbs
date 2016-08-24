@@ -3,8 +3,8 @@
     <h3 class="panel-title"><i class="fa fa-fw {{#if editable }}fa-pencil{{ else }}fa-eye{{/if}}"></i>&nbsp;Job Viewer</h3>
 </div>
 <div class="panel-body">
-  <h5><i class="fa fa-fw fa-gear"></i>&nbsp;{{#if name }}<strong>{{ name }}</strong><br>({{ identifier }}){{ else }}<strong>{{ identifier}}</strong>{{/if}}</h5>
-  {{#if description }}<p>{{ description }}</p>{{/if}}
+  <h5 class="object-metadata"><i class="fa fa-fw fa-gear"></i>&nbsp;{{#if name }}<strong>{{ name }}</strong><br>({{ identifier }}){{ else }}<strong>{{ identifier}}</strong>{{/if}}</h5>
+  {{#if description }}<p class="object-metadata">{{ description }}</p>{{/if}}
   <ul class="list-group">
     {{#unless is_submittable }}
     <li class="list-group-item" id="btn-process">

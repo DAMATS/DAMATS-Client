@@ -101,6 +101,7 @@
         }
 
         var UserModel = Backbone.Model.extend({
+            type: "User",
             fetch: fetch,
             save: save,
             idAttribute: 'identifier',
@@ -122,6 +123,7 @@
         });
 
         var TimeSeriesModel = Backbone.Model.extend({
+            type: "TimeSeries",
             fetch: fetch,
             save: save,
             idAttribute: 'identifier',
@@ -146,6 +148,7 @@
         });
 
         var JobModel =  Backbone.Model.extend({
+            type: "Job",
             fetch: fetch,
             save: save,
             idAttribute: 'identifier',

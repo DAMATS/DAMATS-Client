@@ -140,6 +140,7 @@
                 'click #btn-prev': 'selectPrevious',
                 'click #btn-next': 'selectNext',
                 'click #btn-current': 'scrollToCurrent',
+                'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
             initialize: function (options) {
@@ -147,7 +148,8 @@
             },
             onShow: function (view) {
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
-                this.listenTo(this.sourceModel, 'change', this.refreshSITSGeometry);
+                this.listenTo(this.sourceModel, 'change', this.onSourceModelChange);
+                this.listenTo(this.model, 'change', this.render);
                 this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
@@ -181,9 +183,18 @@
             onRender: function () {
                 this.scrollToCurrent();
             },
+            onSourceModelChange() {
+                this.model.set(this.sourceModel.changedAttributes());
+                this.refreshSITSGeometry();
+            },
+            editMetadata: function () {
+                Communicator.mediator.trigger(
+                    'object:metadata:edit', this.sourceModel
+                );
+            },
             refreshSITSGeometry: function () {
-                this.removeSISTGeometry()
-                this.displaySITSGeometry()
+                this.removeSISTGeometry();
+                this.displaySITSGeometry();
             },
             removeSISTGeometry: function () {
                 Communicator.mediator.trigger('map:geometry:remove:all')

@@ -44,6 +44,7 @@
         'controller/SelectionManagerController',
         'controller/LoadingController',
         'modules/damats/DataController',
+        'modules/damats/ObjectMetadataEditorController',
         'modules/damats/SITSManagerController',
         'modules/damats/SITSCreationController',
         'modules/damats/SITSRemovalController',

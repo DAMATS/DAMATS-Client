@@ -1,0 +1,38 @@
+<div class="modal-dialog modal-confirm" id="object-metadata-editor">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+      <h3 class="panel-title" id="about-title">
+        <i class="fa fa-fw {{#if owned}}fa-pencil{{else}}fa-eye{{/if}}"></i>&nbsp;{{#if owned}}Edit{{else}}View{{/if}} {{ label }} annotation.
+      </h3>
+    </div>
+    <div class="modal-body modal-body-about">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="txt-name" class="col-sm-2 control-label">Id:</label>
+          <div class="col-sm-10">
+            <input id="txt-obj-id" type="text" class="form-control" placeholder="{{ label }} identifier" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="txt-name" class="col-sm-2 control-label">Name:</label>
+          <div class="col-sm-10">
+            <input id="txt-obj-name" type="text" class="form-control" placeholder="{{ label }} name"{{#unless owned}} readonly{{/unless}}>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="txt-description" class="col-sm-2 control-label">Info:</label>
+          <div class="col-sm-10">
+            <textarea id="txt-obj-description" class="form-control" rows="4" placeholder="{{ label }} description" {{#unless owned}} readonly{{/unless}}></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn {{#if owned}}btn-default{{else}}btn-primary{{/if}}" data-dismiss="modal" id="btn-cancel"><i class="fa fa-fw fa-times"></i>&nbsp;Cancel</button>
+    {{#if owned}}
+      <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-obj-save"><i class="fa fa-fw fa-save"></i>&nbsp;Save</button>
+    {{/if}}
+    </div>
+  </div>
+</div>

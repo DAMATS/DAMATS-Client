@@ -72,12 +72,9 @@
             className: 'panel panel-default user-profile not-selectable',
             template: {type: 'handlebars', template: UserProfileTmpl},
             events: {
-                'click #btn-user-update': 'onUpdateClick',
-                'change #txt-user-name': 'onNameChange',
-                'change #txt-user-description': 'onDescriptionChange',
+                'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
-
             onShow: function (view) {
                 this.listenTo(this.model, 'change', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
@@ -93,37 +90,14 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                this.fillForm();
-                this.$('#btn-user-update').attr('disabled', 'disabled');
             },
-
-            onRender: function () {
-                this.fillForm();
+            editMetadata: function () {
+                this.model.owned = true;
+                Communicator.mediator.trigger(
+                    'object:metadata:edit', this.model
+                );
             },
-
-            onUpdateClick: function () {
-                this.model.save();
-                this.$('#btn-user-update').attr('disabled', 'disabled');
-            },
-
             onSaveError: function () {
-                this.$('#btn-user-update').removeAttr('disabled');
-            },
-
-            fillForm: function () {
-                // fill the form variables
-                $('#txt-user-name').val(this.model.get('name'));
-                $('#txt-user-description').val(this.model.get('description'));
-                this.$('#btn-user-update').attr('disabled', 'disabled');
-            },
-
-            onNameChange: function () {
-                this.model.set({name: $('#txt-user-name').val()});
-                this.$('#btn-user-update').removeAttr('disabled');
-            },
-
-            onDescriptionChange: function () {
-                this.model.set({description: $('#txt-user-description').val()});
                 this.$('#btn-user-update').removeAttr('disabled');
             }
         });
