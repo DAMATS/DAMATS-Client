@@ -160,6 +160,7 @@
                 'click #btn-focus': 'focusToSelection',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-open-browser': 'openBrowser',
+                'click #btn-clone': 'cloneSITS',
                 'click #btn-refetch': 'refetch',
                 'click #btn-process': 'processSITS',
                 'click #btn-delete': 'removeSITS',
@@ -224,6 +225,9 @@
             refreshSITSGeometry: function () {
                 this.removeSISTGeometry();
                 this.displaySITSGeometry();
+            },
+            cloneSITS: function () {
+                Communicator.mediator.trigger('sits:editor:clone', this.model);
             },
             removeSISTGeometry: function () {
                 Communicator.mediator.trigger('map:geometry:remove:all');

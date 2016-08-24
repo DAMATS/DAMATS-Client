@@ -52,12 +52,14 @@
             view: null,
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'sits:browser:browse', this.browse);
+                this.listenTo(Communicator.mediator, 'sits:browser:clone', this.clone);
                 this.listenTo(Communicator.mediator, 'sits:browser:fetch', this.fetch);
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSBrowser', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSBrowser', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSBrowser', this.onToggle);
             },
             browse: function (model) {
+                this.onClose();
                 if (!this.model || !this.collection || (
                   this.model.get('identifier') != model.get('identifier')
                 )) {
@@ -77,6 +79,22 @@
             fetch: function () {
                 this.sourceModel.fetch();
                 this.collection.fetch({data: $.param({list: true, all: false})});
+            },
+            clone: function (model) {
+                var new_attributes = _.pick(model.attributes, [
+                    'name', 'description', 'source', 'selection'
+                ]);
+                new_attributes.editable = true;
+                new_attributes.template = model.get('identifier');
+                globals.damats.time_series.create(new_attributes, {
+                    wait: true,
+                    success: function (model) {
+                        model.set('is_saved', true);
+                        Communicator.mediator.trigger(
+                            'sits:browser:browse', model
+                        );
+                    }
+                });
             },
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;

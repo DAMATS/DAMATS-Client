@@ -178,7 +178,9 @@
                     'object:metadata:edit', this.model
                 );
             },
-            cloneJob: function () {},
+            cloneJob: function () {
+                Communicator.mediator.trigger('job:viewer:clone', this.model);
+            },
             removeJob: function () {
                 Communicator.mediator.trigger('job:removal:confirm', this.model);
             },

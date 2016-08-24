@@ -132,6 +132,7 @@
                 'click #btn-focus': 'focusToSelection',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-open-editor': 'openEditor',
+                'click #btn-clone': 'cloneSITS',
                 'click #btn-refetch': 'refetch',
                 'click #btn-process': 'processSITS',
                 'click #btn-delete': 'removeSITS',
@@ -277,6 +278,9 @@
                 Communicator.mediator.trigger(
                     'dialog:open:JobCreation', {'sits': this.sourceModel}
                 );
+            },
+            cloneSITS: function () {
+                Communicator.mediator.trigger('sits:browser:clone', this.model);
             },
             removeSITS: function () {
                 if (this.sourceModel.get('editable')) {

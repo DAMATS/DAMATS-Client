@@ -52,12 +52,14 @@
             view: null,
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'sits:editor:edit', this.edit);
+                this.listenTo(Communicator.mediator, 'sits:editor:clone', this.clone);
                 this.listenTo(Communicator.mediator, 'sits:editor:fetch', this.fetch);
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSEditor', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSEditor', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSEditor', this.onToggle);
             },
             edit: function (model) {
+                this.onClose();
                 if (!this.model || !this.collection || (
                     this.model.get('identifier') != model.get('identifier')
                 )) {
@@ -77,6 +79,22 @@
             fetch: function () {
                 this.sourceModel.fetch();
                 this.collection.fetch({data: $.param({list: true, all: true})});
+            },
+            clone: function (model) {
+                var new_attributes = _.pick(model.attributes, [
+                    'name', 'description', 'source', 'selection'
+                ]);
+                new_attributes.editable = true;
+                new_attributes.template = model.get('identifier');
+                globals.damats.time_series.create(new_attributes, {
+                    wait: true,
+                    success: function (model) {
+                        model.set('is_saved', true);
+                        Communicator.mediator.trigger(
+                            'sits:editor:edit', model
+                        );
+                    }
+                });
             },
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;

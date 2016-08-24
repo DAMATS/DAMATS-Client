@@ -52,11 +52,13 @@
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'job:viewer:view', this.view);
                 this.listenTo(Communicator.mediator, 'job:viewer:fetch', this.fetch);
+                this.listenTo(Communicator.mediator, 'job:viewer:clone', this.clone);
                 this.listenTo(Communicator.mediator, 'dialog:open:JobViewer', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobViewer', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:JobViewer', this.onToggle);
             },
             view: function (model) {
+                this.onClose();
                 this.model = model; // .clone();
                 this.fetch(); // always refresh the model
                 this.view = new JobViewerView.JobViewerView({
@@ -66,6 +68,20 @@
             },
             fetch: function () {
                 this.model.fetch();
+            },
+            clone: function (model) {
+                var new_attributes = _.pick(model.attributes, [
+                    'name', 'description', 'process', 'time_series', 'inputs'
+                ]);
+                globals.damats.jobs.create(new_attributes, {
+                    wait: true,
+                    success: function (model) {
+                        model.set('is_saved', true);
+                        Communicator.mediator.trigger(
+                            'job:viewer:view', model
+                        );
+                    }
+                });
             },
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;
