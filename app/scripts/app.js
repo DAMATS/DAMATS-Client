@@ -54,6 +54,7 @@
         'modules/damats/JobsManagerController',
         'modules/damats/JobRemovalController',
         'modules/damats/JobViewerController',
+        'modules/damats/JobCreationController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
         'router'
@@ -136,6 +137,9 @@
                 // DAMATS specific URL configuration and data loading
                 globals.damats.productTemplate = config.damats.productTemplate;
                 globals.damats.productUrl = (
+                    config.damats.url + config.damats.pathOWS
+                );
+                globals.damats.processUrl = (
                     config.damats.url + config.damats.pathOWS
                 );
                 globals.damats.getProduct = function (id, description, has_time_slider) {

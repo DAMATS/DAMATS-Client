@@ -49,6 +49,8 @@
             model: null,
             collection: null,
             view: null,
+            refreshInterval: 10000,
+            refreshTimer: null,
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'job:viewer:view', this.view);
                 this.listenTo(Communicator.mediator, 'job:viewer:fetch', this.fetch);
@@ -56,6 +58,18 @@
                 this.listenTo(Communicator.mediator, 'dialog:open:JobViewer', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobViewer', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:JobViewer', this.onToggle);
+                this.refreshTimer = setInterval(
+                    _.bind(this.refetch, this), this.refreshInterval
+                );
+            },
+            refetch: function () {
+                if (!this.isClosed()) {
+                    console.log()
+                    var status_ = this.model.get('status');
+                    if ((status_ == "IN_PROGRESS") || (status_ == "ACCEPTED")) {
+                        this.model.fetch();
+                    }
+                }
             },
             view: function (model) {
                 this.onClose();

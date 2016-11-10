@@ -69,7 +69,6 @@
                 'click .btn-remove': 'onRemove',
                 'click .form-control': 'onClick'
             },
-
             onRender: function () {
                 var attr = _.extend(this.model.attributes, this.templateHelpers());
                 this.$el.popover({
@@ -91,22 +90,24 @@
                     )
                 });
             },
-
             onClick: function () {
-                this.onBrowse();
+                this.onSelect();
             },
-
             onReset: function () {
                 this.onBrowse();
             },
-
+            onSelect: function () {
+                this.$el.popover('hide');
+                Communicator.mediator.trigger(
+                    'dialog:open:JobCreation', {'sits': this.model}
+                );
+            },
             onBrowse: function () {
                 this.$el.popover('hide');
                 Communicator.mediator.trigger(
                     'sits:browser:browse', this.model
                 );
             },
-
             onEdit: function () {
                 if (this.model.get('editable')) {
                     this.$el.popover('hide');
@@ -115,13 +116,11 @@
                     );
                 }
             },
-
             onRemove: function () {
                 Communicator.mediator.trigger(
                     'time_series:removal:confirm', this.model
                 );
             },
-
             onRemoveLocked: function () {
                 console.log(this.model.get('identifier') + '.onRemoveLocked()');
             }
@@ -147,7 +146,6 @@
                 'click #btn-sits-create': 'onCreateClick',
                 'click .close': 'close'
             },
-
             onShow: function (view) {
                 this.listenTo(this.model, 'change', this.render);
                 this.listenTo(this.collection, 'sync', this.render);
@@ -164,7 +162,6 @@
                     handle: '.panel-heading'
                 });
             },
-
             onCreateClick: function () {
                 Communicator.mediator.trigger('dialog:open:SITSCreation', true);
             }

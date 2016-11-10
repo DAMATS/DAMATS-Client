@@ -128,7 +128,7 @@
                 return {
                     process: process,
                     time_series: time_series,
-                    is_submittable: status_ == "CREATED",
+                    is_submittable: editable && status_ == "CREATED",
                     is_submitted: status_ != "CREATED",
                     is_terminable: (
                         (status_ == "IN_PROGRESS") || (status_ == "ACCEPTED")
@@ -155,6 +155,9 @@
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
+                'click #btn-clone': 'cloneJob',
+                'click #btn-save': 'saveJob',
+                'click #btn-submit': 'executeJob',
                 'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
@@ -170,13 +173,56 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
+
             },
             //onClose: function () {},
-            //onRender: function () {},
+            onRender: function () {
+                this.$('#btn-save').attr('disabled', 'disabled');
+            },
             editMetadata: function () {
                 Communicator.mediator.trigger(
                     'object:metadata:edit', this.model
                 );
+            },
+            saveJob: function () {
+                console.log('saveJob');
+                if (
+                    (this.model.get('status') == 'CREATED') &&
+                    this.model.get('owned')
+                ) {
+                    this.model.save();
+                    this.$('#btn-save').attr('disabled', 'disabled');
+                }
+            },
+            executeJob: function () {
+                console.log('executeJob');
+                this.$('#btn-submit').attr('disabled', 'disabled');
+                // TODO: POST/XML request
+                // TODO: proper inputs encoding
+                // construct the WPS request URL
+                var url = (
+                    //globals.damats.processUrl + '?service=WPS&request=describeProcess' +
+                    globals.damats.processUrl + '?service=WPS&request=execute' +
+                    '&identifier=' + this.model.get('process') +
+                    '&DataInputs=sits=' + this.model.get('time_series') +
+                    '&StoreExecuteResponse=true&status=true&lineage=true'
+                );
+                var headers = {'X-DAMATS-Job-Id': this.model.get('identifier')};
+                console.log(url)
+                console.log(headers)
+                $.ajax(url, {
+                    headers: headers,
+                    type: 'GET',
+                    async: true,
+                    cache: false,
+                    dataType: 'xml',
+                    //error ??
+                    global: true,
+                    success: _.bind(function (data) {
+                        console.log(data);
+                        this.refetch();
+                    }, this)
+                })
             },
             cloneJob: function () {
                 Communicator.mediator.trigger('job:viewer:clone', this.model);

@@ -64,61 +64,98 @@
 
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'job:creation:create', this.onCreate);
-                this.listenTo(Communicator.mediator, 'job:creation:name:set', this.onNameChange);
+                this.listenTo(Communicator.mediator, 'sits:selected', this.setSITS);
+                this.listenTo(Communicator.mediator, 'sits:browser:browse', this.setSITS);
+                this.listenTo(Communicator.mediator, 'sits:editor:edit', this.setSITS);
+                this.listenTo(Communicator.mediator, 'sits:removed', this.unsetSITS);
+                this.listenTo(Communicator.mediator, 'process:selected', this.setProcess);
+                this.listenTo(Communicator.mediator, 'job:submit', this.submitJob);
+                this.listenTo(Communicator.mediator, 'job:name:set', this.setJobName);
                 this.listenTo(Communicator.mediator, 'dialog:open:JobCreation', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobCreation', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:JobCreation', this.onToggle);
 
                 this.view = new JobCreationView.JobCreationView({
                     model: this.model,
-                    collection: this.collection
                 });
             },
 
-            onNameChange: function (name) {
+            setName: function (name) {
                 this.model.set('name', name);
+                console.log("JobCreationController::setName");
+                console.log(this.model.attributes);
+            },
+            setProcess: function (process) {
+                this.model.set('process', process);
+                console.log(this.model.attributes);
+            },
+            setSITS: function (sits) {
+                this.model.set('sits', sits);
+                console.log(this.model.attributes);
+            },
+            unsetSITS: function (sits) {
+                var sitsModel = this.model.get('sits');
+                if (sitsModel && (sits.get('identifier') == sitsModel.get('identifier'))) {
+                    this.model.set('sits', null);
+                }
+                console.log(this.model.attributes);
+            },
+            submitJob: function () {
+                console.log("JobCreationController::submitJob");
             },
 
             onCreate: function () {
-            /*
-                var model = this.model;
                 globals.damats.jobs.create({ // new object
-                    editable: true,
-                    source: this.model.get('source'),
+                    process: this.model.get('process').get('identifier'),
+                    time_series: this.model.get('sits').get('identifier'),
                     name: this.model.get('name'),
                     description: null,
-                    selection: {
-                        'aoi': this.model.get('AoI'),
-                        'toi': this.model.get('ToI')
-                    }
+                    inputs: {}
                 }, { // create options
                     wait: true,
-                    success: function () {
-                        model.set('is_saved', true);
+                    success: _.bind(function (new_model) {
+                        this.model.set('is_saved', true);
                         Communicator.mediator.trigger(
-                            'dialog:open:Job', true
+                            'job:viewer:view', new_model
+                            //'dialog:open:JobsManager', true
                         );
-                    }
+                    }, this)
                 });
-            */
             },
 
             isClosed: function () {
                 return _.isUndefined(this.view.isClosed) || this.view.isClosed;
             },
 
-            onOpen: function (event_) {
+            onOpen: function (params) {
+                console.log("JobCreationController::onOpen");
+                console.log(params);
+                // check if both SITS and process are selected
+                if (params && params.process) this.setProcess(params.process)
+                if (params && params.sits) this.setSITS(params.sits)
+
+                // TODO user notification
+                if (!this.model.get('sits')) {
+                    Communicator.mediator.trigger('dialog:open:SITSManager');
+                    return
+                } else if (!this.model.get('process')) {
+                    Communicator.mediator.trigger('dialog:open:ProcessList');
+                    return
+                }
+                console.log("JobCreationController::onOpen OK");
+                // reset job name if necessary
                 if (this.model.get('is_saved')) {
-                    // set a new Job
                     this.model.set('is_saved', false);
                     this.model.set('name', getDefaultJobName());
                 }
+                console.log(this.view)
                 if (this.isClosed()) {
+                    console.log(this.view)
                     App.viewContent.show(this.view);
                 }
             },
 
-            onClose: function (event_) {
+            onClose: function () {
                 if (!this.isClosed()) {
                     this.view.close();
                 }

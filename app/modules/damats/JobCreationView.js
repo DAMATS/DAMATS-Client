@@ -31,72 +31,73 @@
     var deps = [
         'backbone',
         'communicator',
-        'hbs!tmpl/ProcessList',
-        'hbs!tmpl/ProcessListItem',
-        'underscore'
+        'hbs!tmpl/JobCreation',
+        'underscore',
+        'bootstrap-datepicker',
+        'bootstrap-select'
     ];
 
     function init(
         Backbone,
         Communicator,
-        ProcessListTmpl,
-        ProcessListItemTmpl
+        JobCreationTmpl
     ) {
-        var ProcessListItemView = Backbone.Marionette.ItemView.extend({
-            tagName: 'li',
-            className: 'list-group-item proces-item',
-            template: {type: 'handlebars', template: ProcessListItemTmpl},
-            events: {
-                'click': 'onClick'
-            },
-            onClick: function () {
-                this.onSelect();
-            },
-            onSelect: function () {
-                Communicator.mediator.trigger(
-                    'dialog:open:JobCreation', {'process': this.model}
-                );
-            }
-        });
-
-        var ProcessListView = Backbone.Marionette.CompositeView.extend({
-            itemView: ProcessListItemView,
-            appendHtml: function (collectionView, itemView, index) {
-                collectionView.$('#process-list').append(itemView.el);
-            },
+        var JobCreationView = Backbone.Marionette.ItemView.extend({
+            className: 'panel panel-default job-creation not-selectable',
+            template: {type: 'handlebars', template: JobCreationTmpl},
             templateHelpers: function () {
+                var attr = this.model.attributes;
                 return {
-                    is_fetching: this.collection.is_fetching,
-                    fetch_failed: this.collection.fetch_failed,
-                    length: this.collection.length,
-                    is_empty: this.collection.length < 1
+                    'sits_attr': attr.sits ? attr.sits.attributes : {},
+                    'process_attr': attr.process ? attr.process.attributes : {},
                 };
             },
-            tagName: 'div',
-            className: 'panel panel-default process-list-view not-selectable',
-            template: {type: 'handlebars', template: ProcessListTmpl},
             events: {
+                //'click #btn-draw-bbox': 'onBBoxClick',
+                //'click #btn-clear-bbox': 'onClearClick',
+                //'click #btn-sits-create': 'onCreateClick',
+                //'change #txt-minx': 'onBBoxFormChange',
+                //'change #txt-maxx': 'onBBoxFormChange',
+                //'change #txt-miny': 'onBBoxFormChange',
+                //'change #txt-maxy': 'onBBoxFormChange',
+                //'hide': 'onCloseTimeWidget',
+                'click #btn-job-create': 'onCreateClick',
+                'change #txt-name': 'onNameFormChange',
+                'click #box-sits': 'onSelectSITS',
+                'click #box-process': 'onSelectProcess',
                 'click .close': 'close'
             },
             onShow: function (view) {
-                this.listenTo(this.model, 'change', this.render);
-                this.listenTo(this.collection, 'sync', this.render);
-                this.listenTo(this.collection, 'update', this.render);
-                this.listenTo(this.collection, 'reset', this.render);
-                this.listenTo(this.collection, 'add', this.render);
-                this.listenTo(this.collection, 'remove', this.render);
-                this.listenTo(this.collection, 'fetch:start', this.render);
-                this.listenTo(this.collection, 'fetch:stop', this.render);
+                this.listenTo(this.model, 'change:name', this.onNameChange);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
                     handle: '.panel-heading'
                 });
+                var name = this.model.get('name');
+                if (name) {
+                    $('#txt-name').val(name);
+                }
             },
+            onSelectSITS: function () {
+                Communicator.mediator.trigger('dialog:open:SITSManager');
+            },
+            onSelectProcess: function () {
+                Communicator.mediator.trigger('dialog:open:ProcessList');
+            },
+            onNameChange: function () {
+                $('#txt-name').val(this.model.get('name'));
+            },
+            onNameFormChange: function () {
+                this.model.set('name', $('#txt-name').val());
+            },
+            onCreateClick: function () {
+                Communicator.mediator.trigger('job:creation:create', true);
+            }
         });
 
-        return {ProcessListView: ProcessListView};
+        return {JobCreationView: JobCreationView};
     };
 
     root.define(deps, init);

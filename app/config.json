@@ -200,17 +200,17 @@
     "url" : "http://damats.terrasigna.com/",
     "items" : [
       {
-        "name" : "Layers",
-        "icon" : "fa-globe",
-        "eventToRaise" : "ui:open:layercontrol",
-        "template" : "LayerControl",
-        "show": false
-      },
-      {
         "name" : "SITS",
         "icon" : "fa-list",
         "eventToRaise" : "dialog:toggle:SITSManager",
         "template" : "SITSManager",
+        "show": false
+      },
+      {
+        "name" : "Processes",
+        "icon" : "fa-wrench",
+        "eventToRaise" : "dialog:toggle:ProcessList",
+        "template" : "ProcessList",
         "show": false
       },
       {
@@ -225,13 +225,6 @@
         "icon" : "fa-user",
         "eventToRaise" : "dialog:toggle:UserProfile",
         "template" : "SITSCreation",
-        "show": false
-      },
-      {
-        "name" : "Processes",
-        "icon" : "fa-wrench",
-        "eventToRaise" : "dialog:toggle:ProcessList",
-        "template" : "ProcessList",
         "show": false
       },
       {
@@ -257,6 +250,13 @@
         "eventToRaise" : "data:fetch:all",
         "template" : "",
         "show": false
+      },
+      {
+        "name" : "Layers",
+        "icon" : "fa-globe",
+        "eventToRaise" : "ui:open:layercontrol",
+        "template" : "LayerControl",
+        "show": false
       }
     ]
   },
@@ -281,6 +281,8 @@
     "modules/damats/SITSRemovalView",
     "modules/damats/UserProfileView",
     "modules/damats/ProcessListView",
+    "modules/damats/JobsManagerView",
+    "modules/damats/JobCreationView",
     "views/MapView",
     "views/NavBarCollectionView",
     "views/NavBarItemView",

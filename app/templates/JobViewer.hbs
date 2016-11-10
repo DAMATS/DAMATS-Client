@@ -12,17 +12,21 @@
     </li>
     {{/unless}}
     <li class="list-group-item" id="box-process">
-      <span {{#if process.description }}title="{{ process.description }}"{{/if}}><i class="fa fa-fw fa-wrench"></i>&nbsp;Process:&nbsp;{{#if process.name }}{{ process.name }}<br>({{ process.identifier }}){{ else }}{{ process.identifier}}{{/if}}</span>
+      <span {{#if process.description }}title="{{ process.description }}"{{/if}}><i class="fa fa-fw fa-gear"></i>&nbsp;Process:&nbsp;{{#if process.name }}{{ process.name }}<br>({{ process.identifier }}){{ else }}{{ process.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-sits">
       <span {{#if time_series.description }}title="{{ time_series.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if time_series.name }}{{ time_series.name }}<br>({{ time_series.identifier }}){{ else }}{{ time_series.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-inputs">
       <i class="fa fa-fw fa-sign-in"></i>&nbsp;Inputs:
+      {{#if is_submittable }}
+        <p>Here come the editable input form.</p>
+      {{else}}
       {{#if is_empty }}
         <p>This job has no inputs.</p>
       {{else}}
         <p>This job has some input.</p>
+      {{/if}}
       {{/if}}
     </li>
     {{#if is_completed }}
@@ -35,7 +39,7 @@
       {{/if}}
     {{/if}}
     </li>
-  </ul
+  </ul>
 </div>
 <div class="panel-footer">
   {{#if is_submittable }}
@@ -55,8 +59,8 @@
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other actions ...</button>
     <ul class="dropdown-menu">
       <li><a id="btn-clone"><i class="fa fa-clone"></i>&nbsp;&nbsp;Clone job</a></li>
-      <li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change job</a></li>
-      <li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload</a></li>
+      <!--li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change job</a></li-->
+      <!--li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload</a></li-->
       <li {{#if is_terminable }}class="disabled"{{/if}}><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete job</a></li>
     </ul>
   </span>

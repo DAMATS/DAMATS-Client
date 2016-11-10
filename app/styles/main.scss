@@ -445,6 +445,41 @@ button[active=active] {
 }
 
 /*
+ * Job Creation
+ */
+.job-creation {
+  width: 40em;
+  top: 10em;
+  right: 3em;
+  font-size: .9em;
+  position: relative;
+  float: right;
+ }
+
+.job-creation .list-group {
+  margin-top: .6em;
+}
+/*
+.job-creation .input-group {
+  margin: .3em 0;
+}
+
+.job-creation .btn-group {
+  margin-top: .6em;
+}
+
+.job-creation .source-list {
+  max-height: 10em;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.job-creation .source-item {
+  width: 100%;
+}
+*/
+
+/*
  * User Profile
  */
 .user-profile {

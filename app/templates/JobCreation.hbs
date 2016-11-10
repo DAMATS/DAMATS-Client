@@ -1,0 +1,25 @@
+<div class="panel-heading">
+    <button type="button" class="close"><i class="fa fa-times-circle"></i></button>
+    <h3 class="panel-title"><i class="fa fa-fw fa-pencil"></i>&nbsp;Job Creation</h3>
+</div>
+<div class="panel-body">
+  <div class="input-group">
+    <span class="input-group-addon fixed-sized-addon">Name</span>
+    <input type="text" class="form-control" placeholder="Job name" id="txt-name">
+  </div>
+  <ul class="list-group">
+    <li class="list-group-item" id="box-process">
+      <span {{#if process_attr.description }}title="{{ process_attr.description }}"{{/if}}><i class="fa fa-fw fa-gear"></i>&nbsp;Process:&nbsp;{{#if process_attr.name }}{{ process_attr.name }}<br>({{ process_attr.identifier }}){{ else }}{{ process_attr.identifier}}{{/if}}</span>
+    </li>
+    <li class="list-group-item" id="box-sits">
+      <span {{#if sits_attr.description }}title="{{ sits_attr.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if sits_attr.name }}{{ sits_attr.name }}<br>({{ sits_attr.identifier }}){{ else }}{{ sits_attr.identifier}}{{/if}}</span>
+    </li>
+    <li class="list-group-item" id="box-inputs">
+      <i class="fa fa-fw fa-sign-in"></i>&nbsp;Inputs:
+        <p>Here come the editable input form.</p>
+    </li>
+  </ul>
+</div>
+<div class="panel-footer">
+  <button class="btn btn-block btn-primary" id="btn-job-create"  href="#modal-create-job"><i class="fa fa-fw fa-plus-square"></i>&nbsp;Create New Job</button>
+</div>

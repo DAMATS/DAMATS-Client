@@ -47,6 +47,8 @@
             model: new Backbone.Model(),
             collection: globals.damats.jobs,
             view: null,
+            refreshInterval: 10000,
+            refreshTimer: null,
 
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'dialog:open:JobsManager', this.onOpen);
@@ -58,6 +60,25 @@
                     model: this.model,
                     collection: this.collection
                 });
+
+                this.refreshTimer = setInterval(
+                    _.bind(this.refetch, this), this.refreshInterval
+                )
+            },
+
+            refetch: function () {
+                if (!this.isClosed()) {
+                    //this.collection.fetch() ;
+                    this.collection.each(function (model) {
+                        var status_ = model.get('status');
+                        if (
+                            (status_ == "IN_PROGRESS") ||
+                            (status_ == "ACCEPTED") //|| (status_ == "CREATED")
+                        ) {
+                            model.fetch();
+                        }
+                    })
+                }
             },
 
             isClosed: function () {

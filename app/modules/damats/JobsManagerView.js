@@ -120,24 +120,34 @@
                 'click .form-control': 'onView'
             },
 
+            onShow: function (view) {
+                this.listenTo(this.model, 'change', this.render);
+            },
+
             onRender: function () {
-                var attr = _.extend(this.model.attributes, this.templateHelpers());
+                this.$el.popover('hide');
                 this.$el.popover({
                     html: true,
                     container: 'body',
-                    title: attr.status_code,
-                    content: ( // TODO: proper content template
-                        '<div class="job-info-popup">' + attr.status_message +
-                        '<br>&nbsp;<table class="table"><tbody>' +
-                        '<tr><td>process:</td><td>' + attr.process + '</td></tr>' +
-                        '<tr><td>created:</td><td>' + attr.created + '</td></tr>' +
-                        '<tr><td>updated:</td><td>' + attr.updated + '</td></tr>' +
-                        (attr.description ? '<tr><td colspan="2">' + attr.description + '</td></tr>' : '') +
-                        '</tbody><table>' +
-                        '</div>'
-                    )
+                    title: _.bind(function() {
+                        return this.model.get('status_code')
+                    }, this),
+                    content: _.bind(function() {
+                        var attr = _.extend(this.model.attributes, this.templateHelpers());
+                        return (
+                            '<div class="job-info-popup">' + attr.status_message +
+                            '<br>&nbsp;<table class="table"><tbody>' +
+                            '<tr><td>process:</td><td>' + attr.process + '</td></tr>' +
+                            '<tr><td>created:</td><td>' + attr.created + '</td></tr>' +
+                            '<tr><td>updated:</td><td>' + attr.updated + '</td></tr>' +
+                            (attr.description ? '<tr><td colspan="2">' + attr.description + '</td></tr>' : '') +
+                            '</tbody><table>' +
+                            '</div>'
+                        )
+                    }, this)
                 });
             },
+
 
             onReset: function () {
                 this.onBrowse();
@@ -149,11 +159,16 @@
             },
 
             onRemove: function () {
+                this.$el.popover('hide');
                 Communicator.mediator.trigger('job:removal:confirm', this.model);
             },
 
             onRemoveLocked: function () {
                 console.log(this.model.get('identifier') + '.onRemoveLocked()');
+            },
+
+            onBeforeDestroy: function () {
+                this.$el.popover('destroy');
             }
         });
 
@@ -174,19 +189,15 @@
             className: 'panel panel-default jobs-manager not-selectable',
             template: {type: 'handlebars', template: JobsManagerTmpl},
             events: {
-                'click #btn-sits-create': 'onCreateClick',
+                'click #btn-job-create': 'onCreateClick',
                 'click .close': 'close'
             },
 
             onShow: function (view) {
                 this.listenTo(this.model, 'change', this.render);
-                this.listenTo(this.collection, 'sync', this.render);
                 this.listenTo(this.collection, 'update', this.render);
-                this.listenTo(this.collection, 'reset', this.render);
-                this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
-                this.listenTo(this.collection, 'fetch:start', this.render);
-                this.listenTo(this.collection, 'fetch:stop', this.render);
+                this.listenTo(this.collection, 'reset', this.render);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
@@ -196,7 +207,7 @@
             },
 
             onCreateClick: function () {
-                Communicator.mediator.trigger('dialog:open:JobsCreation', true);
+                Communicator.mediator.trigger('dialog:open:JobCreation', true);
             }
         });
 
