@@ -32,6 +32,7 @@
         'backbone',
         'communicator',
         'hbs!tmpl/JobCreation',
+        'modules/damats/ProcessUtil',
         'underscore',
         'bootstrap-datepicker',
         'bootstrap-select'
@@ -40,7 +41,8 @@
     function init(
         Backbone,
         Communicator,
-        JobCreationTmpl
+        JobCreationTmpl,
+        ProcessUtil
     ) {
         var JobCreationView = Backbone.Marionette.ItemView.extend({
             className: 'panel panel-default job-creation not-selectable',
@@ -49,7 +51,7 @@
                 var attr = this.model.attributes;
                 return {
                     'sits_attr': attr.sits ? attr.sits.attributes : {},
-                    'process_attr': attr.process ? attr.process.attributes : {},
+                    'process_attr': attr.process ? attr.process.attributes : {}
                 };
             },
             events: {
@@ -93,6 +95,18 @@
                 this.model.set('name', $('#txt-name').val());
             },
             onCreateClick: function () {
+                var parsed = ProcessUtil.parseInputs(
+                    this.model.get('process').get('inputs'), {}
+                );
+                if (!parsed.errors || !parsed.errors.length)
+                {
+                    this.model.set('inputs', parsed.inputs);
+                } else {
+                    console.error("Input parsing error!")
+                    console.error(parsed.errors);
+                    return
+                    //throw "Input parsing error!";
+                }
                 Communicator.mediator.trigger('job:creation:create', true);
             }
         });

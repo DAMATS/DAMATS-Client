@@ -110,7 +110,7 @@
                     time_series: this.model.get('sits').get('identifier'),
                     name: this.model.get('name'),
                     description: null,
-                    inputs: {}
+                    inputs: this.model.get('inputs')
                 }, { // create options
                     wait: true,
                     success: _.bind(function (new_model) {
