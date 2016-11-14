@@ -18,22 +18,47 @@
       <span {{#if time_series.description }}title="{{ time_series.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if time_series.name }}{{ time_series.name }}<br>({{ time_series.identifier }}){{ else }}{{ time_series.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-inputs">
-      <i class="fa fa-fw fa-sign-in"></i>&nbsp;Inputs:
       {{#if is_submittable }}
-        <p>Here come the editable input form.</p>
+        {{#if _inputs}}
+        <form class="form-horizontal" role="form">
+        {{#each _inputs}}
+          <div class="form-group" id="{{this.identifier}}"{{#if this.description}} title="{{ this.description }}"{{/if}}>
+          <label class="col-sm-6 control-label">{{this.name}}</label>
+          <div class="col-sm-6">
+          {{#if this.enum }}
+            <select class="form-control input-sm process-input" id="{{this.identifier}}">{{#each this.enum }}<option value="{{this}}">{{this}}</option>{{/each}}</select>
+          {{ else }}
+            <input type="text" class="form-control input-sm process-input" id="{{this.identifier}}">
+          {{/if}}
+          </div>
+          </div>
+        {{/each}}
+        </form>
+        {{else}}
+        <p>This process does not require any input.</p>
+        {{/if}}
       {{else}}
-      {{#if is_empty }}
-        <p>This job has no inputs.</p>
-      {{else}}
-        <p>This job has some input.</p>
-      {{/if}}
+        {{#if _inputs}}
+          <table class="table table-condensed inputs">
+            <thead>
+            <tr><th>Input Parameter</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+          {{#each _inputs}}
+            <tr><td>{{this.name}}</td><td>{{this.value}}</td></tr>
+          {{/each}}
+            </tbody>
+          </table>
+        {{else}}
+        <p>This job has no input.</p>
+        {{/if}}
       {{/if}}
     </li>
     {{#if is_completed }}
     <li class="list-group-item" id="box-inputs">
       <i class="fa fa-fw fa-sign-out"></i>&nbsp;Outputs:
       {{#if is_empty }}
-        <p>This job has no outputs.</p>
+        <p>This job has no output.</p>
       {{else}}
         <p>This job has some output.</p>
       {{/if}}

@@ -33,6 +33,7 @@
         'communicator',
         'globals',
         'hbs!tmpl/JobViewer',
+        'modules/damats/ProcessUtil',
         'underscore'
     ];
 
@@ -40,7 +41,8 @@
         Backbone,
         Communicator,
         globals,
-        JobViewerTmpl
+        JobViewerTmpl,
+        ProcessUtil
     ) {
         var JobViewerView = Backbone.Marionette.ItemView.extend({
             tagName: 'div',
@@ -81,7 +83,6 @@
                 };
 
                 var status_message;
-
                 if (wps_status.message) {
                     status_message = wps_status.message;
                 } else {
@@ -98,34 +99,32 @@
                 }
 
                 // resolve the process model
-                var process_model = globals.damats.processes.findWhere(
-                    {'identifier': this.model.get('process')}
-                );
                 var process = null;
-                if (process_model) {
-                    process = process_model.attributes
+                if (this.process) {
+                    process = this.process.attributes;
                 } else {
                     process = {
                         'identifier': this.model.get('process'),
-                        'name': 'Invalid process.'
+                        'name': 'Unknown process.'
                     };
                 }
 
                 // resolve the time series model
-                var time_series_model = globals.damats.time_series.findWhere(
-                    {'identifier': this.model.get('time_series')}
-                );
                 var time_series = null;
-                if (time_series_model) {
-                    time_series = time_series_model.attributes
+                if (this.time_series) {
+                    time_series = this.time_series.attributes;
                 } else {
                     time_series = {
                         'identifier': this.model.get('process'),
-                        'name': 'Invalid SITS.'
+                        'name': 'Unknown SITS.'
                     };
                 }
 
                 return {
+                    _inputs: ProcessUtil.listInputValues(
+                        this.process.get('inputs'),
+                        this.inputs || this.model.get('inputs')
+                    ),
                     process: process,
                     time_series: time_series,
                     is_submittable: editable && status_ == "CREATED",
@@ -151,7 +150,7 @@
                 };
             },
             events: {
-                'click #btn-clone': 'cloneJob',
+                'change .process-input': 'onInputChange',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
@@ -162,6 +161,99 @@
                 'click .close': 'close'
             },
             initialize: function (options) {
+                this.inputs = _.clone(this.model.get('inputs'));
+                this.inputs_last = _.clone(this.model.get('inputs'));
+                this.errors = [];
+                this.changed = [];
+                this.time_series = globals.damats.time_series.findWhere(
+                    {'identifier': this.model.get('time_series')}
+                );
+                this.process = globals.damats.processes.findWhere(
+                    {'identifier': this.model.get('process')}
+                );
+            },
+            onInputChange: function (event_) {
+                var $el = $(event_.target);
+                var id = $el.attr('id');
+                var $fg = this.$el.find("#" + id + ".form-group");
+                var input_def = _.find(
+                    this.process.get('inputs'), function (item) {
+                        return item.identifier == id;
+                    }
+                );
+                var value = $el.val();
+                var error = null;
+                if (value) {
+                    try {
+                        value = ProcessUtil.parseInput(input_def, $el.val());
+                    } catch (exception) {
+                        value = null;
+                        error = exception;
+                        console.log(error);
+                    }
+                } else {
+                    value = this.inputs_last[id];
+                }
+                if (value == this.inputs_last[id]) {
+                    this.changed = _.without(this.changed, id);
+                } else {
+                    this.changed = _.union(this.changed, [id]);
+                }
+                this.inputs[id] = value;
+                $fg.find(".input-error").remove();
+                if (error) {
+                    $fg.addClass('has-error');
+                    $el.after($('<div/>', {
+                        class: 'help-block input-error',
+                        text: String(error)
+                    }));
+                    this.errors = _.union(this.errors, [id]);
+                } else {
+                    $fg.removeClass('has-error');
+                    this.errors = _.without(this.errors, id);
+                    $el.val(value);
+                }
+                if (this.errors.length == 0) {
+                    if (this.changed.length == 0) {
+                        this.$('#btn-save').attr('disabled', 'disabled');
+                        this.$('#btn-submit').removeAttr('disabled');
+                    } else {
+                        this.$('#btn-save').removeAttr('disabled');
+                        this.$('#btn-submit').attr('disabled', 'disabled');
+                    }
+                } else {
+                    this.$('#btn-submit').attr('disabled', 'disabled');
+                    this.$('#btn-save').attr('disabled', 'disabled');
+                }
+            },
+            fillInputs: function (inputs) {
+                if (this.model.get('status') != 'CREATED') {
+                    return ;
+                }
+                console.log(this.model.attributes);
+                // extract defaults
+                this.inputs = ProcessUtil.parseInputs(
+                    this.process.get('inputs'), inputs || this.inputs_last 
+                ).inputs;
+                this.$el.find(".input-error").remove();
+                this.errors = [];
+                // fill the form
+                $('#txt-name').val(this.model.get('name'));
+                var changed = [];
+                for (var key in this.inputs) {
+                    $('#' + key + '.process-input').val(this.inputs[key]);
+                    if (this.inputs[key] != this.inputs_last[key]) {
+                        changed.push(key);
+                    }
+                }
+                this.changed = changed;
+                if (this.changed.length == 0) {
+                    this.$('#btn-save').attr('disabled', 'disabled');
+                    this.$('#btn-submit').removeAttr('disabled');
+                } else {
+                    this.$('#btn-save').removeAttr('disabled');
+                    this.$('#btn-submit').attr('disabled', 'disabled');
+                }
             },
             onShow: function (view) {
                 this.listenTo(this.model, 'destroy', this.openManager);
@@ -173,11 +265,10 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
-
+                this.fillInputs(this.inputs); // do not remove
             },
-            //onClose: function () {},
             onRender: function () {
-                this.$('#btn-save').attr('disabled', 'disabled');
+                this.fillInputs(this.inputs);
             },
             editMetadata: function () {
                 Communicator.mediator.trigger(
@@ -185,47 +276,50 @@
                 );
             },
             saveJob: function () {
-                console.log('saveJob');
-                if (
-                    (this.model.get('status') == 'CREATED') &&
-                    this.model.get('owned')
-                ) {
-                    this.model.save();
+                var attr = this.model.attributes;
+                if ((attr.status == 'CREATED') && attr.owned && (this.changed.length > 0)) {
                     this.$('#btn-save').attr('disabled', 'disabled');
+                    this.model.save('inputs', this.inputs, {
+                        success: _.bind(function () {
+                            this.inputs_last = _.clone(this.inputs);
+                            this.fillInputs(this.inputs);
+                        }, this),
+                        error: _.bind(function () {
+                            this.fillInputs(this.inputs);
+                        }, this)
+                    });
                 }
             },
             executeJob: function () {
-                console.log('executeJob');
-                this.$('#btn-submit').attr('disabled', 'disabled');
-                // TODO: POST/XML request
-                // TODO: proper inputs encoding
-                // construct the WPS request URL
-                var url = (
-                    //globals.damats.processUrl + '?service=WPS&request=describeProcess' +
-                    globals.damats.processUrl + '?service=WPS&request=execute' +
-                    '&identifier=' + this.model.get('process') +
-                    '&DataInputs=sits=' + this.model.get('time_series') +
-                    '&StoreExecuteResponse=true&status=true&lineage=true'
-                );
-                var headers = {'X-DAMATS-Job-Id': this.model.get('identifier')};
-                console.log(url)
-                console.log(headers)
-                $.ajax(url, {
-                    headers: headers,
-                    type: 'GET',
-                    async: true,
-                    cache: false,
-                    dataType: 'xml',
-                    //error ??
-                    global: true,
-                    success: _.bind(function (data) {
-                        console.log(data);
-                        this.refetch();
-                    }, this)
-                })
+                // NOTE: Job must be saved before execution.
+                var attr = this.model.attributes;
+                if ((attr.status == 'CREATED') && attr.owned && (this.changed.length == 0)) {
+                    this.$('#btn-submit').attr('disabled', 'disabled');
+                    $.ajax(globals.damats.processUrl, {
+                        headers: {'X-DAMATS-Job-Id': attr.identifier},
+                        type: 'POST',
+                        data: ProcessUtil.buildExecuteRequestXML(attr),
+                        async: true,
+                        cache: false,
+                        dataType: 'xml',
+                        global: true,
+                        error: _.bind(function () {
+                            this.fillInputs(this.inputs);
+                        }, this),
+                        success: _.bind(function (data) {
+                            console.log(data);
+                            this.refetch();
+                        }, this)
+                    });
+                }
             },
             cloneJob: function () {
-                Communicator.mediator.trigger('job:viewer:clone', this.model);
+                //Communicator.mediator.trigger('job:viewer:clone', this.model);
+                Communicator.mediator.trigger('dialog:open:JobCreation', {
+                    time_series: this.time_series,
+                    process: this.process,
+                    inputs: this.model.get('inputs')
+                });
             },
             removeJob: function () {
                 Communicator.mediator.trigger('job:removal:confirm', this.model);
@@ -235,7 +329,7 @@
             },
             refetch: function () {
                 Communicator.mediator.trigger('job:viewer:fetch', true);
-            },
+            }
         });
 
         return {JobViewerView: JobViewerView};

@@ -31,6 +31,7 @@
     var deps = [
         'backbone',
         'communicator',
+        'globals',
         'hbs!tmpl/JobCreation',
         'modules/damats/ProcessUtil',
         'underscore',
@@ -41,6 +42,7 @@
     function init(
         Backbone,
         Communicator,
+        globals,
         JobCreationTmpl,
         ProcessUtil
     ) {
@@ -50,7 +52,10 @@
             templateHelpers: function () {
                 var attr = this.model.attributes;
                 return {
-                    'sits_attr': attr.sits ? attr.sits.attributes : {},
+                    '_inputs': ProcessUtil.listInputValues(
+                        attr.process.attributes.inputs, this.inputs || {}
+                    ),
+                    'time_series_attr': attr.time_series ? attr.time_series.attributes : {},
                     'process_attr': attr.process ? attr.process.attributes : {}
                 };
             },
@@ -64,10 +69,67 @@
                 //'change #txt-maxy': 'onBBoxFormChange',
                 //'hide': 'onCloseTimeWidget',
                 'click #btn-job-create': 'onCreateClick',
+                'change .process-input': 'onInputChange',
                 'change #txt-name': 'onNameFormChange',
-                'click #box-sits': 'onSelectSITS',
+                'click #box-sits': 'onSelectTimeSeries',
                 'click #box-process': 'onSelectProcess',
                 'click .close': 'close'
+            },
+            onInputChange: function (event_) {
+                console.log("on input change");
+                var $el = $(event_.target);
+                var id = $el.attr('id');
+                var $fg = this.$el.find("#" + id + ".form-group");
+                var input_def = _.find(
+                    this.model.get('process').get('inputs'), function (item) {
+                        return item.identifier == id;
+                    }
+                );
+                var value = $el.val();
+                var error = null;
+                if (value) {
+                    try {
+                        value = ProcessUtil.parseInput(input_def, $el.val());
+                    } catch (exception) {
+                        value = null;
+                        error = exception;
+                        console.log(error);
+                    }
+                } else {
+                    value = input_def.default_value;
+                }
+                this.inputs[id] = value;
+                $fg.find(".input-error").remove();
+                if (error) {
+                    $fg.addClass('has-error');
+                    $el.after($('<div/>', {
+                        class: 'help-block input-error',
+                        text: String(error)
+                    }));
+                    this.errors = _.union(this.errors, [id]);
+                } else {
+                    $fg.removeClass('has-error');
+                    this.errors = _.without(this.errors, id);
+                    $el.val(value);
+                }
+                if (this.errors.length == 0) {
+                    this.$('#btn-job-create').removeAttr('disabled');
+                } else {
+                    this.$('#btn-job-create').attr('disabled', 'disabled');
+                }
+            },
+            resetInputs: function (inputs) {
+                // extract defaults
+                this.inputs = ProcessUtil.parseInputs(
+                    this.model.get('process').get('inputs'), inputs || {}
+                ).inputs;
+                this.$el.find(".input-error").remove();
+                this.errors = [];
+                // fill the form
+                $('#txt-name').val(this.model.get('name'));
+                for (var key in this.inputs) {
+                    $('#' + key + '.process-input').val(this.inputs[key]);
+                }
             },
             onShow: function (view) {
                 this.listenTo(this.model, 'change:name', this.onNameChange);
@@ -77,12 +139,9 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                var name = this.model.get('name');
-                if (name) {
-                    $('#txt-name').val(name);
-                }
+                this.resetInputs(this.model.get('inputs'));
             },
-            onSelectSITS: function () {
+            onSelectTimeSeries: function () {
                 Communicator.mediator.trigger('dialog:open:SITSManager');
             },
             onSelectProcess: function () {
@@ -96,18 +155,15 @@
             },
             onCreateClick: function () {
                 var parsed = ProcessUtil.parseInputs(
-                    this.model.get('process').get('inputs'), {}
+                    this.model.get('process').get('inputs'), this.inputs
                 );
                 if (!parsed.errors || !parsed.errors.length)
                 {
-                    this.model.set('inputs', parsed.inputs);
+                    this.model.set('inputs', this.inputs);
+                    Communicator.mediator.trigger('job:creation:create', true);
                 } else {
-                    console.error("Input parsing error!")
-                    console.error(parsed.errors);
-                    return
-                    //throw "Input parsing error!";
+                    throw "An attempt to submit invalid input values.";
                 }
-                Communicator.mediator.trigger('job:creation:create', true);
             }
         });
 

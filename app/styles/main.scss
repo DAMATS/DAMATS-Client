@@ -444,6 +444,10 @@ button[active=active] {
   float: right;
 }
 
+.job-viewer table.inputs{
+  margin-bottom: 0px;
+}
+
 /*
  * Job Creation
  */
@@ -458,6 +462,11 @@ button[active=active] {
 
 .job-creation .list-group {
   margin-top: .6em;
+}
+
+div.input-error {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 /*
 .job-creation .input-group {

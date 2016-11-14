@@ -12,11 +12,27 @@
       <span {{#if process_attr.description }}title="{{ process_attr.description }}"{{/if}}><i class="fa fa-fw fa-gear"></i>&nbsp;Process:&nbsp;{{#if process_attr.name }}{{ process_attr.name }}<br>({{ process_attr.identifier }}){{ else }}{{ process_attr.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-sits">
-      <span {{#if sits_attr.description }}title="{{ sits_attr.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if sits_attr.name }}{{ sits_attr.name }}<br>({{ sits_attr.identifier }}){{ else }}{{ sits_attr.identifier}}{{/if}}</span>
+      <span {{#if time_series_attr.description }}title="{{ time_series_attr.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if time_series_attr.name }}{{ time_series_attr.name }}<br>({{ time_series_attr.identifier }}){{ else }}{{ time_series_attr.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-inputs">
-      <i class="fa fa-fw fa-sign-in"></i>&nbsp;Inputs:
-        <p>Here come the editable input form.</p>
+        {{#if _inputs}}
+        <form class="form-horizontal" role="form">
+        {{#each _inputs}}
+          <div class="form-group" id="{{this.identifier}}"{{#if this.description}} title="{{ this.description }}"{{/if}}>
+          <label class="col-sm-6 control-label">{{this.name}}</label>
+          <div class="col-sm-6">
+          {{#if this.enum }}
+            <select class="form-control input-sm process-input" id="{{this.identifier}}">{{#each this.enum }}<option value="{{this}}">{{this}}</option>{{/each}}</select>
+          {{ else }}
+            <input type="text" class="form-control input-sm process-input" id="{{this.identifier}}">
+          {{/if}}
+          </div>
+          </div>
+        {{/each}}
+        </form>
+        {{else}}
+        <p>This process does not require any input.</p>
+        {{/if}}
     </li>
   </ul>
 </div>

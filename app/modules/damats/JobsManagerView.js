@@ -31,6 +31,7 @@
     var deps = [
         'backbone',
         'communicator',
+        'globals',
         'hbs!tmpl/JobsManager',
         'hbs!tmpl/JobsManagerItem',
         'underscore'
@@ -39,6 +40,7 @@
     function init(
         Backbone,
         Communicator,
+        globals,
         JobsManagerTmpl,
         JobsManagerItemTmpl
     ) {
@@ -130,20 +132,27 @@
                     html: true,
                     container: 'body',
                     title: _.bind(function() {
-                        return this.model.get('status_code')
+                        return this.model.get('status_code');
                     }, this),
                     content: _.bind(function() {
                         var attr = _.extend(this.model.attributes, this.templateHelpers());
+                        var time_series = globals.damats.time_series.findWhere(
+                            {'identifier': attr.time_series}
+                        );
+                        var process = globals.damats.processes.findWhere(
+                            {'identifier': attr.process}
+                        );
                         return (
                             '<div class="job-info-popup">' + attr.status_message +
                             '<br>&nbsp;<table class="table"><tbody>' +
-                            '<tr><td>process:</td><td>' + attr.process + '</td></tr>' +
+                            '<tr><td>SITS:</td><td>' + (time_series.get('name') || attr.time_series) + '</td></tr>' +
+                            '<tr><td>process:</td><td>' + (process.get('name') || attr.process) + '</td></tr>' +
                             '<tr><td>created:</td><td>' + attr.created + '</td></tr>' +
                             '<tr><td>updated:</td><td>' + attr.updated + '</td></tr>' +
                             (attr.description ? '<tr><td colspan="2">' + attr.description + '</td></tr>' : '') +
                             '</tbody><table>' +
                             '</div>'
-                        )
+                        );
                     }, this)
                 });
             },

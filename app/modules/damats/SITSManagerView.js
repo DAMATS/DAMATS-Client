@@ -99,7 +99,7 @@
             onSelect: function () {
                 this.$el.popover('hide');
                 Communicator.mediator.trigger(
-                    'dialog:open:JobCreation', {'sits': this.model}
+                    'dialog:open:JobCreation', {'time_series': this.model}
                 );
             },
             onBrowse: function () {
