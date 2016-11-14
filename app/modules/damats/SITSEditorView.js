@@ -218,7 +218,7 @@
                     'object:metadata:edit', this.sourceModel
                 );
             },
-            onSourceModelChange() {
+            onSourceModelChange: function () {
                 this.model.set(this.sourceModel.changedAttributes());
                 this.refreshSITSGeometry();
             },

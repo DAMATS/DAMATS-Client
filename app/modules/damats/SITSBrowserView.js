@@ -185,7 +185,7 @@
             onRender: function () {
                 this.scrollToCurrent();
             },
-            onSourceModelChange() {
+            onSourceModelChange: function () {
                 this.model.set(this.sourceModel.changedAttributes());
                 this.refreshSITSGeometry();
             },
