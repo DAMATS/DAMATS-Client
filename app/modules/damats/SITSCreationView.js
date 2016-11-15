@@ -98,6 +98,11 @@
             tagName: 'div',
             className: 'panel panel-default sits-creation not-selectable',
             template: {type: 'handlebars', template: SITSCreationTmpl},
+            templateHelpers: function () {
+                return {
+                    has_no_source: this.collection.length < 1,
+                };
+            },
             events: {
                 'click #btn-draw-bbox': 'onBBoxClick',
                 'click #btn-clear-bbox': 'onClearClick',

@@ -8,7 +8,13 @@
     <input type="text" class="form-control" placeholder="SITS name" id="txt-name">
   </div>
   <h6>Select Source Collection</h6>
-  <form name="source-selection"><div class="source-list" id="source-list"></div></form>
+  <form name="source-selection">
+  {{#if has_no_source }}
+  <p class="text-danger" id="alert">No source collection avaialable.</p>
+  {{else}}
+  <div class="source-list" id="source-list"></div>
+  {{/if}}
+  </form>
   <h6>Area of Interest</h6>
   <div class="input-group">
     <span class="input-group-addon fixed-sized-addon">Min X</span>
