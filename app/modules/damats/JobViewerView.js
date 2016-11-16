@@ -65,7 +65,7 @@
                 };
 
                 var status_info = {
-                    "CREATED": "The job has not been started yet.",
+                    "CREATED": "The job has not been submitted yet.",
                     "ACCEPTED": "The job has beed enqueued for execution.",
                     "IN_PROGRESS": "The job is running.",
                     "FAILED": "The job ended with an error.",

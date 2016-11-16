@@ -56,9 +56,28 @@
     </li>
     {{#if wps_response_url }}
     <li class="list-group-item" id="box-inputs">
-      <p><i class="fa fa-fw fa-sign-out"></i>&nbsp;Outputs:</p>
-      <p><a href="{{wps_response_url}}" target="_blank">WPS Execute Response XML Document</a></p>
-      {{#if is_completed }}{{#if is_empty }}{{/if}}{{/if}}
+    {{#if is_completed }}
+      {{#if outputs}}
+      <table class="table table-condensed outputs">
+        <thead>
+        <tr><th>Output</th><th></th></tr>
+        </thead>
+        <tbody>
+        {{#each outputs}}
+          <tr>
+            <td>{{#if this.name }}{{ this.name }}{{else}}{{ this.identifier }}{{/if}}</td>
+            <td>
+            {{#if this.literal}}{{ this.literal.value }}{{/if}}
+            <!--{{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width: 49%;">Display</a>{{/if}} -->
+            {{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width: 49%; float:right;">Download</a>{{/if}}
+            </td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+      {{/if}}
+    {{/if}}
+    <p><a href="{{wps_response_url}}" target="_blank">WPS Execute Response XML Document</a></p>
     </li>
     {{/if}}
   </ul>
