@@ -102,7 +102,7 @@
             },
             onOpen: function (event_) {
                 if (this.view && this.isClosed()) {
-                    App.viewContent.show(this.view);
+                    App.viewJob.show(this.view);
                 }
             },
             onClose: function (event_) {

@@ -64,6 +64,7 @@
 
             onOpen: function (event_) {
                 if (this.isClosed()) {
+                    App.viewJob.reset();
                     App.viewContent.show(this.view);
                 }
             },

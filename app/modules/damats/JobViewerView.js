@@ -120,7 +120,18 @@
                     };
                 }
 
+                var _outputs = _.map(
+                    this.process.get('outputs') || [],
+                    function (output) {
+                        return _.extend({
+                            is_displayed: output.identifer == this.displayed_result
+                        }, output);
+                    }
+                );
+
                 return {
+                    displayed_result: this.displayed_result,
+                    _outputs: _outputs,
                     _inputs: ProcessUtil.listInputValues(
                         this.process.get('inputs'),
                         this.inputs || this.model.get('inputs')
@@ -151,16 +162,19 @@
             },
             events: {
                 'change .process-input': 'onInputChange',
+                'click #btn-display-result': 'onResultDisplayToggle',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
                 'click #btn-clone': 'cloneJob',
                 'click #btn-save': 'saveJob',
                 'click #btn-submit': 'executeJob',
+                'click #box-sits': 'browseSITS',
                 'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
             initialize: function (options) {
+                this.displayed_result = null;
                 this.inputs = _.clone(this.model.get('inputs'));
                 this.inputs_last = _.clone(this.model.get('inputs'));
                 this.errors = [];
@@ -171,6 +185,37 @@
                 this.process = globals.damats.processes.findWhere(
                     {'identifier': this.model.get('process')}
                 );
+            },
+            browseSITS: function () {
+                Communicator.mediator.trigger('sits:browser:browse', this.time_series);
+            },
+            onResultDisplayToggle: function (event_) {
+                var $el = $(event_.target);
+                var output_id = $el.data('output-id');
+                var coverage_id = $el.data('coverage-id');
+                var classEnabled = 'btn-success';
+                var classDisabled = 'btn-default';
+                if (this.displayed_result == output_id) {
+                    // hide this result
+                    this.displayed_result = null;
+                    $el.removeClass(classEnabled);
+                    $el.addClass(classDisabled);
+                    Communicator.mediator.trigger('map:preview:clear');
+                } else {
+                    if (this.displayed_result) {
+                        // hide another displayed result
+                        this.$el.find('#btn-display-result').removeClass(classEnabled);
+                        this.$el.find('#btn-display-result').addClass(classDisabled);
+                    }
+                    // show this result
+                    $el.removeClass(classDisabled);
+                    $el.addClass(classEnabled);
+                    this.displayed_result = output_id;
+
+                    Communicator.mediator.trigger(
+                        'map:preview:set', globals.damats.productUrl, coverage_id
+                    );
+                }
             },
             onInputChange: function (event_) {
                 var $el = $(event_.target);
@@ -233,7 +278,7 @@
                 console.log(this.model.attributes);
                 // extract defaults
                 this.inputs = ProcessUtil.parseInputs(
-                    this.process.get('inputs'), inputs || this.inputs_last 
+                    this.process.get('inputs'), inputs || this.inputs_last
                 ).inputs;
                 this.$el.find(".input-error").remove();
                 this.errors = [];
@@ -268,6 +313,7 @@
                 this.fillInputs(this.inputs); // do not remove
             },
             onRender: function () {
+                Communicator.mediator.trigger('map:preview:clear');
                 this.fillInputs(this.inputs);
             },
             editMetadata: function () {
@@ -326,9 +372,13 @@
             },
             openManager: function () {
                 Communicator.mediator.trigger('dialog:open:JobsManager', true);
+                this.close();
             },
             refetch: function () {
                 Communicator.mediator.trigger('job:viewer:fetch', true);
+            },
+            onClose: function() {
+                Communicator.mediator.trigger('map:preview:clear');
             }
         });
 

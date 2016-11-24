@@ -191,9 +191,9 @@ button[active=active] {
  * Layer control styles
  */
 .layercontrol {
-    width: 20em;
+    width: 32em;
     top: 10em;
-    left: 3em;
+    right: 3em;
     font-size: .9em;
     position: absolute;
 }
@@ -309,11 +309,11 @@ button[active=active] {
  */
  .sits-browser {
   width: 40em;
-  top: 10em;
-  right: 3em;
+  top: 7em;
+  left: 3em;
   font-size: .9em;
   position: relative;
-  float: right;
+  float: left;
  }
 
 .sits-browser .coverage-list {
@@ -331,11 +331,11 @@ button[active=active] {
  */
 .sits-editor {
   width: 40em;
-  top: 10em;
-  right: 3em;
+  top: 7em;
+  left: 3em;
   font-size: .9em;
   position: relative;
-  float: right;
+  float: left;
  }
 
 .sits-editor .coverage-list {
@@ -437,7 +437,7 @@ button[active=active] {
  */
 .job-viewer {
   width: 40em;
-  top: 10em;
+  top: 7em;
   right: 3em;
   font-size: .9em;
   position: relative;

@@ -150,6 +150,7 @@
                     is_fetching: this.collection.is_fetching,
                     fetch_failed: this.collection.fetch_failed,
                     length: this.collection.length,
+                    singular: this.collection.length == 1,
                     is_empty: this.collection.length < 1
                 };
             },
@@ -198,12 +199,12 @@
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model.get('source')
                 );
-                this.displaySITSGeometry();
-                this.focusToSelection();
                 Communicator.mediator.trigger('time:change', {
                     start: new Date(this.model.get('selection').toi.start),
-                    end: new Date(this.model.get('selection').toi.end)
+                    end: new Date(this.model.get('selection').toi.start)
                 });
+                this.displaySITSGeometry();
+                this.focusToSelection();
             },
             onClose: function () {
                 Communicator.mediator.trigger('map:layer:hide:all');

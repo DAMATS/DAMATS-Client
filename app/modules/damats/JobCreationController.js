@@ -156,7 +156,7 @@
                 console.log(this.view);
                 if (this.isClosed()) {
                     console.log(this.view);
-                    App.viewContent.show(this.view);
+                    App.viewJob.show(this.view);
                 }
             },
 

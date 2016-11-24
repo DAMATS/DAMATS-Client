@@ -68,8 +68,8 @@
             <td>{{#if this.name }}{{ this.name }}{{else}}{{ this.identifier }}{{/if}}</td>
             <td>
             {{#if this.literal}}{{ this.literal.value }}{{/if}}
-            <!--{{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width: 49%;">Display</a>{{/if}} -->
-            {{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width: 49%; float:right;">Download</a>{{/if}}
+            {{#if this.coverage_id }}<button type="button" class="btn btn-default btn-xs" id="btn-display-result" data-output-id="{{ this.identifier }}" data-coverage-id="{{ this.coverage_id }}"  style="width:49%;">Display</button>{{/if}}
+            {{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width:49%;float:right;">Download</a>{{/if}}
             </td>
           </tr>
         {{/each}}

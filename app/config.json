@@ -190,6 +190,10 @@
       "class": ""
     },
     {
+      "name": "viewJob",
+      "class": ""
+    },
+    {
       "name": "dialogRegion",
       "class": ""
     }
