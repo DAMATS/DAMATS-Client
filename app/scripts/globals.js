@@ -35,7 +35,7 @@ define(
     ],
     function (Backbone, ObjectStore, DataModels) {
         return {
-            version: "0.3.3dev",
+            version: "0.4.0dev",
             objects: new ObjectStore(),
             selections: new ObjectStore(),
             baseLayers: new Backbone.Collection(),
