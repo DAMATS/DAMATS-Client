@@ -156,7 +156,7 @@
                     status_message: status_message,
                     is_removable: (
                         (status_ != "ACCEPTED") && (status_ != "IN_PROGRESS") &&
-                        editable
+                        this.model.get('owned')
                     )
                 };
             },

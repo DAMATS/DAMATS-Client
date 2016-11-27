@@ -102,10 +102,9 @@
       <li><a id="btn-clone"><i class="fa fa-clone"></i>&nbsp;&nbsp;Clone job</a></li>
       <!--li><a id="btn-open-manager"><i class="fa fa-list"></i>&nbsp;&nbsp;Change job</a></li-->
       <!--li><a id="btn-refetch"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reload</a></li-->
-      <li {{#if is_terminable }}class="disabled"{{/if}}><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete job</a></li>
+      <li {{#unless is_removable }}class="disabled"{{/unless}}><a id="btn-delete"><i class="fa fa-times"></i>&nbsp;&nbsp;Delete job</a></li>
     </ul>
   </span>
-{{#if is_terminated}}
-  &nbsp;<br>&nbsp;
+{{#if is_terminated}}&nbsp;<br>&nbsp;{{else}}{{#unless is_removable}}&nbsp;<br>&nbsp;{{/unless}}
 {{/if}}
 </div>

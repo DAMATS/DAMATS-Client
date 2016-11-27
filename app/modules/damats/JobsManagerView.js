@@ -206,6 +206,7 @@
                 this.listenTo(this.model, 'change', this.render);
                 this.listenTo(this.collection, 'update', this.render);
                 this.listenTo(this.collection, 'remove', this.render);
+                this.listenTo(this.collection, 'add', this.render);
                 this.listenTo(this.collection, 'reset', this.render);
                 this.delegateEvents(this.events);
                 this.$el.draggable({

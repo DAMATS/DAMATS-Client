@@ -60,14 +60,6 @@
                 };
             },
             events: {
-                //'click #btn-draw-bbox': 'onBBoxClick',
-                //'click #btn-clear-bbox': 'onClearClick',
-                //'click #btn-sits-create': 'onCreateClick',
-                //'change #txt-minx': 'onBBoxFormChange',
-                //'change #txt-maxx': 'onBBoxFormChange',
-                //'change #txt-miny': 'onBBoxFormChange',
-                //'change #txt-maxy': 'onBBoxFormChange',
-                //'hide': 'onCloseTimeWidget',
                 'click #btn-job-create': 'onCreateClick',
                 'change .process-input': 'onInputChange',
                 'change #txt-name': 'onNameFormChange',
