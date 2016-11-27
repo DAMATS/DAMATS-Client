@@ -475,7 +475,35 @@
             },
 
             onMapClick: function (clickEvent) {
+                var xy_ = clickEvent.xy;
+                var lonlat = this.map.getLonLatFromPixel(clickEvent.xy);
+                var layers = globals.products.filter(function (model) {
+                    return model.get('visible');
+                });
+                var extent = this.map.getExtent();
 
+                // trigger a signal with the click details
+                Communicator.mediator.trigger("map:clicked", {
+                    x: xy_.x,
+                    y: xy_.y,
+                    lat: lonlat.lat,
+                    lon: lonlat.lon,
+                    extent: {
+                        top: extent.top,
+                        bottom: extent.bottom,
+                        left: extent.left,
+                        right: extent.right
+                    },
+                    crs: this.map.projection,
+                    size: {
+                        width: clickEvent.currentTarget.clientWidth,
+                        height: clickEvent.currentTarget.clientHeight
+                    },
+                    layers: layers
+                });
+
+            // TODO: fix the get feature info behaviour
+            /*
                 //TODO: move to global map configuration
                 var map_crs_reverse_axes = true;
 
@@ -604,6 +632,7 @@
                 // trigger an event iindicating end of the responses
                 Communicator.mediator.trigger("info:stop");
 
+            */
             },
 
             onExportGeoJSON: function () {
