@@ -346,12 +346,32 @@
 
 
             onSortProducts: function (productLayers) {
-                globals.products.each(function (product) {
-                  var productLayer = this.map.getLayersByName(product.get("name"))[0];
-                  var index = globals.products.indexOf(productLayer);
-                  this.map.setLayerIndex(productLayer, index);
+                console.log("onSortProducts")
+
+                globals.overlays.each(function (item) {
+                  var layer = this.map.getLayersByName(item.get("name"))[0];
+                  this.map.setLayerIndex(layer, -1);
                 }, this);
+
+                if (this.previewLayer) {
+                    this.map.setLayerIndex(this.previewLayer, -1);
+                }
+
+                globals.products.each(function (item) {
+                  var layer = this.map.getLayersByName(item.get("name"))[0];
+                  var index = globals.products.indexOf(layer);
+                  this.map.setLayerIndex(layer, index);
+                }, this);
+
+                globals.baseLayers.each(function (item) {
+                  var layer = this.map.getLayersByName(item.get("name"))[0];
+                  this.map.setLayerIndex(layer, -1);
+                }, this);
+
                 console.log("Map products sorted");
+                _.each(this.map.layers, function (layer) {
+                    console.log([layer.name, this.map.getLayerIndex(layer)])
+                }, this);
             },
 
             onUpdateOpacity: function (options) {
@@ -733,6 +753,8 @@
 
                 // add the layer to the map
                 this.map.addLayer(this.previewLayer);
+
+                this.onSortProducts();
             },
 
             onPreviewLayerRemove: function () {
