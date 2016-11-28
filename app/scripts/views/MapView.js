@@ -96,6 +96,7 @@
                 this.listenTo(Communicator.mediator, 'map:layer:save', this.getLayerURL);
                 this.listenTo(Communicator.mediator, 'map:preview:set', this.onPreviewLayerCreate);
                 this.listenTo(Communicator.mediator, 'map:preview:clear', this.onPreviewLayerRemove);
+                this.listenTo(Communicator.mediator, 'map:preview:updateOpacity', this.onPreviewUpdateOpacity);
                 this.listenTo(Communicator.mediator, 'map:geometry:add', this.addGeometry);
                 this.listenTo(Communicator.mediator, 'map:geometry:remove', this.removeGeometry);
                 this.listenTo(Communicator.mediator, 'map:geometry:remove:all', this.removeGeometryAll);
@@ -346,8 +347,6 @@
 
 
             onSortProducts: function (productLayers) {
-                console.log("onSortProducts")
-
                 globals.overlays.each(function (item) {
                   var layer = this.map.getLayersByName(item.get("name"))[0];
                   this.map.setLayerIndex(layer, -1);
@@ -366,11 +365,6 @@
                 globals.baseLayers.each(function (item) {
                   var layer = this.map.getLayersByName(item.get("name"))[0];
                   this.map.setLayerIndex(layer, -1);
-                }, this);
-
-                console.log("Map products sorted");
-                _.each(this.map.layers, function (layer) {
-                    console.log([layer.name, this.map.getLayerIndex(layer)])
                 }, this);
             },
 
@@ -417,8 +411,6 @@
             },
 
             addGeometry: function (options) {
-                console.log('addGeometry')
-                console.log(options)
                 var feature = new OpenLayers.Feature.Vector(
                     options.geometry, options.attributes, options.style
                 )
@@ -727,8 +719,7 @@
                 return this.geojson.write(this.vectorLayer.features, true);
             },
 
-            onPreviewLayerCreate: function (url, layers, params) {
-
+            onPreviewLayerCreate: function (url, layers, params, options) {
                 // remove the previous layer if exists
                 this.onPreviewLayerRemove();
 
@@ -741,9 +732,9 @@
                         transparent: "true",
                         format: "image/png"
                     },
-                    {
+                    _.extend({
                         isBaseLayer: false
-                    }
+                    }, options || {})
                 );
 
                 // merge any possible additional user parameters
@@ -755,6 +746,12 @@
                 this.map.addLayer(this.previewLayer);
 
                 this.onSortProducts();
+            },
+
+            onPreviewUpdateOpacity: function (opacity) {
+                if (this.previewLayer) {
+                    this.previewLayer.setOpacity(opacity);
+                }
             },
 
             onPreviewLayerRemove: function () {

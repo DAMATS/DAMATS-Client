@@ -185,9 +185,54 @@
                 this.process = globals.damats.processes.findWhere(
                     {'identifier': this.model.get('process')}
                 );
+                var opacity = this.model.get('opacity');
+                if ((!opacity) && (opacity != 0)) {
+                    this.model.set('opacity', 1.0, {silent: true});
+                }
             },
             browseSITS: function () {
                 Communicator.mediator.trigger('sits:browser:browse', this.time_series);
+            },
+            onMapClicked: function (event_) {
+                Communicator.mediator.trigger('map:marker:set', event_);
+                this.lastClicked = event_;
+                if (this.displayed_result == "indices") {
+                    // get pixel value and display mask
+                    $.ajax({
+                        method: "GET",
+                        dataType: "text",
+                        url: (
+                            globals.damats.productUrl +
+                            "?service=WPS&version=1.0.0&request=Execute" +
+                            "&rawDataOutput=pixel&identifier=getPixelValue" +
+                            "&dataInputs=coverage=" + this.coverage_id +
+                            ";latitude=" + event_.lat +
+                            ";longitude=" + event_.lon
+                        ),
+                        success: _.bind(function (data) {
+                            console.log("Pixel value:" + data);
+                            if (data) {
+                                Communicator.mediator.trigger(
+                                    'map:preview:set',
+                                    globals.damats.productUrl,
+                                    this.coverage_id + "_value_mask",
+                                    {
+                                        mask_value: "!" + data,
+                                        mask_style: "black",
+                                    },
+                                    {opacity: this.model.get('opacity')}
+                                );
+                            } else {
+                                Communicator.mediator.trigger(
+                                    'map:preview:set',
+                                    globals.damats.productUrl,
+                                    this.coverage_id,
+                                    null, {opacity: this.model.get('opacity')}
+                                );
+                            }
+                        }, this)
+                    });
+                }
             },
             onResultDisplayToggle: function (event_) {
                 var $el = $(event_.target);
@@ -211,9 +256,12 @@
                     $el.removeClass(classDisabled);
                     $el.addClass(classEnabled);
                     this.displayed_result = output_id;
+                    this.coverage_id = coverage_id;
 
                     Communicator.mediator.trigger(
-                        'map:preview:set', globals.damats.productUrl, coverage_id
+                        'map:preview:set',
+                        globals.damats.productUrl, coverage_id,
+                        null, {opacity: this.model.get('opacity')}
                     );
                 }
             },
@@ -304,6 +352,7 @@
                 this.listenTo(this.model, 'destroy', this.openManager);
                 this.listenTo(this.model, 'change', this.render);
                 this.listenTo(Communicator.mediator, 'data:fetch:all', this.refetch);
+                this.listenTo(Communicator.mediator, 'map:clicked', this.onMapClicked);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
@@ -315,6 +364,21 @@
             onRender: function () {
                 Communicator.mediator.trigger('map:preview:clear');
                 this.fillInputs(this.inputs);
+                this.$('#opacity-value').text((100*this.model.get('opacity') || 0)+"%");
+                // opacity slider
+                this.$('#opacity-control').append($('<div>').slider({
+                    range: "max",
+                    max: 100,
+                    min: 0,
+                    value: 100*this.model.get('opacity') || 0,
+                    slide: _.bind(function(evt, ui) {
+                        this.$('#opacity-value').text(ui.value+"%");
+                        this.model.set('opacity', ui.value/100.0, {silent: true});
+                        Communicator.mediator.trigger(
+                            'map:preview:updateOpacity', ui.value/100.0
+                        );
+                    }, this)
+                }));
             },
             editMetadata: function () {
                 Communicator.mediator.trigger(
@@ -379,6 +443,7 @@
             },
             onClose: function() {
                 Communicator.mediator.trigger('map:preview:clear');
+                Communicator.mediator.trigger('map:marker:clearAll');
             }
         });
 
