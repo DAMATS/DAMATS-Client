@@ -713,6 +713,7 @@
 
             onSetExtent: function (bbox) {
                 this.map.zoomToExtent(bbox);
+                Communicator.mediator.trigger("map:extent:changed", bbox);
             },
 
             onGetGeoJSON: function () {

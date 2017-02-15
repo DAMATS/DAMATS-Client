@@ -32,6 +32,8 @@
         'backbone',
         'communicator',
         'globals',
+        'modules/damats/CommonUtilities',
+        'modules/damats/FeatureStyles',
         'hbs!tmpl/SITSEditor',
         'hbs!tmpl/SITSEditorCoverageItem',
         'underscore'
@@ -41,6 +43,8 @@
         Backbone,
         Communicator,
         globals,
+        cutils,
+        fstyles,
         SITSEditorTmpl,
         SITSEditorCoverageItemTmpl
     ) {
@@ -101,13 +105,6 @@
                 this.parentModel.set('selected', this.model.get('id'));
             },
             setLayer: function () {
-                /*
-                Communicator.mediator.trigger(
-                    'map:preview:set', globals.damats.productUrl,
-                    this.model.get('id') + ',' +
-                    this.model.get('id') + '_outlines'
-                );
-                */
                 Communicator.mediator.trigger('time:change', {
                         start: new Date(this.model.get('t0')),
                         end: new Date(this.model.get('t1'))
@@ -158,7 +155,7 @@
             className: 'panel panel-default sits-editor not-selectable',
             template: {type: 'handlebars', template: SITSEditorTmpl},
             events: {
-                'click #btn-focus': 'focusToSelection',
+                'click #btn-focus': 'focusToAoI',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-open-browser': 'openBrowser',
                 'click #btn-clone': 'cloneSITS',
@@ -180,22 +177,18 @@
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
                 this.listenTo(this.sourceModel, 'change', this.onSourceModelChange);
                 this.listenTo(this.model, 'change', this.render);
-                this.listenTo(this.collection, 'sync', this.render);
-                this.listenTo(this.collection, 'update', this.render);
-                this.listenTo(this.collection, 'reset', this.render);
-                this.listenTo(this.collection, 'add', this.render);
-                this.listenTo(this.collection, 'remove', this.render);
                 this.listenTo(this.collection, 'fetch:start', this.render);
-                this.listenTo(this.collection, 'fetch:stop', this.render);
+                this.listenTo(this.collection, 'fetch:stop', this.onFetchStop);
                 this.listenTo(Communicator.mediator, 'product:selected', this.selectById);
                 this.listenTo(Communicator.mediator, 'data:fetch:all', this.refetch);
+                this.listenTo(Communicator.mediator, 'map:extent:changed', this.focusToToI);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                Communicator.mediator.trigger('date:selection:disable')
+                Communicator.mediator.trigger('date:selection:disable');
                 Communicator.mediator.trigger(
                     'map:layer:show:exclusive', this.model.get('source')
                 );
@@ -204,12 +197,19 @@
                     end: new Date(this.model.get('selection').toi.start)
                 });
                 this.displaySITSGeometry();
-                this.focusToSelection();
+                this.focusToAoI();
             },
             onClose: function () {
                 Communicator.mediator.trigger('map:layer:hide:all');
                 Communicator.mediator.trigger('date:tick:remove');
-                this.removeSISTGeometry()
+                this.removeSISTGeometry();
+            },
+            onFetchStop: function() {
+                if ((this.collection.length > 0) && (!this.model.get('selected'))) {
+                    this.selectFirst();
+                } else {
+                    this.render();
+                }
             },
             onRender: function () {
                 this.scrollToCurrent();
@@ -227,89 +227,53 @@
                 this.removeSISTGeometry();
                 this.displaySITSGeometry();
             },
-            cloneSITS: function () {
-                Communicator.mediator.trigger('sits:editor:clone', this.model);
-            },
             removeSISTGeometry: function () {
                 Communicator.mediator.trigger('map:geometry:remove:all');
             },
             displaySITSGeometry: function () {
-                // TODO: find a better place for the style configuration
-                function coords_to_geom(coords) {
-                    return new OpenLayers.Geometry.MultiPolygon(_.map(
-                        coords,
-                        function (item) {
-                            return new OpenLayers.Geometry.Polygon(
-                                new OpenLayers.Geometry.LinearRing(
-                                    _.map(item, function (xy) {
-                                        return new OpenLayers.Geometry.Point(
-                                            xy[0], xy[1]
-                                        );
-                                    })
-                                )
-                            )
-                        }
-                    ));
-                };
                 // clear the geometry layer
-                this.removeSISTGeometry()
-                // display the selected polygon
+                this.removeSISTGeometry();
+                // display the selected AoI polygon (matched data)
                 Communicator.mediator.trigger('map:geometry:add', {
-                    geometry: coords_to_geom(
+                    geometry: cutils.coordsToGeometry(
                         this.sourceModel.get('selection_area')
                     ),
                     attributes: {
                         identifer: this.sourceModel.get('identifier'),
                         type: 'selected-area'
                     },
-                    style: {
-                        fill: false,
-                        stroke: true,
-                        strokeColor: '#ffff88',
-                        strokeOpacity: 0.6,
-                        strokeWidth: 2.5,
-                        strokeDashstyle: 'dot',
-                    }
+                    style: fstyles.aoi
                 });
-                // display the selection polygon
+                // display the selection polygon (user input)
                 Communicator.mediator.trigger('map:geometry:add', {
-                    geometry: coords_to_geom(
+                    geometry: cutils.coordsToGeometry(
                         this.sourceModel.get('selection_area')
                     ),
                     attributes: {
                         identifer: this.sourceModel.get('identifier'),
                         type: 'selection-area'
                     },
-                    style: {
-                        fill: false,
-                        stroke: true,
-                        strokeColor: '#ffff88',
-                        strokeOpacity: 0.6,
-                        strokeWidth: 2.5,
-                    }
+                    style: fstyles.selection
                 });
                 // display the CIA
                 Communicator.mediator.trigger('map:geometry:add', {
-                    geometry: coords_to_geom(
+                    geometry: cutils.coordsToGeometry(
                         this.sourceModel.get('common_intersection_area')
                     ),
                     attributes: {
                         identifer: this.sourceModel.get('identifier'),
                         type: 'common-area'
                     },
-                    style: {
-                        fill: false,
-                        stroke: true,
-                        strokeColor: '#88ffff',
-                        strokeOpacity: 0.5,
-                        strokeWidth: 2.5,
-                    }
+                    style: fstyles.cia
                 });
             },
             processSITS: function () {
                 Communicator.mediator.trigger(
                     'dialog:open:JobCreation', {'sits': this.sourceModel}
                 );
+            },
+            cloneSITS: function () {
+                Communicator.mediator.trigger('sits:editor:clone', this.model);
             },
             removeSITS: function () {
                 Communicator.mediator.trigger(
@@ -375,37 +339,20 @@
             refetch: function () {
                 Communicator.mediator.trigger('sits:editor:fetch', true);
             },
-            focusToSelection: function () {
-            /*
-                if (this.collection.length < 1) { return ; }
-                var ext = this.collection.reduce(function (ext, model) {
-                    var x0 = model.get('x0');
-                    var x1 = model.get('x1');
-                    var y0 = model.get('y0');
-                    var y1 = model.get('y1');
-                    return {
-                        x0: ext.x0 < x0 ? ext.x0 : x0,
-                        y0: ext.y0 < y0 ? ext.y0 : y0,
-                        x1: ext.x1 > x1 ? ext.x1 : x1,
-                        y1: ext.y1 > y1 ? ext.y1 : y1
-                    };
-                }, {
-                    x0: Number.POSITIVE_INFINITY,
-                    y0: Number.POSITIVE_INFINITY,
-                    x1: Number.NEGATIVE_INFINITY,
-                    y1: Number.NEGATIVE_INFINITY
-                });
-                Communicator.mediator.trigger('map:set:extent', [
-                    ext.x0, ext.y0, ext.x1, ext.y1
-                ]);
-            */
+            focusToAoI: function () {
+                this._focus_on = true;
                 Communicator.mediator.trigger(
                     'map:set:extent', this.model.get('selection_extent')
-                )
-                Communicator.mediator.trigger('timeslider:zoom', {
-                    start: new Date(this.model.get('selection').toi.start),
-                    end: new Date(this.model.get('selection').toi.end)
-                });
+                );
+            },
+            focusToToI: function () {
+                if (this._focus_on) {
+                    Communicator.mediator.trigger('timeslider:zoom', {
+                        start: new Date(this.model.get('selection').toi.start),
+                        end: new Date(this.model.get('selection').toi.end)
+                    });
+                    this._focus_on = false;
+                }
             }
         });
 

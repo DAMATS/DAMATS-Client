@@ -32,6 +32,8 @@
         'backbone',
         'communicator',
         'globals',
+        'modules/damats/CommonUtilities',
+        'modules/damats/FeatureStyles',
         'hbs!tmpl/JobViewer',
         'modules/damats/ProcessUtil',
         'underscore'
@@ -41,6 +43,8 @@
         Backbone,
         Communicator,
         globals,
+        cutils,
+        fstyles,
         JobViewerTmpl,
         ProcessUtil
     ) {
@@ -170,6 +174,7 @@
                 'click #btn-save': 'saveJob',
                 'click #btn-submit': 'executeJob',
                 'click #box-sits': 'browseSITS',
+                'click #btn-focus': 'focusToAoI',
                 'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
@@ -189,6 +194,57 @@
                 if ((!opacity) && (opacity != 0)) {
                     this.model.set('opacity', 1.0, {silent: true});
                 }
+            },
+            focusToAoI: function () {
+                Communicator.mediator.trigger(
+                    'map:set:extent', this.time_series.get('selection_extent')
+                );
+                this.refreshSITSGeometry();
+                return false; // suppress event propagation
+            },
+            refreshSITSGeometry: function () {
+                this.removeSISTGeometry();
+                this.displaySITSGeometry();
+            },
+            removeSISTGeometry: function () {
+                Communicator.mediator.trigger('map:geometry:remove:all');
+            },
+            displaySITSGeometry: function () {
+                // clear the geometry layer
+                this.removeSISTGeometry();
+                // display the selected AoI polygon (matched data)
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: cutils.coordsToGeometry(
+                        this.time_series.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: this.time_series.get('identifier'),
+                        type: 'selected-area'
+                    },
+                    style: fstyles.aoi
+                });
+                // display the selection polygon (user input)
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: cutils.coordsToGeometry(
+                        this.time_series.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: this.time_series.get('identifier'),
+                        type: 'selection-area'
+                    },
+                    style: fstyles.selection
+                });
+                // display the CIA
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: cutils.coordsToGeometry(
+                        this.time_series.get('common_intersection_area')
+                    ),
+                    attributes: {
+                        identifer: this.time_series.get('identifier'),
+                        type: 'common-area'
+                    },
+                    style: fstyles.cia
+                });
             },
             browseSITS: function () {
                 Communicator.mediator.trigger('sits:browser:browse', this.time_series);
@@ -218,7 +274,7 @@
                                     this.coverage_id + "_value_mask",
                                     {
                                         mask_value: "!" + data,
-                                        mask_style: "black",
+                                        mask_style: "black"
                                     },
                                     {opacity: this.model.get('opacity')}
                                 );
@@ -360,22 +416,23 @@
                     handle: '.panel-heading'
                 });
                 this.fillInputs(this.inputs); // do not remove
+                this.displaySITSGeometry();
             },
             onRender: function () {
                 Communicator.mediator.trigger('map:preview:clear');
                 this.fillInputs(this.inputs);
-                this.$('#opacity-value').text((100*this.model.get('opacity') || 0)+"%");
+                this.$('#opacity-value').text((100 * this.model.get('opacity') || 0) + "%");
                 // opacity slider
                 this.$('#opacity-control').append($('<div>').slider({
                     range: "max",
                     max: 100,
                     min: 0,
-                    value: 100*this.model.get('opacity') || 0,
+                    value: 100 * this.model.get('opacity') || 0,
                     slide: _.bind(function(evt, ui) {
-                        this.$('#opacity-value').text(ui.value+"%");
-                        this.model.set('opacity', ui.value/100.0, {silent: true});
+                        this.$('#opacity-value').text(ui.value + "%");
+                        this.model.set('opacity', ui.value / 100.0, {silent: true});
                         Communicator.mediator.trigger(
-                            'map:preview:updateOpacity', ui.value/100.0
+                            'map:preview:updateOpacity', ui.value / 100.0
                         );
                     }, this)
                 }));
@@ -444,6 +501,7 @@
             onClose: function() {
                 Communicator.mediator.trigger('map:preview:clear');
                 Communicator.mediator.trigger('map:marker:clearAll');
+                this.removeSISTGeometry();
             }
         });
 
