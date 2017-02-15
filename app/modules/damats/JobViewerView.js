@@ -162,7 +162,7 @@
             },
             events: {
                 'change .process-input': 'onInputChange',
-                'click #btn-display-result': 'onResultDisplayToggle',
+                'click .btn-display-result': 'onResultDisplayToggle',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
@@ -249,8 +249,8 @@
                 } else {
                     if (this.displayed_result) {
                         // hide another displayed result
-                        this.$el.find('#btn-display-result').removeClass(classEnabled);
-                        this.$el.find('#btn-display-result').addClass(classDisabled);
+                        this.$el.find('.btn-display-result').removeClass(classEnabled);
+                        this.$el.find('.btn-display-result').addClass(classDisabled);
                     }
                     // show this result
                     $el.removeClass(classDisabled);
