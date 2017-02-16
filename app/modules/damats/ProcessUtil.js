@@ -189,7 +189,8 @@
         }
 
         function parseInputs(input_defs, inputs) {
-            var errors = []; // list of detected errors
+            var errors = {}; // list of detected errors
+            var missing = []; // list of missing mandatory values
             var parsed = {}; // parsed inputs
             inputs = inputs || {};
 
@@ -200,10 +201,14 @@
                         input_def, inputs[input_def.identifier]
                     );
                 } catch (exception) {
-                    errors.push(exception);
+                    if (exception == "Missing mandatory value.") {
+                        missing.push(input_def.identifier);
+                    } else {
+                        errors[input_def.identifier] = exception;
+                    }
                 }
             });
-            return {inputs: parsed, errors: errors};
+            return {inputs: parsed, errors: errors, missing: missing};
         }
 
         function listInputValues(input_defs, inputs) {
@@ -212,7 +217,7 @@
                 try {
                     value = parseInput(input_def, value);
                 } catch (exception) {
-                    console.error(input_def.identifier + ":" + exception);
+                    console.warn(input_def.identifier + ":" + exception);
                 }
                 return _.extend({value: value}, input_def);
             });

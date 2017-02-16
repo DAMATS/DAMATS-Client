@@ -32,6 +32,8 @@
         'backbone',
         'communicator',
         'globals',
+        'modules/damats/CommonUtilities',
+        'modules/damats/FeatureStyles',
         'hbs!tmpl/JobCreation',
         'modules/damats/ProcessUtil',
         'underscore',
@@ -43,6 +45,8 @@
         Backbone,
         Communicator,
         globals,
+        cutils,
+        fstyles,
         JobCreationTmpl,
         ProcessUtil
     ) {
@@ -64,11 +68,54 @@
                 'change .process-input': 'onInputChange',
                 'change #txt-name': 'onNameFormChange',
                 'click #box-sits': 'onSelectTimeSeries',
+                'click #btn-focus': 'focusToAoI',
                 'click #box-process': 'onSelectProcess',
                 'click .close': 'close'
             },
+            refreshSITSGeometry: function () {
+                this.removeSISTGeometry();
+                this.displaySITSGeometry();
+            },
+            removeSISTGeometry: function () {
+                Communicator.mediator.trigger('map:geometry:remove:all');
+            },
+            displaySITSGeometry: function (time_series) {
+                // clear the geometry layer
+                this.removeSISTGeometry();
+                // display the selected AoI polygon (matched data)
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: cutils.coordsToGeometry(
+                        time_series.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: time_series.get('identifier'),
+                        type: 'selected-area'
+                    },
+                    style: fstyles.aoi
+                });
+                // display the selection polygon (user input)
+                Communicator.mediator.trigger('map:geometry:add', {
+                    geometry: cutils.coordsToGeometry(
+                        time_series.get('selection_area')
+                    ),
+                    attributes: {
+                        identifer: time_series.get('identifier'),
+                        type: 'selection-area'
+                    },
+                    style: fstyles.selection
+                });
+            },
+            browseSITS: function () {
+                Communicator.mediator.trigger('sits:browser:browse', this.time_series);
+            },
+            focusToAoI: function () {
+                Communicator.mediator.trigger(
+                    'map:set:extent',
+                    this.model.get('time_series').get('selection_extent')
+                );
+                return false; // suppress event propagation
+            },
             onInputChange: function (event_) {
-                console.log("on input change");
                 var $el = $(event_.target);
                 var id = $el.attr('id');
                 var $fg = this.$el.find("#" + id + ".form-group");
@@ -85,7 +132,6 @@
                     } catch (exception) {
                         value = null;
                         error = exception;
-                        console.log(error);
                     }
                 } else {
                     value = input_def.default_value;
@@ -98,13 +144,17 @@
                         class: 'help-block input-error',
                         text: String(error)
                     }));
-                    this.errors = _.union(this.errors, [id]);
+                    this.errors[id] = error;
                 } else {
-                    $fg.removeClass('has-error');
-                    this.errors = _.without(this.errors, id);
                     $el.val(value);
+                    delete this.errors[id];
+                    if (value == null) {
+                        $fg.addClass('has-error');
+                    } else {
+                        $fg.removeClass('has-error');
+                    }
                 }
-                if (this.errors.length == 0) {
+                if (_.isEmpty(this.errors)) {
                     this.$('#btn-job-create').removeAttr('disabled');
                 } else {
                     this.$('#btn-job-create').attr('disabled', 'disabled');
@@ -112,16 +162,43 @@
             },
             resetInputs: function (inputs) {
                 // extract defaults
-                this.inputs = ProcessUtil.parseInputs(
+                var parsed = ProcessUtil.parseInputs(
                     this.model.get('process').get('inputs'), inputs || {}
-                ).inputs;
+                );
+                // clear any error label
                 this.$el.find(".input-error").remove();
-                this.errors = [];
+
                 // fill the form
                 $('#txt-name').val(this.model.get('name'));
-                for (var key in this.inputs) {
-                    $('#' + key + '.process-input').val(this.inputs[key]);
+
+                _.each(parsed.inputs, function (value, key) {
+                    this.$el.find("#" + key + ".process-input").val(value);
+                }, this);
+
+                // display errors
+                _.each(parsed.errors, function (message, key) {
+                    this.$el.find("#" + key + ".process-input").val(null).after(
+                        $('<div/>', {
+                            class: 'help-block input-error',
+                            text: String(message)
+                        })
+                    );
+                    this.$el.find("#" + key + ".form-group").addClass('has-error');
+                }, this);
+
+                // highlight missing values
+                _.each(parsed.missing, function (key) {
+                    this.$el.find("#" + key + ".process-input").val(null);
+                    this.$el.find("#" + key + ".form-group").addClass('has-error');
+                }, this);
+
+                // set error flags
+                if (!_.isEmpty(parsed.errors)) {
+                    this.$('#btn-job-create').attr('disabled', 'disabled');
                 }
+
+                this.inputs = parsed.inputs;
+                this.errors = parsed.errors;
             },
             onShow: function (view) {
                 this.listenTo(this.model, 'change:name', this.onNameChange);
@@ -132,12 +209,20 @@
                     handle: '.panel-heading'
                 });
                 this.resetInputs(this.model.get('inputs'));
+                this.displaySITSGeometry(this.model.get('time_series'));
+            },
+            onClose: function() {
+                //Communicator.mediator.trigger('map:preview:clear');
+                //Communicator.mediator.trigger('map:marker:clearAll');
+                this.removeSISTGeometry();
             },
             onSelectTimeSeries: function () {
                 Communicator.mediator.trigger('dialog:open:SITSManager');
+                this.close();
             },
             onSelectProcess: function () {
                 Communicator.mediator.trigger('dialog:open:ProcessList');
+                this.close();
             },
             onNameChange: function () {
                 $('#txt-name').val(this.model.get('name'));
@@ -149,8 +234,7 @@
                 var parsed = ProcessUtil.parseInputs(
                     this.model.get('process').get('inputs'), this.inputs
                 );
-                if (!parsed.errors || !parsed.errors.length)
-                {
+                if (_.isEmpty(parsed.errors)) {
                     this.model.set('inputs', this.inputs);
                     Communicator.mediator.trigger('job:creation:create', true);
                 } else {

@@ -132,8 +132,7 @@
             },
 
             onOpen: function (params) {
-                console.log("JobCreationController::onOpen");
-                console.log(params);
+                Communicator.mediator.trigger('dialog:close:all');
                 // check if both TimeSeries and process are selected
                 if (params && params.process) this.setProcess(params.process);
                 if (params && params.time_series) this.setTimeSeries(params.time_series);
@@ -153,7 +152,6 @@
                     this.model.set('is_saved', false);
                     this.model.set('name', getDefaultJobName());
                 }
-                console.log(this.view);
                 if (this.isClosed()) {
                     console.log(this.view);
                     App.viewJob.show(this.view);

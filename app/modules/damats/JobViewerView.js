@@ -338,7 +338,6 @@
                     } catch (exception) {
                         value = null;
                         error = exception;
-                        console.log(error);
                     }
                 } else {
                     value = this.inputs_last[id];
@@ -356,54 +355,85 @@
                         class: 'help-block input-error',
                         text: String(error)
                     }));
-                    this.errors = _.union(this.errors, [id]);
+                    this.errors[id] = error;
+                    this.missing = _.without(this.missing, id);
                 } else {
-                    $fg.removeClass('has-error');
-                    this.errors = _.without(this.errors, id);
                     $el.val(value);
-                }
-                if (this.errors.length == 0) {
-                    if (this.changed.length == 0) {
-                        this.$('#btn-save').attr('disabled', 'disabled');
-                        this.$('#btn-submit').removeAttr('disabled');
+                    delete this.errors[id];
+                    if (value == null) {
+                        $fg.addClass('has-error');
+                        this.missing = _.union(this.errors, [id]);
                     } else {
-                        this.$('#btn-save').removeAttr('disabled');
-                        this.$('#btn-submit').attr('disabled', 'disabled');
+                        $fg.removeClass('has-error');
+                        this.missing = _.without(this.missing, id);
                     }
-                } else {
-                    this.$('#btn-submit').attr('disabled', 'disabled');
-                    this.$('#btn-save').attr('disabled', 'disabled');
                 }
+                this.updateButtons();
             },
             fillInputs: function (inputs) {
                 if (this.model.get('status') != 'CREATED') {
                     return ;
                 }
-                console.log(this.model.attributes);
                 // extract defaults
-                this.inputs = ProcessUtil.parseInputs(
-                    this.process.get('inputs'), inputs || this.inputs_last
-                ).inputs;
+                var parsed = ProcessUtil.parseInputs(
+                    this.process.get('inputs'), inputs || {}
+                );
+
+                // clear any error label
                 this.$el.find(".input-error").remove();
-                this.errors = [];
+
                 // fill the form
                 $('#txt-name').val(this.model.get('name'));
+
                 var changed = [];
-                for (var key in this.inputs) {
-                    $('#' + key + '.process-input').val(this.inputs[key]);
-                    if (this.inputs[key] != this.inputs_last[key]) {
+                _.each(parsed.inputs, function (value, key) {
+                    this.$el.find("#" + key + ".process-input").val(value);
+                    if (value != this.inputs_last[key]) {
                         changed.push(key);
                     }
-                }
+                }, this);
+
+                // display errors
+                _.each(parsed.errors, function (message, key) {
+                    this.$el.find("#" + key + ".process-input").val(null).after(
+                        $('<div/>', {
+                            class: 'help-block input-error',
+                            text: String(message)
+                        })
+                    );
+                    this.$el.find("#" + key + ".form-group").addClass('has-error');
+                }, this);
+
+                // highlight missing values
+                _.each(parsed.missing, function (key) {
+                    this.$el.find("#" + key + ".process-input").val(null);
+                    this.$el.find("#" + key + ".form-group").addClass('has-error');
+                }, this);
+
+                this.inputs = parsed.inputs;
+                this.errors = parsed.errors;
+                this.missing = parsed.missing;
                 this.changed = changed;
-                if (this.changed.length == 0) {
+
+                this.updateButtons();
+            },
+
+            updateButtons: function () {
+                // allow saving if some input changed and all inputs are correct
+                if ((this.changed.length > 0) && (_.isEmpty(this.errors))) {
+                    this.$('#btn-save').removeAttr('disabled');
+                } else {
                     this.$('#btn-save').attr('disabled', 'disabled');
+                }
+
+                // allow submission if all inputs are set to a correct value
+                if ((this.missing.length == 0) && (_.isEmpty(this.errors))) {
                     this.$('#btn-submit').removeAttr('disabled');
                 } else {
-                    this.$('#btn-save').removeAttr('disabled');
                     this.$('#btn-submit').attr('disabled', 'disabled');
                 }
             },
+
             onShow: function (view) {
                 this.listenTo(this.model, 'destroy', this.openManager);
                 this.listenTo(this.model, 'change', this.render);
@@ -415,7 +445,7 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                this.fillInputs(this.inputs); // do not remove
+                //this.fillInputs(this.inputs); // do not remove
                 this.displaySITSGeometry();
             },
             onRender: function () {
@@ -474,7 +504,6 @@
                             this.fillInputs(this.inputs);
                         }, this),
                         success: _.bind(function (data) {
-                            console.log(data);
                             this.refetch();
                         }, this)
                     });

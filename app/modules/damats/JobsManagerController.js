@@ -52,6 +52,7 @@
 
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'dialog:open:JobsManager', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:all', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobsManager', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:JobsManager', this.onToggle);
                 //this.listenTo(Communicator.mediator, 'job:removal:proceed', this.onItemRemove);

@@ -12,6 +12,7 @@
       <span {{#if process_attr.description }}title="{{ process_attr.description }}"{{/if}}><i class="fa fa-fw fa-gear"></i>&nbsp;Process:&nbsp;{{#if process_attr.name }}{{ process_attr.name }}<br>({{ process_attr.identifier }}){{ else }}{{ process_attr.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-sits">
+      <button type="button" class="btn btn-default" id="btn-focus" style="float:right"><i class="fa fa-fw fa-crosshairs" title="Zoom to selection extent."></i></button>
       <span {{#if time_series_attr.description }}title="{{ time_series_attr.description }}"{{/if}}><i class="fa fa-fw fa-list"></i>&nbsp;SITS:&nbsp;{{#if time_series_attr.name }}{{ time_series_attr.name }}<br>({{ time_series_attr.identifier }}){{ else }}{{ time_series_attr.identifier}}{{/if}}</span>
     </li>
     <li class="list-group-item" id="box-inputs">

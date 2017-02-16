@@ -102,6 +102,7 @@
             },
             onOpen: function (event_) {
                 if (this.view && this.isClosed()) {
+                    Communicator.mediator.trigger('dialog:close:all');
                     App.viewJob.show(this.view);
                 }
             },

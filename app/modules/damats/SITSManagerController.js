@@ -50,6 +50,7 @@
 
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'dialog:open:SITSManager', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:all', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSManager', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSManager', this.onToggle);
                 //this.listenTo(Communicator.mediator, 'time_series:removal:proceed', this.onItemRemove);

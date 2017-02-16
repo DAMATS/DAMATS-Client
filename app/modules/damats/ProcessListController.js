@@ -50,6 +50,7 @@
 
             initialize: function (options) {
                 this.listenTo(Communicator.mediator, 'dialog:open:ProcessList', this.onOpen);
+                this.listenTo(Communicator.mediator, 'dialog:close:all', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:close:ProcessList', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:ProcessList', this.onToggle);
 
