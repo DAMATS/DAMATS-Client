@@ -249,10 +249,39 @@
             browseSITS: function () {
                 Communicator.mediator.trigger('sits:browser:browse', this.time_series);
             },
+            showSampleMarker: function () {
+                if (
+                    (this.inputs.sample_latitude != null) &&
+                    (this.inputs.sample_longitude != null)
+                ) {
+                    Communicator.mediator.trigger('map:marker:set', {
+                        lat: this.inputs.sample_latitude,
+                        lon: this.inputs.sample_longitude
+                    }, {
+                        icon: globals.icons.pinRed
+                    });
+                } else {
+                    Communicator.mediator.trigger('map:marker:clearAll');
+                }
+            },
             onMapClicked: function (event_) {
-                Communicator.mediator.trigger('map:marker:set', event_);
+                // map sample input hack
+                if (this.model.get('status') == "CREATED") {
+                    this.fillInputs({
+                        "sample_latitude": event_.lat,
+                        "sample_longitude": event_.lon
+                    });
+                }
+
                 this.lastClicked = event_;
                 if (this.displayed_result == "indices") {
+                    // display markers
+                    this.showSampleMarker();
+                    Communicator.mediator.trigger(
+                        'map:marker:set', event_,
+                        {icon: globals.icons.pinWhite, clear: false}
+                    );
+
                     // get pixel value and display mask
                     $.ajax({
                         method: "GET",
@@ -296,6 +325,7 @@
                 var coverage_id = $el.data('coverage-id');
                 var classEnabled = 'btn-success';
                 var classDisabled = 'btn-default';
+                this.showSampleMarker();
                 if (this.displayed_result == output_id) {
                     // hide this result
                     this.displayed_result = null;
@@ -369,6 +399,10 @@
                     }
                 }
                 this.updateButtons();
+
+                if ((id == "sample_latitude") || (id == "sample_longitude")) {
+                    this.showSampleMarker();
+                }
             },
             fillInputs: function (inputs) {
                 if (this.model.get('status') != 'CREATED') {
@@ -388,6 +422,7 @@
                 var changed = [];
                 _.each(parsed.inputs, function (value, key) {
                     this.$el.find("#" + key + ".process-input").val(value);
+                    this.$el.find("#" + key + ".form-group").removeClass('has-error');
                     if (value != this.inputs_last[key]) {
                         changed.push(key);
                     }
@@ -416,6 +451,8 @@
                 this.changed = changed;
 
                 this.updateButtons();
+
+                this.showSampleMarker();
             },
 
             updateButtons: function () {
@@ -445,8 +482,8 @@
                     scroll: false,
                     handle: '.panel-heading'
                 });
-                //this.fillInputs(this.inputs); // do not remove
                 this.displaySITSGeometry();
+                this.showSampleMarker();
             },
             onRender: function () {
                 Communicator.mediator.trigger('map:preview:clear');

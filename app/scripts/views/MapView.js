@@ -141,6 +141,7 @@
                 //create shared marker icons
                 globals.icons = {};
                 globals.icons.pinWhite = new OpenLayers.Icon('images/icons/marker_pin_white.png', {w: 19, h: 32}, {x: -9, y: -32});
+                globals.icons.pinRed = new OpenLayers.Icon('images/icons/marker_pin_red.png', {w: 19, h: 32}, {x: -9, y: -32});
 
                 var that = this;
 
@@ -442,9 +443,13 @@
                 }
             },
 
-            setMarker: function (lonlat) {
-                this.markerLayer.clearMarkers();
-                var marker = new OpenLayers.Marker(lonlat, globals.icons.pinWhite.clone());
+            setMarker: function (lonlat, options) {
+                var icon = options.icon || globals.icons.pinWhite;
+                var clear = options.clear != null ? options.clear : true;
+                if (clear) {
+                    this.markerLayer.clearMarkers();
+                }
+                var marker = new OpenLayers.Marker(lonlat, icon.clone());
                 this.markerLayer.addMarker(marker);
             },
 
