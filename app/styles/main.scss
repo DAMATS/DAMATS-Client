@@ -156,6 +156,13 @@ div#preload {
   }
 }
 
+@media screen and (min-width: 62em) {
+  .modal-dialog.modal-statistics {
+    width: 60em;
+    margin: 1em auto;
+  }
+}
+
 /*
  * Buttons
  */

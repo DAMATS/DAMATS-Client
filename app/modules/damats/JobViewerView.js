@@ -125,12 +125,13 @@
                 }
 
                 var _outputs = _.map(
-                    this.process.get('outputs') || [],
-                    function (output) {
+                    this.model.get('outputs') || [],
+                    _.bind(function (output) {
                         return _.extend({
-                            is_displayed: output.identifer == this.displayed_result
+                            is_statistic: output.identifier == "statistics",
+                            is_displayed: output.identifier == this.displayed_result
                         }, output);
-                    }
+                    }, this)
                 );
 
                 return {
@@ -167,6 +168,7 @@
             events: {
                 'change .process-input': 'onInputChange',
                 'click .btn-display-result': 'onResultDisplayToggle',
+                'click .btn-display-statistics': 'onDisplayStatistics',
                 'click #btn-open-manager': 'openManager',
                 'click #btn-refetch': 'refetch',
                 'click #btn-delete': 'removeJob',
@@ -318,6 +320,17 @@
                         }, this)
                     });
                 }
+            },
+            onDisplayStatistics: function (event_) { 
+                var $el = $(event_.target);
+                var output = _.find(
+                    this.model.get('outputs'), function(output){
+                        return output.identifier == $el.data('output-id');
+                    }
+                );
+                Communicator.mediator.trigger(
+                    'class:statistics:display', this.model, output
+                )
             },
             onResultDisplayToggle: function (event_) {
                 var $el = $(event_.target);

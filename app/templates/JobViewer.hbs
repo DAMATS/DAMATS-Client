@@ -64,11 +64,12 @@
         <tr><th>Output</th><th></th></tr>
         </thead>
         <tbody>
-        {{#each outputs}}
+        {{#each _outputs}}
           <tr>
             <td>{{#if this.name }}{{ this.name }}{{else}}{{ this.identifier }}{{/if}}</td>
             <td>
             {{#if this.literal}}{{ this.literal.value }}{{/if}}
+            {{#if this.is_statistic }}<button type="button" class="btn btn-default btn-xs btn-display-statistics" data-output-id="{{ this.identifier }}" data-href="{{ this.reference.url }}" style="width:49%;">Display</button>{{/if}}
             {{#if this.coverage_id }}<button type="button" class="btn btn-default btn-xs btn-display-result" data-output-id="{{ this.identifier }}" data-coverage-id="{{ this.coverage_id }}" style="width:49%;">Display</button>{{/if}}
             {{#if this.reference}}<a href="{{ this.reference.url }}" target="_blank" class="btn btn-default btn-xs" style="width:49%;float:right;">Download</a>{{/if}}
             </td>

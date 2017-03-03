@@ -57,6 +57,7 @@
         'modules/damats/JobCreationController',
         'modules/damats/UserProfileController',
         'modules/damats/MapController',
+        'modules/damats/ClassStatisticsController',
         'router'
     ];
 
