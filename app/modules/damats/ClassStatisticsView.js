@@ -40,6 +40,20 @@
         Communicator,
         ClassStatisticsTmpl
     ) {
+        function format_percent(number) {
+            var ndec;
+            if (Math.abs(number) < 0.01) {
+                ndec = 3;
+            } else if (Math.abs(number) < 0.1) {
+                ndec = 2;
+            } else if (Math.abs(number) < 1) {
+                ndec = 1;
+            } else {
+                ndec = 0;
+            }
+            return (100 * number).toFixed(ndec) + "%";
+        }
+
         var ClassStatisticsView = Backbone.Marionette.CompositeView.extend({
             tagName: 'div',
             className: 'modal fade',
@@ -51,9 +65,10 @@
                     item.finals = _.map(
                         _.zip(item.counts, this.counts),
                         function (pair) {
-                            return (0.01 * Math.round(10000 * pair[0] / pair[1])) + '%';
+                            return format_percent(pair[0] / pair[1]);
                         }
                     );
+                    item.total = format_percent(item.count / this.count);
                 };
                 _.each(this.lc_classes, _.bind(format_finals, this));
 
@@ -106,18 +121,21 @@
                 this.count = Number(data[1][1]);
                 this.counts = _.map(data[1].slice(2), Number);
                 // parse land-cover classes
-                this.lc_classes = _.map(
-                    _.filter(
-                        data.slice(2),
-                        function (line) { return Number(line[1]) > 0; }
+                this.lc_classes = _.sortBy(
+                    _.map(
+                        _.filter(
+                            data.slice(2),
+                            function (line) { return Number(line[1]) > 0; }
+                        ),
+                        function (line) {
+                            return {
+                                label: line[0],
+                                count: Number(line[1]),
+                                counts: _.map(line.slice(2), Number)
+                            };
+                        }
                     ),
-                    function (line) {
-                        return {
-                            label: line[0],
-                            count: Number(line[1]),
-                            counts: _.map(line.slice(2), Number)
-                        };
-                    }
+                    function (item) { return -item.count; }
                 );
                 // get rid of the others if no present
                 if (this.counts[this.counts.length - 1] == 0) {

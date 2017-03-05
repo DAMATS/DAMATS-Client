@@ -14,12 +14,38 @@
         <i class="fa fa-warning"></i> Failed to load the data from the server!
       </p>
     {{else}}
-      <table class="table">
-      <tr><td></td>{{#each labels}}<td><strong>{{ this }}</strong></td>{{/each}}</tr>
-      {{#each lc_classes}}
-      <tr><td><strong>{{ this.label }}</strong></td>{{#each this.finals}}<td>{{ this }}</td>{{/each}}</tr>
-      {{/each}}
-      </table>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-top-left">
+            <table class="stat-table stat-table-left">
+              <tr><td class="stat-top-left-cell">Land Cover Class</td><td class="stat-class-label">Coverage</td></tr>
+            </table>
+        </div>
+        <div class="col-top-body">
+          <div class="col stat-top-row">
+            <table class="stat-table stat-table-body">
+              <tr>{{#each labels}}<td class="stat-class-label">{{ this }}</td>{{/each}}<td></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-left">
+          <table class="stat-table stat-table-left">
+            {{#each lc_classes}}
+            <tr><td class="stat-lc-class-label" title="{{ this.label }}">{{ this.label }}</td><td class="stat-number">{{ this.total }}</td></tr>
+            {{/each}}
+          </table>
+        </div>
+        <div class="col-body" onScroll="this.scrollLeft=$('div.col-top-body').scrollLeft(this.scrollLeft).scrollLeft();this.scrollTop=$('div.col-left').scrollTop(this.scrollTop).scrollTop();">
+          <table class="stat-table stat-table-body">
+            {{#each lc_classes}}
+            <tr>{{#each this.finals}}<td class="stat-number">{{ this }}</td>{{/each}}<td></td></tr>
+            {{/each}}
+          </table>
+        </div>
+      </div>
+    </div>
     {{/if}}{{/if}}
     </div>
     <div class="modal-footer">

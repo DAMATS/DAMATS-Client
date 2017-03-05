@@ -156,11 +156,92 @@ div#preload {
   }
 }
 
-@media screen and (min-width: 62em) {
-  .modal-dialog.modal-statistics {
-    width: 60em;
-    margin: 1em auto;
-  }
+.modal-dialog.modal-statistics {
+    width: auto;
+    margin: 2em;
+}
+
+/*
+ * Tables
+ */
+div.col-left, div.col-top-left {
+  position: relative;
+  float: left;
+  width: 26em;
+}
+
+
+div.col-left {
+  height: 20em;
+  overflow: hidden;
+  border-right: 2px solid #ddd;
+  padding-bottom: 20px;
+}
+
+div.col-top-left {
+  border-right: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+}
+
+div.col-body {
+  width: auto;
+  height: 20em;
+  overflow: auto;
+  padding-bottom: 20px;
+  padding-right: 20px;
+}
+
+div.col-top-body {
+  width: auto;
+  overflow: hidden;
+  border-bottom: 2px solid #ddd;
+  padding-right: 20px;
+}
+
+table.stat-table>tbody>tr>td {
+   padding: 8px;
+   line-height: 1.42857143;
+   vertical-align: top;
+}
+
+table.stat-table-left {
+  width: 26em;
+  table-layout: fixed;
+}
+
+table.stat-table-body {
+  width: 100%;
+  table-layout: fixed;
+}
+
+td.stat-top-left-cell {
+  width: 20em;
+	font-weight:bold;
+}
+
+td.stat-lc-class-label {
+  width: 20em;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid #ddd;
+}
+
+td.stat-class-label {
+  width: 6em;
+  font-weight: bold;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+td.stat-number {
+  width: 6em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid #ddd;
 }
 
 /*
