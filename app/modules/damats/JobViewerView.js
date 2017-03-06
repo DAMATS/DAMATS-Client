@@ -182,6 +182,8 @@
                 'click .close': 'close'
             },
             initialize: function (options) {
+                this.lc_class_idx = -1;
+                this.class_idx = -1;
                 this.displayed_result = null;
                 this.inputs = _.clone(this.model.get('inputs'));
                 this.inputs_last = _.clone(this.model.get('inputs'));
@@ -281,7 +283,9 @@
                 }
 
                 this.lastClicked = event_;
-                if (this.displayed_result == "indices") {
+                console.log(this.displayed_result)
+                if ((this.displayed_result == "indices") ||
+                    (this.displayed_result == "land_cover")){
                     // display markers
                     this.showSampleMarker();
                     Communicator.mediator.trigger(
@@ -304,6 +308,11 @@
                         success: _.bind(function (data) {
                             console.log("Pixel value:" + data);
                             if (data) {
+                                if (this.displayed_result == 'indices') {
+                                    this.class_idx = Number(data);
+                                } else if (this.displayed_result == "land_cover") {
+                                    this.lc_class_idx = Number(data);
+                                }
                                 Communicator.mediator.trigger(
                                     'map:preview:set',
                                     globals.damats.productUrl,
@@ -326,7 +335,7 @@
                     });
                 }
             },
-            onDisplayStatistics: function (event_) { 
+            onDisplayStatistics: function (event_) {
                 var $el = $(event_.target);
                 var output = _.find(
                     this.model.get('outputs'), function(output){
@@ -334,7 +343,10 @@
                     }
                 );
                 Communicator.mediator.trigger(
-                    'class:statistics:display', this.model, output
+                    'class:statistics:display', this.model, output, {
+                        "lc_class_idx": this.lc_class_idx,
+                        "class_idx": this.class_idx
+                    }
                 )
             },
             onResultDisplayToggle: function (event_) {
@@ -344,6 +356,8 @@
                 var classEnabled = 'btn-success';
                 var classDisabled = 'btn-default';
                 this.showSampleMarker();
+                this.lc_class_idx = -1;
+                this.class_idx = -1;
                 if (this.displayed_result == output_id) {
                     // hide this result
                     this.displayed_result = null;

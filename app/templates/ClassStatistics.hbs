@@ -24,7 +24,7 @@
         <div class="col-top-body">
           <div class="col stat-top-row">
             <table class="stat-table stat-table-body">
-              <tr>{{#each labels}}<td class="stat-class-label">{{ this }}</td>{{/each}}<td></td></tr>
+              <tr>{{#each classes}}<td class="stat-class-label{{#if this.highlighted }} stat-highlighted{{/if}}">{{ this.label }}</td>{{/each}}<td></td></tr>
             </table>
           </div>
         </div>
@@ -33,14 +33,17 @@
         <div class="col-left">
           <table class="stat-table stat-table-left">
             {{#each lc_classes}}
-            <tr><td class="stat-lc-class-label" title="{{ this.label }}">{{ this.label }}</td><td class="stat-number">{{ this.total }}</td></tr>
+            <tr>
+              <td class="stat-lc-class-label{{#if this.highlighted }} stat-highlighted{{/if}}" title="{{ this.label }}">{{ this.label }}</td>
+              <td class="stat-number{{#if this.highlighted }} stat-highlighted{{/if}}">{{ this.total }}</td>
+            </tr>
             {{/each}}
           </table>
         </div>
         <div class="col-body" onScroll="this.scrollLeft=$('div.col-top-body').scrollLeft(this.scrollLeft).scrollLeft();this.scrollTop=$('div.col-left').scrollTop(this.scrollTop).scrollTop();">
           <table class="stat-table stat-table-body">
             {{#each lc_classes}}
-            <tr>{{#each this.finals}}<td class="stat-number">{{ this }}</td>{{/each}}<td></td></tr>
+            <tr>{{#each this.counts}}<td class="stat-number{{#if this.highlighted }} stat-highlighted{{/if}}">{{ this.formatted }}</td>{{/each}}<td></td></tr>
             {{/each}}
           </table>
         </div>

@@ -52,15 +52,15 @@
                 this.listenTo(Communicator.mediator, 'dialog:close:ClassStatistics', this.onClose);
             },
 
-            onRequest: function (model, output) {
+            onRequest: function (model, output, options) {
                 if (!this.isClosed()) {
                     this.view.close();
                 }
                 this.model = model;
-                this.view = new ClassStatisticsView.ClassStatisticsView({
+                this.view = new ClassStatisticsView.ClassStatisticsView(_.extend({
                     output: output,
                     model: model
-                });
+                }, options || {}));
                 App.dialogRegion.show(this.view);
             },
 

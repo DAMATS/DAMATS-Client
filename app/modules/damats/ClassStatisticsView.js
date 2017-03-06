@@ -62,20 +62,16 @@
                 var format_finals;
                 // evaluate and format final values
                 format_finals = function (item) {
-                    item.finals = _.map(
-                        _.zip(item.counts, this.counts),
-                        function (pair) {
-                            return format_percent(pair[0] / pair[1]);
-                        }
-                    );
-                    item.total = format_percent(item.count / this.count);
+                    _.each(_.zip(item.counts, this.classes), function (pair) {
+                        pair[0].formatted = format_percent(pair[0].value / pair[1].count);
+                    });
                 };
                 _.each(this.lc_classes, _.bind(format_finals, this));
 
                 return {
                     is_fetching: this.fetch_status == 'fetching',
                     fetch_failed: this.fetch_status == 'failure',
-                    labels: this.labels,
+                    classes: this.classes,
                     lc_classes: this.lc_classes,
                     output: this.output
                 };
@@ -96,6 +92,8 @@
             initialize: function (options) {
                 this.fetch_status == 'fetching';
                 this.output = options.output;
+                this.lc_class_idx = options.lc_class_idx;
+                this.class_idx = options.class_idx;
                 // get reference dataset name
                 this.fetch();
             },
@@ -116,10 +114,18 @@
                 // parse the TSV table
                 data = data.split('\r\n');
                 data = _.map(data, function (line) {return line.split('\t');});
-                // parse labels
-                this.labels = data[0].slice(2);
+                // parse class labels and pixel counts
                 this.count = Number(data[1][1]);
-                this.counts = _.map(data[1].slice(2), Number);
+                this.classes = _.map(
+                    _.zip(data[0].slice(2), data[1].slice(2)),
+                    _.bind(function (pair, index) {
+                        return {
+                            highlighted: this.class_idx == index,
+                            label: pair[0],
+                            count: Number(pair[1])
+                        };
+                    }, this)
+                );
                 // parse land-cover classes
                 this.lc_classes = _.sortBy(
                     _.map(
@@ -127,20 +133,31 @@
                             data.slice(2),
                             function (line) { return Number(line[1]) > 0; }
                         ),
-                        function (line) {
+                        _.bind(function (line, line_index) {
                             return {
+                                highlighted: this.lc_class_idx == line_index,
                                 label: line[0],
                                 count: Number(line[1]),
-                                counts: _.map(line.slice(2), Number)
+                                counts: _.map(
+                                    line.slice(2),
+                                    _.bind(function (value, index) {
+                                        return {
+                                            value: Number(value),
+                                            highlighted: (
+                                                (this.class_idx == index) ||
+                                                (this.lc_class_idx == line_index)
+                                            )
+                                        };
+                                    }, this)
+                                )
                             };
-                        }
+                        }, this)
                     ),
                     function (item) { return -item.count; }
                 );
                 // get rid of the others if no present
-                if (this.counts[this.counts.length - 1] == 0) {
-                    this.labels.pop();
-                    this.counts.pop();
+                if (this.classes[this.classes.length - 1].count == 0) {
+                    this.classes.pop();
                     _.each(this.lc_classes, function (item) {
                         item.counts.pop();
                     });
