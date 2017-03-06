@@ -35,7 +35,7 @@
             {{#each lc_classes}}
             <tr>
               <td class="stat-lc-class-label{{#if this.highlighted }} stat-highlighted{{/if}}" title="{{ this.label }}">{{ this.label }}</td>
-              <td class="stat-number{{#if this.highlighted }} stat-highlighted{{/if}}">{{ this.total }}</td>
+              <td class="stat-number{{#if this.highlighted }} stat-highlighted{{/if}}">{{ this.formatted }}</td>
             </tr>
             {{/each}}
           </table>

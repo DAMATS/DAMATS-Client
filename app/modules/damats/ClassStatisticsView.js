@@ -62,6 +62,7 @@
                 var format_finals;
                 // evaluate and format final values
                 format_finals = function (item) {
+                    item.formatted = format_percent(item.count / this.count);
                     _.each(_.zip(item.counts, this.classes), function (pair) {
                         pair[0].formatted = format_percent(pair[0].value / pair[1].count);
                     });
