@@ -174,6 +174,7 @@
                 'click #btn-delete': 'removeJob',
                 'click #btn-clone': 'cloneJob',
                 'click #btn-save': 'saveJob',
+                'click #btn-reset': 'resetJob',
                 'click #btn-submit': 'executeJob',
                 'click #box-sits': 'browseSITS',
                 'click #btn-focus': 'focusToAoI',
@@ -472,12 +473,14 @@
                 // allow saving if some input changed and all inputs are correct
                 if ((this.changed.length > 0) && (_.isEmpty(this.errors))) {
                     this.$('#btn-save').removeAttr('disabled');
+                    this.$('#btn-reset').removeAttr('disabled');
                 } else {
                     this.$('#btn-save').attr('disabled', 'disabled');
+                    this.$('#btn-reset').attr('disabled', 'disabled');
                 }
 
-                // allow submission if all inputs are set to a correct value
-                if ((this.missing.length == 0) && (_.isEmpty(this.errors))) {
+                // allow submission if all inputs are saved and set to a correct value
+                if ((this.changed.length == 0) && (this.missing.length == 0) && (_.isEmpty(this.errors))) {
                     this.$('#btn-submit').removeAttr('disabled');
                 } else {
                     this.$('#btn-submit').attr('disabled', 'disabled');
@@ -521,6 +524,12 @@
                 Communicator.mediator.trigger(
                     'object:metadata:edit', this.model
                 );
+            },
+            resetJob: function () {
+                var attr = this.model.attributes;
+                if ((attr.status == 'CREATED') && attr.owned && (this.changed.length > 0)) {
+                    this.fillInputs(this.inputs_last)
+                }
             },
             saveJob: function () {
                 var attr = this.model.attributes;
