@@ -115,6 +115,28 @@
                 );
                 return false; // suppress event propagation
             },
+            onMapClicked: function (event_) {
+                this.inputs.sample_latitude = event_.lat;
+                this.inputs.sample_longitude = event_.lon;
+                this.resetInputs(this.inputs);
+                console.log(this.inputs)
+                this.showSampleMarker();
+            },
+            showSampleMarker: function () {
+                if (
+                    (this.inputs.sample_latitude != null) &&
+                    (this.inputs.sample_longitude != null)
+                ) {
+                    Communicator.mediator.trigger('map:marker:set', {
+                        lat: this.inputs.sample_latitude,
+                        lon: this.inputs.sample_longitude
+                    }, {
+                        icon: globals.icons.pinRed
+                    });
+                } else {
+                    Communicator.mediator.trigger('map:marker:clearAll');
+                }
+            },
             onInputChange: function (event_) {
                 var $el = $(event_.target);
                 var id = $el.attr('id');
@@ -159,6 +181,10 @@
                 } else {
                     this.$('#btn-job-create').attr('disabled', 'disabled');
                 }
+
+                if ((id == "sample_latitude") || (id == "sample_longitude")) {
+                    this.showSampleMarker();
+                }
             },
             resetInputs: function (inputs) {
                 // extract defaults
@@ -173,6 +199,7 @@
 
                 _.each(parsed.inputs, function (value, key) {
                     this.$el.find("#" + key + ".process-input").val(value);
+                    this.$el.find("#" + key + ".form-group").removeClass('has-error');
                 }, this);
 
                 // display errors
@@ -202,6 +229,7 @@
             },
             onShow: function (view) {
                 this.listenTo(this.model, 'change:name', this.onNameChange);
+                this.listenTo(Communicator.mediator, 'map:clicked', this.onMapClicked);
                 this.delegateEvents(this.events);
                 this.$el.draggable({
                     containment: '#content' ,
@@ -210,10 +238,11 @@
                 });
                 this.resetInputs(this.model.get('inputs'));
                 this.displaySITSGeometry(this.model.get('time_series'));
+                this.showSampleMarker();
             },
             onClose: function() {
                 //Communicator.mediator.trigger('map:preview:clear');
-                //Communicator.mediator.trigger('map:marker:clearAll');
+                Communicator.mediator.trigger('map:marker:clearAll');
                 this.removeSISTGeometry();
             },
             onSelectTimeSeries: function () {

@@ -468,7 +468,6 @@
 
                 this.showSampleMarker();
             },
-
             updateButtons: function () {
                 // allow saving if some input changed and all inputs are correct
                 if ((this.changed.length > 0) && (_.isEmpty(this.errors))) {
@@ -486,7 +485,6 @@
                     this.$('#btn-submit').attr('disabled', 'disabled');
                 }
             },
-
             onShow: function (view) {
                 this.listenTo(this.model, 'destroy', this.openManager);
                 this.listenTo(this.model, 'change', this.render);
