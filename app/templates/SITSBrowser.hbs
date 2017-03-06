@@ -31,6 +31,7 @@
     <button type="button" class="btn btn-default" id="btn-next"><i class="fa fa-fw fa-step-forward" title="Go to next."></i></button>
     <button type="button" class="btn btn-default" id="btn-last"><i class="fa fa-fw fa-fast-forward" title="Go to last."></i></button>
   </span>
+{{#unless hide_actions}}
   <span class="btn-group dropup" style="float:right">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Other actions ...</button>
     <ul class="dropdown-menu">
@@ -46,4 +47,5 @@
 {{/if}}
     </ul>
   </span>
+{{/unless}}
 </div>

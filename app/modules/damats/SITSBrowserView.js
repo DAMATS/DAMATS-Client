@@ -110,6 +110,7 @@
             },
             templateHelpers: function () {
                 return {
+                    hide_actions: this.hideActions,
                     is_fetching: this.collection.is_fetching,
                     fetch_failed: this.collection.fetch_failed,
                     length: this.collection.length,
@@ -138,6 +139,7 @@
             },
             initialize: function (options) {
                 this.sourceModel = options.sourceModel;
+                this.hideActions = options.hideActions;
             },
             onShow: function (view) {
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);

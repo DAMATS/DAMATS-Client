@@ -58,7 +58,7 @@
                 this.listenTo(Communicator.mediator, 'dialog:close:SITSBrowser', this.onClose);
                 this.listenTo(Communicator.mediator, 'dialog:toggle:SITSBrowser', this.onToggle);
             },
-            browse: function (model) {
+            browse: function (model, options) {
                 this.onClose();
                 if (!this.model || !this.collection || (
                   this.model.get('identifier') != model.get('identifier')
@@ -69,11 +69,11 @@
                 this.sourceModel = model; // keep reference to the orig. model
                 this.fetch(); // always refresh the collection
                 this.model = model.clone(); // but work with a copy of the model
-                this.view = new SITSBrowserView.SITSBrowserView({
+                this.view = new SITSBrowserView.SITSBrowserView(_.extend({
                     sourceModel: this.sourceModel,
                     model: this.model,
                     collection: this.collection
-                });
+                }, options || {}));
                 this.onOpen(true);
             },
             fetch: function () {

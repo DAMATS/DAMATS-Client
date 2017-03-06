@@ -250,7 +250,11 @@
                 });
             },
             browseSITS: function () {
-                Communicator.mediator.trigger('sits:browser:browse', this.time_series);
+                Communicator.mediator.trigger(
+                    'sits:browser:browse', this.time_series, {
+                        hideActions: true
+                    }
+                );
             },
             showSampleMarker: function () {
                 if (
