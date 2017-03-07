@@ -1,1 +1,3 @@
 <i class="fa fa-fw fa-image"></i>&nbsp;<strong>{{ id }}</strong><br>start:{{ t0 }} &nbsp;&nbsp; stop: {{ t1 }}
+{{#if bc_prev }}<button id="btn-previous" class="{{#if bc_prev_pressed}}btn-success{{else}}btn-default{{/if}} btn-xs btn-binary-change btn-top-right" title="Binary change to the previous product." data-coverage-id="{{ bc_prev }}"><i class="fa fa-fw fa-chevron-up"></i></button>{{/if}}
+{{#if bc_next }}<button id="btn-next" class="{{#if bc_next_pressed}}btn-success{{else}}btn-default{{/if}} btn-xs btn-binary-change btn-bottom-right" title="Binary change to the next product." data-coverage-id="{{ bc_next }}"><i class="fa fa-fw fa-chevron-down"></i></button>{{/if}}

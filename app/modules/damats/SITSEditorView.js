@@ -284,8 +284,10 @@
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
                 if ($item.get().length < 1) return;
+                var centre_offset = 0.5 * ($list.height() - $item.height());
                 $list.scrollTop(
                     $list.scrollTop() + $item.offset().top - $list.offset().top
+                    - (centre_offset > 0 ? centre_offset : 0)
                 );
             },
             getIndexOf: function (id) {

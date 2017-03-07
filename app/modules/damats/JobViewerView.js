@@ -128,6 +128,7 @@
                     this.model.get('outputs') || [],
                     _.bind(function (output) {
                         return _.extend({
+                            is_binary_change: output.identifier == "ndk_binary_changes",
                             is_statistic: output.identifier == "statistics",
                             is_displayed: output.identifier == this.displayed_result
                         }, output);
@@ -199,6 +200,8 @@
                 if ((!opacity) && (opacity != 0)) {
                     this.model.set('opacity', 1.0, {silent: true});
                 }
+                this.listenTo(Communicator.mediator, 'job:display:binary_change', this.displayBinaryChange);
+                this.delegateEvents(this.events);
             },
             focusToAoI: function () {
                 Communicator.mediator.trigger(
@@ -252,9 +255,16 @@
                 });
             },
             browseSITS: function () {
+                // extract binary changes
                 Communicator.mediator.trigger(
                     'sits:browser:browse', this.time_series, {
-                        hideActions: true
+                        hideActions: true,
+                        binaryChangeCoverageIds: (_.find(
+                            this.model.get('outputs') || [],
+                            function (output) {
+                                return output.identifier == "ndk_binary_changes";
+                            }
+                        ) || {}).coverage_ids
                     }
                 );
             },
@@ -283,7 +293,6 @@
                 }
 
                 this.lastClicked = event_;
-                console.log(this.displayed_result)
                 if ((this.displayed_result == "indices") ||
                     (this.displayed_result == "land_cover")){
                     // display markers
@@ -349,6 +358,28 @@
                     }
                 )
             },
+            displayBinaryChange: function (coverage_id) {
+                var classEnabled = 'btn-success';
+                var classDisabled = 'btn-default';
+                if (coverage_id) {
+                    if (this.displayed_result && (this.displayed_result != 'binary_change')) {
+                        // hide another displayed result
+                        this.$el.find('.btn-display-result').removeClass(classEnabled);
+                        this.$el.find('.btn-display-result').addClass(classDisabled);
+                    }
+                    this.displayed_result = 'binary_change';
+                    // show binary change
+                    Communicator.mediator.trigger(
+                        'map:preview:set',
+                        globals.damats.productUrl, coverage_id,
+                        null, {opacity: this.model.get('opacity')}
+                    );
+                } else if (this.displayed_result == 'binary_change') {
+                    // clear binary change
+                    this.displayed_result = null;
+                    Communicator.mediator.trigger('map:preview:clear');
+                }
+            },
             onResultDisplayToggle: function (event_) {
                 var $el = $(event_.target);
                 var output_id = $el.data('output-id');
@@ -366,9 +397,13 @@
                     Communicator.mediator.trigger('map:preview:clear');
                 } else {
                     if (this.displayed_result) {
-                        // hide another displayed result
-                        this.$el.find('.btn-display-result').removeClass(classEnabled);
-                        this.$el.find('.btn-display-result').addClass(classDisabled);
+                        if (this.displayed_result == 'binary_change') {
+                            Communicator.mediator.trigger('job:hide:binary_change');
+                        } else {
+                            // hide another displayed result
+                            this.$el.find('.btn-display-result').removeClass(classEnabled);
+                            this.$el.find('.btn-display-result').addClass(classDisabled);
+                        }
                     }
                     // show this result
                     $el.removeClass(classDisabled);
