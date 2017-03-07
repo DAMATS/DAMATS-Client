@@ -69,7 +69,7 @@
                 this.listenTo(Communicator.mediator, 'sits:editor:edit', this.setTimeSeries);
                 this.listenTo(Communicator.mediator, 'sits:removed', this.unsetTimeSeries);
                 this.listenTo(Communicator.mediator, 'process:selected', this.setProcess);
-                this.listenTo(Communicator.mediator, 'job:submit', this.submitJob);
+                //this.listenTo(Communicator.mediator, 'job:submit', this.submitJob);
                 this.listenTo(Communicator.mediator, 'job:name:set', this.setJobName);
                 this.listenTo(Communicator.mediator, 'dialog:open:JobCreation', this.onOpen);
                 this.listenTo(Communicator.mediator, 'dialog:close:JobCreation', this.onClose);
@@ -82,31 +82,27 @@
 
             setName: function (name) {
                 this.model.set('name', name);
-                console.log("JobCreationController::setName");
-                console.log(this.model.attributes);
             },
             setInputs: function (inputs) {
                 this.model.set('inputs', inputs);
-                console.log(this.model.attributes);
             },
             setProcess: function (process) {
                 this.model.set('process', process);
-                console.log(this.model.attributes);
             },
             setTimeSeries: function (timeSeries) {
                 this.model.set('time_series', timeSeries);
-                console.log(this.model.attributes);
             },
             unsetTimeSeries: function (timeSeries) {
                 var tsModel = this.model.get('time_series');
                 if (tsModel && (timeSeries.get('identifier') == tsModel.get('identifier'))) {
                     this.model.set('time_series', null);
                 }
-                console.log(this.model.attributes);
             },
+            /*
             submitJob: function () {
                 console.log("JobCreationController::submitJob");
             },
+            */
 
             onCreate: function () {
                 globals.damats.jobs.create({ // new object
@@ -146,14 +142,12 @@
                     Communicator.mediator.trigger('dialog:open:ProcessList');
                     return;
                 }
-                console.log("JobCreationController::onOpen OK");
                 // reset job name if necessary
                 if (this.model.get('is_saved')) {
                     this.model.set('is_saved', false);
                     this.model.set('name', getDefaultJobName());
                 }
                 if (this.isClosed()) {
-                    console.log(this.view);
                     App.viewJob.show(this.view);
                 }
             },

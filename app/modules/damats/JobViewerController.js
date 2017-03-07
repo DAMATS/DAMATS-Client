@@ -64,7 +64,6 @@
             },
             refetch: function () {
                 if (!this.isClosed()) {
-                    console.log()
                     var status_ = this.model.get('status');
                     if ((status_ == "IN_PROGRESS") || (status_ == "ACCEPTED")) {
                         this.model.fetch();
