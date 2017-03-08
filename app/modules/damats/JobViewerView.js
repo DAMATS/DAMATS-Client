@@ -362,19 +362,19 @@
                 var classEnabled = 'btn-success';
                 var classDisabled = 'btn-default';
                 if (coverage_id) {
-                    if (this.displayed_result && (this.displayed_result != 'binary_change')) {
+                    if (this.displayed_result && (this.displayed_result != 'ndk_binary_change')) {
                         // hide another displayed result
                         this.$el.find('.btn-display-result').removeClass(classEnabled);
                         this.$el.find('.btn-display-result').addClass(classDisabled);
                     }
-                    this.displayed_result = 'binary_change';
+                    this.displayed_result = 'ndk_binary_change';
                     // show binary change
                     Communicator.mediator.trigger(
                         'map:preview:set',
-                        globals.damats.productUrl, coverage_id,
+                        globals.damats.productUrl, coverage_id + "_intensity_mask",
                         null, {opacity: this.model.get('opacity')}
                     );
-                } else if (this.displayed_result == 'binary_change') {
+                } else if (this.displayed_result == 'ndk_binary_change') {
                     // clear binary change
                     this.displayed_result = null;
                     Communicator.mediator.trigger('map:preview:clear');
@@ -397,7 +397,7 @@
                     Communicator.mediator.trigger('map:preview:clear');
                 } else {
                     if (this.displayed_result) {
-                        if (this.displayed_result == 'binary_change') {
+                        if (this.displayed_result == 'ndk_binary_change') {
                             Communicator.mediator.trigger('job:hide:binary_change');
                         } else {
                             // hide another displayed result
@@ -410,6 +410,10 @@
                     $el.addClass(classEnabled);
                     this.displayed_result = output_id;
                     this.coverage_id = coverage_id;
+
+                    if (output_id == 'ndk_cumulative_change') {
+                        coverage_id += "_intensity_mask";
+                    }
 
                     Communicator.mediator.trigger(
                         'map:preview:set',
