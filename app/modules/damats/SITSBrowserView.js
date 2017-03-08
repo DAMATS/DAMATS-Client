@@ -148,7 +148,9 @@
                 collectionView.$('#coverage-list').append(itemView.el);
             },
             templateHelpers: function () {
+                var attr = this.model.attributes;
                 return {
+                    removable: attr.owned && attr.editable,
                     hide_actions: this.hideActions,
                     is_fetching: this.collection.is_fetching,
                     fetch_failed: this.collection.fetch_failed,

@@ -51,15 +51,17 @@
             },
             template: {type: 'handlebars', template: SITSManagerItemTmpl},
             templateHelpers: function () {
-                var toi = this.model.get('selection').toi;
-                var ext = this.model.get('selection_extent');
+                var attr = this.model.attributes;
+                var toi = attr.selection.toi;
+                var ext = attr.selection_extent;
                 return {
+                    removable: attr.owned && attr.editable,
                     start: formatISOTime(toi.start),
                     end: formatISOTime(toi.end),
                     lats: '[' + ext[1].toFixed(3) + ", " + ext[3].toFixed(3) + ']',
                     lons: '[' + ext[0].toFixed(3) + ", " + ext[2].toFixed(3) + ']',
-                    created: formatISOTime(this.model.get('created')),
-                    updated: formatISOTime(this.model.get('updated'))
+                    created: formatISOTime(attr.created),
+                    updated: formatISOTime(attr.updated)
                 };
             },
             events: {
