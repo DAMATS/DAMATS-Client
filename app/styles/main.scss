@@ -297,7 +297,8 @@ button[active=active] {
 .layercontrol {
     width: 32em;
     top: 10em;
-    right: 3em;
+    left: 50%;
+    margin-left: -16em;
     font-size: .9em;
     position: absolute;
     z-index: 2;
