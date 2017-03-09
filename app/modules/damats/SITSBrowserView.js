@@ -150,6 +150,7 @@
             templateHelpers: function () {
                 var attr = this.model.attributes;
                 return {
+                    locked_scroll: this.locked_scroll,
                     removable: attr.owned && attr.editable,
                     hide_actions: this.hideActions,
                     is_fetching: this.collection.is_fetching,
@@ -174,11 +175,13 @@
                 'click #btn-last': 'selectLast',
                 'click #btn-prev': 'selectPrevious',
                 'click #btn-next': 'selectNext',
-                'click #btn-current': 'scrollToCurrent',
+                'click #btn-current': 'toggleScrollLock',
                 'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
             initialize: function (options) {
+                this.locked_scroll = true;
+                this.scroll_offset = 0;
                 this.sourceModel = options.sourceModel;
                 this.hideActions = options.hideActions;
                 this.binaryChangeCoverageIds = options.binaryChangeCoverageIds;
@@ -187,6 +190,7 @@
                 this.listenTo(this.sourceModel, 'destroy', this.openManager);
                 this.listenTo(this.sourceModel, 'change', this.onSourceModelChange);
                 this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.model, 'change:selected', this.scrollToCurrent);
                 this.listenTo(this.model, 'change:selected_binary_change', this.onBinaryChangeChange);
                 this.listenTo(this.collection, 'fetch:start', this.render);
                 this.listenTo(this.collection, 'fetch:stop', this.onFetchStop);
@@ -195,6 +199,7 @@
                 this.listenTo(Communicator.mediator, 'map:extent:changed', this.focusToToI);
                 this.listenTo(Communicator.mediator, 'job:hide:binary_change', this.clearBinaryChange);
                 this.delegateEvents(this.events);
+
                 this.$el.draggable({
                     containment: '#content' ,
                     scroll: false,
@@ -231,7 +236,9 @@
                 }
             },
             onRender: function () {
-                this.scrollToCurrent();
+                var $covlist = this.$('#coverage-list');
+                $covlist.on('scroll', _.bind(this.onScroll, this));
+                $covlist.scrollTop(this.scroll_offset);
             },
             editMetadata: function () {
                 Communicator.mediator.trigger(
@@ -302,14 +309,16 @@
                 }
             },
             scrollTo: function (id) {
+                if (!this.locked_scroll) return;
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
                 if ($item.get().length < 1) return;
                 var centre_offset = 0.5 * ($list.height() - $item.height());
-                $list.scrollTop(
+                this.scroll_offset = (
                     $list.scrollTop() + $item.offset().top - $list.offset().top -
                     (centre_offset > 0 ? centre_offset : 0)
                 );
+                $list.scrollTop(this.scroll_offset);
             },
             getIndexOf: function (id) {
                  // TODO: Change to findIndex after upgrading Underscore.js
@@ -322,7 +331,6 @@
                 if (selected != this.model.get('selected'))
                 {
                     this.model.set('selected', selected);
-                    this.scrollTo(selected);
                 }
             },
             selectByIndex: function (index) {
@@ -331,13 +339,39 @@
                 if (index < 0) {
                     index += this.collection.length;
                 }
-                this.selectById(this.collection.at(index).get('id'));
+                var item = this.collection.at(index);
+                this.selectById(item.get('id'));
+                var binary_change = this.model.get('selected_binary_change');
+                if ((binary_change != item.get('bc_next')) &&
+                    (binary_change != item.get('bc_prev'))) {
+                    this.model.set('selected_binary_change', null);
+                }
             },
             selectFirst: function () {
                 this.selectByIndex(0);
             },
             selectLast: function () {
                 this.selectByIndex(-1);
+            },
+            onScroll: function () {
+                var $covlist = this.$('#coverage-list');
+                if (this.scroll_offset != $covlist.scrollTop()) {
+                    this.scroll_offset = $covlist.scrollTop();
+                    if (this.locked_scroll) {
+                        this.toggleScrollLock();
+                    }
+                }
+            },
+            toggleScrollLock() {
+                var $el = this.$el.find('#btn-current');
+                if (this.locked_scroll) {
+                    this.locked_scroll = false;
+                    $el.removeClass('active').removeAttr('aria-pressed');
+                } else {
+                    this.locked_scroll = true;
+                    $el.addClass('active').attr('aria-pressed', 'true');
+                    this.scrollToCurrent();
+                }
             },
             scrollToCurrent: function () {
                 this.scrollTo(this.model.get('selected'));

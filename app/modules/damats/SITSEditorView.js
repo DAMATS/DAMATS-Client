@@ -144,6 +144,7 @@
             },
             templateHelpers: function () {
                 return {
+                    locked_scroll: this.locked_scroll,
                     is_fetching: this.collection.is_fetching,
                     fetch_failed: this.collection.fetch_failed,
                     length: this.collection.length,
@@ -166,11 +167,13 @@
                 'click #btn-last': 'selectLast',
                 'click #btn-prev': 'selectPrevious',
                 'click #btn-next': 'selectNext',
-                'click #btn-current': 'scrollToCurrent',
+                'click #btn-current': 'toggleScrollLock',
                 'click .object-metadata': 'editMetadata',
                 'click .close': 'close'
             },
             initialize: function (options) {
+                this.locked_scroll = true;
+                this.scroll_offset = 0;
                 this.sourceModel = options.sourceModel;
             },
             onShow: function (view) {
@@ -212,7 +215,9 @@
                 }
             },
             onRender: function () {
-                this.scrollToCurrent();
+                var $covlist = this.$('#coverage-list');
+                $covlist.on('scroll', _.bind(this.onScroll, this));
+                $covlist.scrollTop(this.scroll_offset);
             },
             editMetadata: function () {
                 Communicator.mediator.trigger(
@@ -281,14 +286,16 @@
                 );
             },
             scrollTo: function (id) {
+                if (!this.locked_scroll) return;
                 var $list = this.$('#coverage-list');
                 var $item = this.$('#' + id);
                 if ($item.get().length < 1) return;
                 var centre_offset = 0.5 * ($list.height() - $item.height());
-                $list.scrollTop(
-                    $list.scrollTop() + $item.offset().top - $list.offset().top
-                    - (centre_offset > 0 ? centre_offset : 0)
+                this.scroll_offset = (
+                    $list.scrollTop() + $item.offset().top - $list.offset().top -
+                    (centre_offset > 0 ? centre_offset : 0)
                 );
+                $list.scrollTop(this.scroll_offset);
             },
             getIndexOf: function (id) {
                  // TODO: Change to findIndex after upgrading Underscore.js
@@ -317,6 +324,26 @@
             },
             selectLast: function () {
                 this.selectByIndex(-1);
+            },
+            onScroll: function () {
+                var $covlist = this.$('#coverage-list');
+                if (this.scroll_offset != $covlist.scrollTop()) {
+                    this.scroll_offset = $covlist.scrollTop();
+                    if (this.locked_scroll) {
+                        this.toggleScrollLock();
+                    }
+                }
+            },
+            toggleScrollLock() {
+                var $el = this.$el.find('#btn-current');
+                if (this.locked_scroll) {
+                    this.locked_scroll = false;
+                    $el.removeClass('active').removeAttr('aria-pressed');
+                } else {
+                    this.locked_scroll = true;
+                    $el.addClass('active').attr('aria-pressed', 'true');
+                    this.scrollToCurrent();
+                }
             },
             scrollToCurrent: function () {
                 this.scrollTo(this.model.get('selected'));

@@ -27,7 +27,7 @@
   <span class="btn-group" role="button" style="margin-left:2em">
     <button type="button" class="btn btn-default" id="btn-first"><i class="fa fa-fw fa-fast-backward" title="Go to first."></i></button>
     <button type="button" class="btn btn-default" id="btn-prev"><i class="fa fa-fw fa-step-backward" title="Go to previous."></i></button>
-    <button type="button" class="btn btn-default" id="btn-current"><i class="fa fa-fw fa-location-arrow" title="Scroll to current item."></i></button>
+    <button type="button" class="btn btn-default{{#if locked_scroll}} active{{/if}}" id="btn-current"{{#if locked_scroll}} aria-pressed="true"{{/if}}><i class="fa fa-fw fa-location-arrow" title="Scroll to current item."></i></button>
     <button type="button" class="btn btn-default" id="btn-next"><i class="fa fa-fw fa-step-forward" title="Go to next."></i></button>
     <button type="button" class="btn btn-default" id="btn-last"><i class="fa fa-fw fa-fast-forward" title="Go to last."></i></button>
   </span>
