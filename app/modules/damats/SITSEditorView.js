@@ -334,7 +334,7 @@
                     }
                 }
             },
-            toggleScrollLock() {
+            toggleScrollLock: function () {
                 var $el = this.$el.find('#btn-current');
                 if (this.locked_scroll) {
                     this.locked_scroll = false;
