@@ -140,17 +140,17 @@
         "attribution": "Terrain { Data &copy; <a href=\"http://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a> contributors and <a href='javascript:;' onClick='toggle(terrain_attribution)'>others</a>, Rendering &copy; <a href=\"http://eox.at\" target=\"_blank\">EOX</a> }"
       },
       {
-        "name": "Sentinel-2 cloud-free",
+        "name": "Sentinel-2 cloud-less",
         "id": "s2cloudless",
         "protocol": "WMTS",
         "requestEncoding": "REST",
         "visible": false,
         "urls": [
-          "http://maplab.eox.at/wmts/wmts/",
-          "http://maplab.eox.at/wmts/wmts/",
-          "http://maplab.eox.at/wmts/wmts/",
-          "http://maplab.eox.at/wmts/wmts/",
-          "http://maplab.eox.at/wmts/wmts/"
+            "http://a.tiles.maps.eox.at/wmts/",
+            "http://b.tiles.maps.eox.at/wmts/",
+            "http://c.tiles.maps.eox.at/wmts/",
+            "http://d.tiles.maps.eox.at/wmts/",
+            "http://e.tiles.maps.eox.at/wmts/"
         ],
         "matrixSet": "WGS84",
         "style": "default",
