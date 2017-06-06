@@ -52,7 +52,7 @@
             refreshInterval: 10000,
             refreshTimer: null,
             initialize: function (options) {
-                this.listenTo(Communicator.mediator, 'job:viewer:view', this.view);
+                this.listenTo(Communicator.mediator, 'job:viewer:show', this.show);
                 this.listenTo(Communicator.mediator, 'job:viewer:fetch', this.fetch);
                 this.listenTo(Communicator.mediator, 'job:viewer:clone', this.clone);
                 this.listenTo(Communicator.mediator, 'dialog:open:JobViewer', this.onOpen);
@@ -70,7 +70,7 @@
                     }
                 }
             },
-            view: function (model) {
+            show: function (model) {
                 this.onClose();
                 this.model = model; // .clone();
                 this.fetch(); // always refresh the model
@@ -91,7 +91,7 @@
                     success: function (model) {
                         model.set('is_saved', true);
                         Communicator.mediator.trigger(
-                            'job:viewer:view', model
+                            'job:viewer:show', model
                         );
                     }
                 });

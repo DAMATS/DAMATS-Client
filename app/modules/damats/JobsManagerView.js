@@ -164,7 +164,7 @@
 
             onView: function () {
                 this.$el.popover('hide');
-                Communicator.mediator.trigger('job:viewer:view', this.model);
+                Communicator.mediator.trigger('job:viewer:show', this.model);
             },
 
             onRemove: function () {

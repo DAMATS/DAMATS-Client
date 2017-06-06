@@ -276,10 +276,9 @@
                                 time: layer.time
                             },
                             {
-                                format: 'image/png',
+                                format: layer.format,
                                 matrixSet: layer.matrixSet,
                                 style: layer.style,
-                                format: layer.format,
                                 maxExtent: layer.maxExtent,
                                 resolutions: layer.resolutions,
                                 projection: layer.projection,

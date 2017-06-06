@@ -116,7 +116,7 @@
                     success: _.bind(function (new_model) {
                         this.model.set('is_saved', true);
                         Communicator.mediator.trigger(
-                            'job:viewer:view', new_model
+                            'job:viewer:show', new_model
                             //'dialog:open:JobsManager', true
                         );
                     }, this)
